@@ -32,15 +32,18 @@ export function IncidentDetailPage() {
     return <div className="card">Incident not found.</div>;
   }
 
+  const currentIncident = incident;
+  const currentUser = user;
+
   function handleCommentSubmit() {
-    if (!commentText.trim() || user.role !== 'viewer') return;
+    if (!commentText.trim() || currentUser.role !== 'viewer') return;
 
     addComment({
-      incidentId: incident.id,
+      incidentId: currentIncident.id,
       commentText: commentText.trim(),
-      userName: user.fullName,
-      userEmail: user.email,
-      userRole: user.role,
+      userName: currentUser.fullName,
+      userEmail: currentUser.email,
+      userRole: currentUser.role,
     });
 
     setCommentText('');
@@ -49,18 +52,18 @@ export function IncidentDetailPage() {
   }
 
   function handleStatusSave() {
-    updateIncidentStatus(incident.id, selectedStatus);
+    updateIncidentStatus(currentIncident.id, selectedStatus);
     setMessage('Action status updated successfully.');
     setRefreshKey((previous) => previous + 1);
   }
 
   function handleReviewSave() {
-    if (user.role !== 'viewer') return;
-    updateIncidentReview(incident.id, {
+    if (currentUser.role !== 'viewer') return;
+    updateIncidentReview(currentIncident.id, {
       approvalStatus: selectedApproval,
       reviewComments,
-      reviewerName: user.fullName,
-      approverName: selectedApproval === 'Approved' ? user.fullName : incident.approvedBy,
+      reviewerName: currentUser.fullName,
+      approverName: selectedApproval === 'Approved' ? currentUser.fullName : currentIncident.approvedBy,
     });
     setMessage('Review comment saved successfully.');
     setRefreshKey((previous) => previous + 1);

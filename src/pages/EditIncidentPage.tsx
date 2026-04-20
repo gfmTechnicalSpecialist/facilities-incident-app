@@ -25,6 +25,8 @@ export function EditIncidentPage() {
     );
   }
 
+  const incidentId = incident.id;
+
   const initialValues: IncidentFormValues = {
     title: incident.title,
     reporterName: incident.reporterName,
@@ -67,7 +69,7 @@ export function EditIncidentPage() {
   };
 
   function handleSubmit(values: IncidentFormValues) {
-    const updated = updateIncident(incident.id, values);
+    const updated = updateIncident(incidentId, values);
     navigate(`/incidents/${updated.id}`);
   }
 
