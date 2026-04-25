@@ -198,18 +198,41 @@ label span, label > strong {
 .page-actions { display: flex; justify-content: flex-end; }
 .stats-grid, .detail-grid {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.stat-card, .stat-header {
+.stat-card {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 1.75rem;
 }
-.stat-card h3, .headline-card h3, .chart-copy h3, .card h3, .card h4 { margin: 0; }
-.stat-card .muted-text, .chart-copy p, .headline-card p { margin: 0; }
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.stat-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.stat-header svg { opacity: 0.45; flex-shrink: 0; }
+.stat-card h3 {
+  margin: 0;
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.stat-card .muted-text { margin: 0; font-size: 0.82rem; }
+.headline-card h3, .chart-copy h3, .card h3, .card h4 { margin: 0; }
+.chart-copy p, .headline-card p { margin: 0; }
 .chart-card-split .chart-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
