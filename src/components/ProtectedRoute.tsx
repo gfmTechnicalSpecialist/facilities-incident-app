@@ -5,7 +5,7 @@ export function ProtectedRoute() {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/sign-in" replace />;
   }
 
   return <Outlet />;
@@ -15,7 +15,7 @@ export function AdminRoute() {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/sign-in" replace />;
   }
 
   if (user.role !== 'admin') {
