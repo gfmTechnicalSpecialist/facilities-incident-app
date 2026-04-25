@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await fetch(SIGN_IN_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: selected.email, password }),
+        body: JSON.stringify({ fullName: selected.fullName, password }),
       });
 
       const data = (await response.json()) as SignInApiResponse;
