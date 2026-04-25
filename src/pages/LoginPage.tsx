@@ -19,10 +19,14 @@ function LoginCard({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleLogin() {
-    const result = login(role, selectedUserId, password);
+  async function handleLogin() {
+    setIsLoading(true);
+    setMessage('');
+    const result = await login(role, selectedUserId, password);
     setMessage(result.message);
+    setIsLoading(false);
   }
 
   return (
@@ -58,8 +62,8 @@ function LoginCard({
           </div>
         </label>
       </div>
-      <button className="solid-button full-width" type="button" onClick={handleLogin}>
-        <KeyRound size={16} /> Log in
+      <button className="solid-button full-width" type="button" onClick={handleLogin} disabled={isLoading}>
+        <KeyRound size={16} /> {isLoading ? 'Signing in…' : 'Log in'}
       </button>
       {message && <p className={message.includes('successful') ? 'success-text' : 'form-error'}>{message}</p>}
     </section>

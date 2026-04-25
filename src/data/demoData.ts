@@ -4,7 +4,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_jacob_lesale',
     fullName: 'Jacob Lesale',
-    email: 'jacob.lesale@momentum.test',
+    email: 'jlesale@momentum.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'JL!MGroup26',
@@ -12,7 +12,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_william_mcpherson',
     fullName: 'William McPherson',
-    email: 'william.mcpherson@momentum.test',
+    email: 'wmcpherson@momentum.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'WM#MGroup26',
@@ -20,7 +20,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_martin_munzhedi',
     fullName: 'Martin Munzhedi',
-    email: 'martin.munzhedi@momentum.test',
+    email: 'mmunzhedi@momentum.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'MM@MGroup26',
@@ -28,7 +28,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_teinie_potgieter',
     fullName: 'Teinie Potgieter',
-    email: 'teinie.potgieter@momentum.test',
+    email: 'tpotgieter@momentum.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'TP$MGroup26',
@@ -36,7 +36,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_nadia_van_zyl',
     fullName: 'Nadia van Zyl',
-    email: 'nadia.vanzyl@momentum.test',
+    email: 'nvanzyl@momentum.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'NVZ%MGroup26',
@@ -44,7 +44,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_debbi_smyly',
     fullName: 'Debbi Smyly',
-    email: 'debbi.smyly@momentum.test',
+    email: 'dsmyly@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'DS!MGroup26',
@@ -52,7 +52,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_gavin_williams',
     fullName: 'Gavin Williams',
-    email: 'gavin.williams@momentum.test',
+    email: 'gwilliams@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'GW#MGroup26',
@@ -60,7 +60,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_ezekiel_mabowe',
     fullName: 'Ezekiel Mabowe',
-    email: 'ezekiel.mabowe@momentum.test',
+    email: 'emabowe@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'EM@MGroup26',
@@ -68,7 +68,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_mazwikayise_sibiya',
     fullName: 'Mazwikayise Sibiya',
-    email: 'mazwikayise.sibiya@momentum.test',
+    email: 'msibiya@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'MS$MGroup26',
@@ -76,7 +76,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_klynboy_kwakwa',
     fullName: 'Klynboy Kwakwa',
-    email: 'klynboy.kwakwa@momentum.test',
+    email: 'kkwakwa@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'KK%MGroup26',
@@ -84,7 +84,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_kenny_kabini',
     fullName: 'Kenny Kabini',
-    email: 'kenny.kabini@momentum.test',
+    email: 'kkabini@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'KKa!MGroup26',
@@ -92,7 +92,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_michael_venter',
     fullName: 'Michael Venter',
-    email: 'michael.venter@momentum.test',
+    email: 'mventer@momentum.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'MV#MGroup26',
