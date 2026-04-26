@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { actionStatuses, severities, sites } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { API_BASE } from '../lib/apiBase';
@@ -178,6 +179,7 @@ export function IncidentsPage() {
                   <th>Action status</th>
                   <th>Approval status</th>
                   <th>Date</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -197,6 +199,15 @@ export function IncidentsPage() {
                       <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
                     </td>
                     <td>{incident.date}</td>
+                    <td>
+                      <Link
+                        className="text-link"
+                        to={`/incidents/view/${incident.incidentId}`}
+                        state={incident}
+                      >
+                        Open
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

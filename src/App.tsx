@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditIncidentPage } from './pages/EditIncidentPage';
 import { IncidentDetailPage } from './pages/IncidentDetailPage';
+import { IncidentViewPage } from './pages/IncidentViewPage';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { LoginPage } from './pages/LoginPage';
 import { NewIncidentPage } from './pages/NewIncidentPage';
@@ -20,6 +21,7 @@ function App() {
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/incidents" element={<IncidentsPage />} />
+              <Route path="/incidents/view/:incidentId" element={<IncidentViewPage />} />
               <Route path="/incidents/:id" element={<IncidentDetailPage />} />
               <Route element={<AdminRoute />}>
                 <Route path="/incidents/new" element={<NewIncidentPage />} />
