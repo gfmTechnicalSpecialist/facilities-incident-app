@@ -172,9 +172,16 @@ export function EditReportPage() {
           RootCauseCategory: values.rootCauseCategory,
         }),
       });
-      const json = await res.json() as { message: string };
+      const text = await res.text();
+      let message: string | undefined;
+      try {
+        const json = JSON.parse(text) as { message?: string };
+        message = json.message;
+      } catch {
+        message = text || undefined;
+      }
       if (!res.ok) {
-        setSaveError(json.message ?? `Save failed (${res.status})`);
+        setSaveError(message ?? `Save failed (${res.status})`);
       } else {
         setSavedBanner(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
