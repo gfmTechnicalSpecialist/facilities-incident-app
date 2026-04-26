@@ -206,7 +206,7 @@ export function EditReportPage() {
           ReviewedBy: rawData?.workflow.reviewedBy ?? null,
           ApprovedBy: rawData?.workflow.approvedBy ?? null,
           ReviewComments: rawData?.workflow.reviewComments ?? null,
-          SubmittedBy: values.submittedBy,
+          SubmittedBy: rawData?.incidentDetail.submittedBy ?? values.submittedBy,
         }),
       });
       const text = await res.text();
