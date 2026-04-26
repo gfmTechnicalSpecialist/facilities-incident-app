@@ -1,44 +1,109 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { listIncidents } from '../services/incidentService';
-import { actionStatuses, incidentCategories, severities, sites } from '../utils/constants';
-import { approvalStatusClass, approvalStatusLabel, formatListDate, monthYearLabel } from '../utils/helpers';
+import { useEffect, useMemo, useState } from 'react';
+import { actionStatuses, severities, sites } from '../utils/constants';
+import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { API_BASE } from '../lib/apiBase';
+
+const INCIDENTS_API_URL = `${API_BASE}/api/GetReportsData?code=0kvBybL_C3lVuX5kuG2KjA1vUox0iXnt_GrJYgFMqatZAzFuJjpabQ==`;
+
+interface ApiIncident {
+  incidentId: string;
+  title: string;
+  site: string;
+  type: string;
+  severity: string;
+  actionStatus: string;
+  approvalStatus: string;
+  date: string;
+}
+
+interface MonthGroup {
+  monthGroup: string;
+  reportCount: number;
+  incidents: ApiIncident[];
+}
 
 export function IncidentsPage() {
-  const incidents = listIncidents();
+  const [groups, setGroups] = useState<MonthGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [search, setSearch] = useState('');
   const [site, setSite] = useState('All');
-  const [category, setCategory] = useState('All');
+  const [type, setType] = useState('All');
   const [severity, setSeverity] = useState('All');
   const [status, setStatus] = useState('All');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  const filtered = useMemo(
-    () =>
-      incidents.filter((incident) => {
-        const haystack = [incident.title, incident.incidentId, incident.specificLocation, incident.incidentType, incident.reporterName]
-          .join(' ')
-          .toLowerCase();
-        const matchesSearch = haystack.includes(search.toLowerCase());
-        const matchesSite = site === 'All' || incident.site === site;
-        const matchesCategory = category === 'All' || incident.incidentCategory === category;
-        const matchesSeverity = severity === 'All' || incident.severity === severity;
-        const matchesStatus = status === 'All' || incident.actionStatus === status;
-        const matchesFrom = !dateFrom || incident.incidentDate >= dateFrom;
-        const matchesTo = !dateTo || incident.incidentDate <= dateTo;
-        return matchesSearch && matchesSite && matchesCategory && matchesSeverity && matchesStatus && matchesFrom && matchesTo;
-      }),
-    [category, dateFrom, dateTo, incidents, search, severity, site, status],
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetch(INCIDENTS_API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
+        return res.json() as Promise<MonthGroup[]>;
+      })
+      .then((json) => {
+        if (!cancelled) setGroups(json);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load incidents');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allIncidents = useMemo(() => groups.flatMap((g) => g.incidents), [groups]);
+
+  const availableTypes = useMemo(
+    () => [...new Set(allIncidents.map((i) => i.type))].sort(),
+    [allIncidents],
   );
 
-  const grouped = useMemo(() => {
-    return filtered.reduce<Record<string, typeof filtered>>((acc, incident) => {
-      const key = monthYearLabel(incident.incidentDate);
-      acc[key] = [...(acc[key] ?? []), incident];
-      return acc;
-    }, {});
-  }, [filtered]);
+  const filteredGroups = useMemo(() => {
+    return groups
+      .map((group) => {
+        const filtered = group.incidents.filter((incident) => {
+          const haystack = [incident.title, incident.incidentId, incident.site, incident.type]
+            .join(' ')
+            .toLowerCase();
+          const matchesSearch = haystack.includes(search.toLowerCase());
+          const matchesSite = site === 'All' || incident.site === site;
+          const matchesType = type === 'All' || incident.type === type;
+          const matchesSeverity = severity === 'All' || incident.severity === severity;
+          const matchesStatus = status === 'All' || incident.actionStatus === status;
+          const incidentDate = new Date(incident.date);
+          const matchesFrom = !dateFrom || incidentDate >= new Date(dateFrom);
+          const matchesTo = !dateTo || incidentDate <= new Date(dateTo);
+          return matchesSearch && matchesSite && matchesType && matchesSeverity && matchesStatus && matchesFrom && matchesTo;
+        });
+        return { ...group, incidents: filtered };
+      })
+      .filter((group) => group.incidents.length > 0);
+  }, [groups, search, site, type, severity, status, dateFrom, dateTo]);
+
+  const totalFiltered = filteredGroups.reduce((sum, g) => sum + g.incidents.length, 0);
+
+  if (loading) {
+    return (
+      <div className="page-stack">
+        <p className="muted-text">Loading incidents…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-stack">
+        <p className="muted-text" style={{ color: 'var(--color-danger, #d71920)' }}>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="page-stack">
@@ -46,7 +111,7 @@ export function IncidentsPage() {
         <div className="filters-grid filters-grid-wide final-filters-grid">
           <label>
             <span>Search</span>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search title, ID, location, reporter, or type" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search title, ID, site, or type" />
           </label>
           <label>
             <span>Site</span>
@@ -58,10 +123,10 @@ export function IncidentsPage() {
             </select>
           </label>
           <label>
-            <span>Category</span>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <span>Type</span>
+            <select value={type} onChange={(e) => setType(e.target.value)}>
               <option>All</option>
-              {incidentCategories.map((item) => (
+              {availableTypes.map((item) => (
                 <option key={item}>{item}</option>
               ))}
             </select>
@@ -95,11 +160,11 @@ export function IncidentsPage() {
         </div>
       </section>
 
-      {Object.entries(grouped).map(([label, items]) => (
-        <section className="card table-card" key={label}>
+      {filteredGroups.map((group) => (
+        <section className="card table-card" key={group.monthGroup}>
           <div className="grouped-header">
-            <h3>{label}</h3>
-            <p className="muted-text">{items.length} report{items.length === 1 ? '' : 's'}</p>
+            <h3>{group.monthGroup}</h3>
+            <p className="muted-text">{group.incidents.length} report{group.incidents.length === 1 ? '' : 's'}</p>
           </div>
           <div className="table-scroll">
             <table>
@@ -113,16 +178,15 @@ export function IncidentsPage() {
                   <th>Action status</th>
                   <th>Approval status</th>
                   <th>Date</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((incident) => (
-                  <tr key={incident.id}>
+                {group.incidents.map((incident) => (
+                  <tr key={incident.incidentId}>
                     <td>{incident.incidentId}</td>
                     <td>{incident.title}</td>
                     <td>{incident.site}</td>
-                    <td>{incident.incidentType === 'Other' && incident.otherIncidentType ? incident.otherIncidentType : incident.incidentType}</td>
+                    <td>{incident.type}</td>
                     <td>
                       <span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>
                     </td>
@@ -132,12 +196,7 @@ export function IncidentsPage() {
                     <td>
                       <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
                     </td>
-                    <td>{formatListDate(incident.incidentDate)}</td>
-                    <td>
-                      <Link className="text-link" to={`/incidents/${incident.id}`}>
-                        Open
-                      </Link>
-                    </td>
+                    <td>{incident.date}</td>
                   </tr>
                 ))}
               </tbody>
@@ -146,7 +205,9 @@ export function IncidentsPage() {
         </section>
       ))}
 
-      {!filtered.length && <section className="card"><p>No reports match the current filters.</p></section>}
+      {!loading && totalFiltered === 0 && (
+        <section className="card"><p>No reports match the current filters.</p></section>
+      )}
     </div>
   );
 }

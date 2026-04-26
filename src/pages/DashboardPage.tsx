@@ -3,9 +3,10 @@ import { AlertTriangle, CheckCircle2, FolderClock, Printer, ShieldEllipsis } fro
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { StatCard } from '../components/StatCard';
 import { incidentTypeColorMap, monthPalette, siteColorMap } from '../utils/helpers';
+import { API_BASE } from '../lib/apiBase';
 
 const DASHBOARD_API_URL =
-  'https://gfmapi-fpgth4e8aqa8auae.northeurope-01.azurewebsites.net/api/GetDashboardData?code=1FyUacAQl5-aBeSRIppmNIv2dfipzTbnhgzajeJTVD-OAzFu5DynZg==';
+  `${API_BASE}/api/GetDashboardData?code=1FyUacAQl5-aBeSRIppmNIv2dfipzTbnhgzajeJTVD-OAzFu5DynZg==`;
 
 interface ChartItem {
   name: string;

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
+import { API_BASE } from '../lib/apiBase';
 
 const REPORTS_API_URL =
-  'https://gfmapi-fpgth4e8aqa8auae.northeurope-01.azurewebsites.net/api/GetReportsData?code=0kvBybL_C3lVuX5kuG2KjA1vUox0iXnt_GrJYgFMqatZAzFuJjpabQ==';
+  `${API_BASE}/api/GetReportsData?code=0kvBybL_C3lVuX5kuG2KjA1vUox0iXnt_GrJYgFMqatZAzFuJjpabQ==`;
 
 interface ReportIncident {
   incidentId: string;
