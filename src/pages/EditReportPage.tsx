@@ -7,9 +7,7 @@ import { API_BASE } from '../lib/apiBase';
 import type { IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
 
 const DETAILS_API_URL = `${API_BASE}/api/GetIncidentDetails?code=GbtQx8CyGWG21uVQZJjDJjMqarS-syWVkawI47Qm23tOAzFuvxz2zQ==`;
-
-// TODO: Replace with the real UpdateIncident endpoint when available.
-// const UPDATE_API_URL = `${API_BASE}/api/UpdateIncident?code=<your-function-code>`;
+const UPDATE_API_URL = `${API_BASE}/api/UpdateIncident?code=qGmWbQ3Jl5r0XfMtapKC13yTcty9KU-7JI0mG0z2DeRLAzFu0TzZaw==`;
 
 interface ApiDetails {
   header: {
@@ -121,6 +119,8 @@ export function EditReportPage() {
   const [initialValues, setInitialValues] = useState<IncidentFormValues | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [savedBanner, setSavedBanner] = useState(false);
 
   useEffect(() => {
@@ -151,13 +151,39 @@ export function EditReportPage() {
     return () => { cancelled = true; };
   }, [incidentId]);
 
-  function handleSubmit(values: IncidentFormValues) {
-    // TODO: Wire to UpdateIncident API when available:
-    // fetch(UPDATE_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ incidentId, ...values }) })
-    console.log('[EditReportPage] save payload:', { incidentId, ...values });
-    setSavedBanner(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  async function handleSubmit(values: IncidentFormValues) {
+    setSaving(true);
+    setSaveError(null);
+    setSavedBanner(false);
+    try {
+      const res = await fetch(UPDATE_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          IncidentId: incidentId,
+          Title: values.title,
+          Site: values.site,
+          Severity: values.severity,
+          ActionStatus: values.actionStatus,
+          IncidentType: values.incidentType,
+          Description: values.description,
+          SystemRestored: values.systemRestored,
+          FacilitiesAction: values.facilitiesAction,
+          RootCauseCategory: values.rootCauseCategory,
+        }),
+      });
+      const json = await res.json() as { message: string };
+      if (!res.ok) {
+        setSaveError(json.message ?? `Save failed (${res.status})`);
+      } else {
+        setSavedBanner(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!user) return null;
@@ -202,18 +228,15 @@ export function EditReportPage() {
         <div
           className="card"
           style={{
-            borderLeft: '5px solid #ffb000',
-            background: '#fffbf0',
+            borderLeft: '5px solid #43a047',
+            background: '#f6fff6',
             display: 'flex',
             alignItems: 'center',
             gap: '0.75rem',
           }}
         >
-          <span style={{ fontWeight: 600, color: '#b07800' }}>Placeholder save</span>
-          <span className="muted-text">
-            The form values have been logged to the console. Connect an{' '}
-            <code>UpdateIncident</code> API endpoint to persist changes.
-          </span>
+          <span style={{ fontWeight: 600, color: '#2e7031' }}>Changes saved</span>
+          <span className="muted-text">The incident record has been updated successfully.</span>
           <button
             className="ghost-button"
             type="button"
@@ -225,11 +248,36 @@ export function EditReportPage() {
         </div>
       )}
 
+      {saveError && (
+        <div
+          className="card"
+          style={{
+            borderLeft: '5px solid #d71920',
+            background: '#fff5f5',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+        >
+          <span style={{ fontWeight: 600, color: '#d71920' }}>Save failed</span>
+          <span className="muted-text">{saveError}</span>
+          <button
+            className="ghost-button"
+            type="button"
+            style={{ marginLeft: 'auto', fontSize: '0.75rem' }}
+            onClick={() => setSaveError(null)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       <IncidentForm
         currentUser={user}
         initialValues={initialValues}
         onSubmit={handleSubmit}
-        submitLabel="Save changes"
+        submitLabel={saving ? 'Saving…' : 'Save changes'}
+        submitDisabled={saving}
       />
     </div>
   );
