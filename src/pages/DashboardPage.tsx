@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, FolderClock, Printer, ShieldEllipsis } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { AlertTriangle, CheckCircle2, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { StatCard } from '../components/StatCard';
 import { incidentTypeColorMap, monthPalette, siteColorMap } from '../utils/helpers';
 import { API_BASE } from '../lib/apiBase';
@@ -53,20 +53,17 @@ function mapByMonth(items: { month: string; count: number }[]): ChartItem[] {
   }));
 }
 
-function LegendList({ items, title }: { items: ChartItem[]; title: string }) {
+function LegendRow({ items }: { items: ChartItem[] }) {
   return (
-    <aside className="chart-legend-panel" aria-label={title}>
-      <h4>{title}</h4>
-      <ul className="chart-legend-list">
-        {items.map((item) => (
-          <li key={item.name}>
-            <span className="legend-key" style={{ backgroundColor: item.color }} />
-            <span>{item.name}</span>
-            <strong>{item.value}</strong>
-          </li>
-        ))}
-      </ul>
-    </aside>
+    <div className="chart-legend-row">
+      {items.map((item) => (
+        <span key={item.name} className="legend-row-item">
+          <span className="legend-key" style={{ backgroundColor: item.color }} />
+          <span>{item.name}</span>
+          <strong>{item.value}</strong>
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -124,44 +121,94 @@ export function DashboardPage() {
   const bySite = mapBySite(charts.incidentsBySite);
   const byMonth = mapByMonth(charts.monthlyTrend);
 
+  const reportDate = new Date().toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
     <div className="page-stack">
-      <section className="page-actions no-print">
-        <button className="solid-button" type="button" onClick={() => window.print()}>
-          <Printer size={16} /> Print dashboard
-        </button>
-      </section>
+      {/* ── Header ── */}
+      <header className="card dashboard-header">
+        <div className="dashboard-header-left">
+          <p className="eyebrow">Facilities Incident Management</p>
+          <h2 className="dashboard-title">Operations Dashboard</h2>
+          <p className="dashboard-subtitle">Live summary of incident activity across all sites and categories</p>
+        </div>
+        <div className="dashboard-header-right">
+          <div className="dashboard-meta">
+            <p>Report generated</p>
+            <strong>{reportDate}</strong>
+          </div>
+          <button className="solid-button no-print" type="button" onClick={() => window.print()}>
+            <Printer size={15} /> Print Report
+          </button>
+        </div>
+      </header>
 
+      {/* ── KPI cards ── */}
       <section className="stats-grid">
-        <StatCard label="Total incidents" value={overview.totalIncidents} subtext="All reports in the system" icon={<ShieldEllipsis />} />
-        <StatCard label="Open incidents" value={overview.openIncidents} subtext="Items still being worked on" icon={<FolderClock />} />
-        <StatCard label="Closed incidents" value={overview.closedIncidents} subtext="Resolved and reviewed" icon={<CheckCircle2 />} />
-        <StatCard label="Critical incidents" value={overview.criticalIncidents} subtext="Highest severity count" icon={<AlertTriangle />} />
+        <StatCard
+          label="Total incidents"
+          value={overview.totalIncidents}
+          subtext="All reports logged in the system"
+          icon={<ShieldEllipsis size={18} />}
+          accentColor="#0057b8"
+        />
+        <StatCard
+          label="Open incidents"
+          value={overview.openIncidents}
+          subtext="Currently under investigation"
+          icon={<FolderClock size={18} />}
+          accentColor="#ffb000"
+        />
+        <StatCard
+          label="Closed incidents"
+          value={overview.closedIncidents}
+          subtext="Resolved and signed off"
+          icon={<CheckCircle2 size={18} />}
+          accentColor="#43a047"
+        />
+        <StatCard
+          label="Critical incidents"
+          value={overview.criticalIncidents}
+          subtext="Highest severity — requires attention"
+          icon={<AlertTriangle size={18} />}
+          accentColor="#d71920"
+        />
       </section>
 
-      <section className="card headline-card">
+      {/* ── Key insight ── */}
+      <section className="card insight-card">
         <div>
-          <p className="eyebrow">Most reported incident type</p>
-          <h3>{overview.mostReportedType}</h3>
+          <p className="insight-label">Most reported incident type</p>
+          <h3 className="insight-value">{overview.mostReportedType}</h3>
+          <p className="insight-desc">
+            This category accounts for the highest volume of reports. Review preventive measures to reduce recurrence across all sites.
+          </p>
         </div>
-        <p className="muted-text">This helps the team see repeat failures and prioritise preventive action.</p>
+        <span className="insight-badge">
+          <TrendingUp size={14} />
+          High frequency
+        </span>
       </section>
 
-      <section className="card chart-card chart-card-split">
-        <div className="chart-copy">
-          <h3>Incidents by type</h3>
-          <p className="muted-text">Each bar represents the number of reports logged for a specific incident type.</p>
-        </div>
-        <div className="chart-layout">
+      {/* ── Charts: by type & by site ── */}
+      <div className="charts-two-col">
+        <section className="card chart-card">
+          <div className="section-title-bar">
+            <h3>Incidents by type</h3>
+            <p>Report count per category</p>
+          </div>
           <div className="chart-canvas">
-            <ResponsiveContainer width="100%" height={340}>
-              <BarChart data={byType} margin={{ top: 10, right: 10, left: 10, bottom: 70 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-20} textAnchor="end" height={90} interval={0} label={{ value: 'Incident type', position: 'insideBottom', offset: -48 }} />
-                <YAxis allowDecimals={false} label={{ value: 'Number of reports', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" name="Report count" radius={[8, 8, 0, 0]}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={byType} margin={{ top: 10, right: 10, left: -10, bottom: 70 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--line)" />
+                <XAxis dataKey="name" angle={-25} textAnchor="end" height={90} interval={0} tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
+                <Bar dataKey="value" name="Reports" radius={[5, 5, 0, 0]}>
                   {byType.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
@@ -169,55 +216,57 @@ export function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <LegendList items={byType} title="Incident type key" />
-        </div>
-      </section>
+          <LegendRow items={byType} />
+        </section>
 
-      <section className="card chart-card chart-card-split">
-        <div className="chart-copy">
-          <h3>Incidents by site</h3>
-          <p className="muted-text">Each slice shows what share of reports came from each site.</p>
-        </div>
-        <div className="chart-layout">
+        <section className="card chart-card">
+          <div className="section-title-bar">
+            <h3>Incidents by site</h3>
+            <p>Distribution across facilities</p>
+          </div>
           <div className="chart-canvas">
-            <ResponsiveContainer width="100%" height={340}>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={bySite} dataKey="value" nameKey="name" outerRadius={110} label>
+                <Pie
+                  data={bySite}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={110}
+                  innerRadius={48}
+                  paddingAngle={3}
+                >
                   {bySite.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <LegendList items={bySite} title="Site key" />
-        </div>
-      </section>
+          <LegendRow items={bySite} />
+        </section>
+      </div>
 
-      <section className="card chart-card chart-card-split">
-        <div className="chart-copy">
+      {/* ── Monthly trend ── */}
+      <section className="card chart-card">
+        <div className="section-title-bar">
           <h3>Monthly incident trend</h3>
-          <p className="muted-text">This chart shows how many incidents were logged each month.</p>
+          <p>Volume of reports per calendar month</p>
         </div>
-        <div className="chart-layout">
-          <div className="chart-canvas">
-            <ResponsiveContainer width="100%" height={340}>
-              <BarChart data={byMonth} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" label={{ value: 'Month', position: 'insideBottom', offset: -5 }} />
-                <YAxis allowDecimals={false} label={{ value: 'Number of reports', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" name="Monthly incidents" radius={[8, 8, 0, 0]}>
-                  {byMonth.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <LegendList items={byMonth} title="Month key" />
+        <div className="chart-canvas">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={byMonth} margin={{ top: 10, right: 20, left: -10, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--line)" />
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
+              <Bar dataKey="value" name="Incidents" radius={[5, 5, 0, 0]}>
+                {byMonth.map((entry) => (
+                  <Cell key={entry.name} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
     </div>

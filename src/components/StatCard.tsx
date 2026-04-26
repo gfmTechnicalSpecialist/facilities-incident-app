@@ -5,17 +5,23 @@ interface StatCardProps {
   value: string | number;
   subtext: string;
   icon?: ReactNode;
+  accentColor?: string;
 }
 
-export function StatCard({ label, value, subtext, icon }: StatCardProps) {
+export function StatCard({ label, value, subtext, icon, accentColor = '#0057b8' }: StatCardProps) {
+  const iconBg = `${accentColor}1a`;
   return (
-    <div className="card stat-card">
-      <div className="stat-header">
-        <p>{label}</p>
-        {icon}
+    <div className="card stat-card-v2" style={{ borderLeft: `5px solid ${accentColor}` }}>
+      <div className="stat-card-top">
+        <p className="stat-label-v2">{label}</p>
+        {icon && (
+          <span className="stat-icon-wrap" style={{ background: iconBg, color: accentColor }}>
+            {icon}
+          </span>
+        )}
       </div>
-      <h3>{value}</h3>
-      <p className="muted-text">{subtext}</p>
+      <p className="stat-value-v2">{value}</p>
+      <p className="stat-desc-v2">{subtext}</p>
     </div>
   );
 }
