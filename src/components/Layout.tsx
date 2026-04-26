@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ClipboardList, Eye, EyeOff, LogOut, PlusCircle, ShieldAlert } from 'lucide-react';
+import { ClipboardList, Eye, EyeOff, LogOut, PlusCircle, ShieldAlert, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from './Logo';
 
@@ -39,6 +39,9 @@ export function Layout() {
             </NavLink>
             <NavLink to="/incidents" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               <ClipboardList size={18} /> Reports
+            </NavLink>
+            <NavLink to="/my-reports" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <User size={18} /> My Reports
             </NavLink>
             {user?.role === 'admin' && (
               <NavLink to="/incidents/new" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
