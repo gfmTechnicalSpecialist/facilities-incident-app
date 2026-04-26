@@ -1,9 +1,10 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { appUsers } from '../data/demoData';
 import type { AppUser, UserRole } from '../types';
+import { API_BASE } from '../lib/apiBase';
 
 const SIGN_IN_URL =
-  'https://gfmapi-fpgth4e8aqa8auae.northeurope-01.azurewebsites.net/api/SignIn?code=eImUYC7SFcPbIzEAWlmltgMPArf1FN90YvHW1Po4AydxAzFuNAG77g==';
+  `${API_BASE}/api/SignIn?code=eImUYC7SFcPbIzEAWlmltgMPArf1FN90YvHW1Po4AydxAzFuNAG77g==`;
 
 interface SignInApiResponse {
   message: string;

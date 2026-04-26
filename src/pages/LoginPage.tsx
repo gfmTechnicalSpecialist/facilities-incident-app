@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, KeyRound } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,6 +15,7 @@ function LoginCard({
   users: { id: string; fullName: string }[];
 }) {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +26,10 @@ function LoginCard({
     setIsLoading(true);
     setMessage('');
     const result = await login(role, selectedUserId, password);
+    if (result.ok) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
     setMessage(result.message);
     setIsLoading(false);
   }
