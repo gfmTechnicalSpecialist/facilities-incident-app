@@ -91,11 +91,18 @@ export function Layout() {
         <header className="topbar no-print">
           <div>
             <p className="eyebrow">Facilities Incident Management</p>
-            <h2>{location.pathname === '/dashboard' ? 'Overview' : 'Incident workspace'}</h2>
+            <h2>{
+              location.pathname === '/dashboard' ? 'Overview'
+              : location.pathname === '/incidents/new' ? 'Log report'
+              : location.pathname.includes('/incidents/view/') ? 'Incident detail'
+              : location.pathname === '/incidents' ? 'Incident workspace'
+              : location.pathname === '/reports' ? 'Reports'
+              : 'Incident workspace'
+            }</h2>
           </div>
         </header>
 
-        <Outlet />
+        <Outlet key={location.pathname} />
       </main>
     </div>
   );

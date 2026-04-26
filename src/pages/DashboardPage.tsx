@@ -101,7 +101,10 @@ export function DashboardPage() {
   if (loading) {
     return (
       <div className="page-stack">
-        <p className="muted-text">Loading dashboard data…</p>
+        <div className="loading-center">
+          <div className="loading-spinner" />
+          <p className="muted-text">Loading dashboard…</p>
+        </div>
       </div>
     );
   }

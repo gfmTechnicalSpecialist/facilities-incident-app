@@ -79,7 +79,7 @@ function RequiredLabel({ children }: { children: string }) {
 
 export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled }: IncidentFormProps) {
   const [values, setValues] = useState<IncidentFormValues>(() => initialValues ?? buildDefaultValues(currentUser));
-  const [error, setError] = useState('');
+  const [touched, setTouched] = useState(false);
 
   const availableTypes = incidentCategoryMap[values.incidentCategory] ?? ['Other'];
   const showOtherType = values.incidentType === 'Other';
@@ -90,30 +90,31 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
     }
   }, [availableTypes, values.incidentType]);
 
-  const canSubmit = useMemo(
-    () =>
-      Boolean(
-        values.title &&
-          values.incidentDate &&
-          values.incidentTime &&
-          values.site &&
-          values.specificLocation &&
-          values.impactedAreaSystem &&
-          values.incidentCategory &&
-          values.incidentType &&
-          values.severity &&
-          values.description &&
-          values.incidentSummary &&
-          values.why1 &&
-          values.why2 &&
-          values.why3 &&
-          values.why4 &&
-          values.why5 &&
-          values.lessonsLearned &&
-          values.recommendations,
-      ),
-    [values],
-  );
+  const fieldErrors = useMemo(() => {
+    const errs: Record<string, string> = {};
+    if (!values.title?.trim())               errs.title               = 'Short title is required.';
+    if (!values.specificLocation?.trim())    errs.specificLocation    = 'Specific location is required.';
+    if (!values.impactedAreaSystem?.trim())  errs.impactedAreaSystem  = 'Impacted area/system is required.';
+    if (!values.description?.trim())         errs.description         = 'Description is required.';
+    if (showOtherType && !values.otherIncidentType?.trim()) errs.otherIncidentType = 'Please specify the other incident type.';
+    if (!values.incidentSummary?.trim())     errs.incidentSummary     = 'Incident summary is required.';
+    if (!values.why1?.trim())                errs.why1                = 'Why 1 is required.';
+    if (!values.why2?.trim())                errs.why2                = 'Why 2 is required.';
+    if (!values.why3?.trim())                errs.why3                = 'Why 3 is required.';
+    if (!values.why4?.trim())                errs.why4                = 'Why 4 is required.';
+    if (!values.why5?.trim())                errs.why5                = 'Why 5 is required.';
+    if (!values.recommendations?.trim())     errs.recommendations     = 'Recommendations are required.';
+    if (!values.lessonsLearned?.trim())      errs.lessonsLearned      = 'Lessons learned is required.';
+    if (values.followUpRequired && !values.targetCompletionDate) errs.targetCompletionDate = 'Target completion date is required when follow-up is checked.';
+    if (values.systemRestored && !values.restoredAt) errs.restoredAt  = 'Restore date/time is required when system is marked restored.';
+    return errs;
+  }, [values, showOtherType]);
+
+  const hasErrors = Object.keys(fieldErrors).length > 0;
+
+  function fi(field: string) {
+    return touched && fieldErrors[field] ? 'field-invalid' : '';
+  }
 
   function update<K extends keyof IncidentFormValues>(key: K, value: IncidentFormValues[K]) {
     setValues((previous) => ({ ...previous, [key]: value }));
@@ -131,23 +132,8 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!canSubmit) {
-      setError('Please complete all required fields marked with an asterisk.');
-      return;
-    }
-    if (showOtherType && !values.otherIncidentType?.trim()) {
-      setError('Please capture the other incident type.');
-      return;
-    }
-    if (values.followUpRequired && !values.targetCompletionDate) {
-      setError('Please provide a target completion date for the follow-up action.');
-      return;
-    }
-    if (values.systemRestored && !values.restoredAt) {
-      setError('Please provide the restore date and time.');
-      return;
-    }
-    setError('');
+    setTouched(true);
+    if (hasErrors) return;
     onSubmit(values);
   }
 
@@ -186,9 +172,10 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
       <section className="card form-section">
         <h3>Incident details</h3>
         <div className="fields two-column">
-          <label>
+          <label className={fi('title')}>
             <RequiredLabel>Short title</RequiredLabel>
             <input value={values.title} onChange={(e) => update('title', e.target.value)} placeholder="Cable theft - PDC 8.P2" />
+            {touched && fieldErrors.title && <span className="field-error-msg">{fieldErrors.title}</span>}
           </label>
           <label>
             <RequiredLabel>Site</RequiredLabel>
@@ -206,13 +193,15 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             <RequiredLabel>Time of incident</RequiredLabel>
             <input type="time" value={values.incidentTime} onChange={(e) => update('incidentTime', e.target.value)} />
           </label>
-          <label>
+          <label className={fi('specificLocation')}>
             <RequiredLabel>Specific location</RequiredLabel>
             <input value={values.specificLocation} onChange={(e) => update('specificLocation', e.target.value)} />
+            {touched && fieldErrors.specificLocation && <span className="field-error-msg">{fieldErrors.specificLocation}</span>}
           </label>
-          <label>
+          <label className={fi('impactedAreaSystem')}>
             <RequiredLabel>Impacted area/system</RequiredLabel>
             <input value={values.impactedAreaSystem} onChange={(e) => update('impactedAreaSystem', e.target.value)} />
+            {touched && fieldErrors.impactedAreaSystem && <span className="field-error-msg">{fieldErrors.impactedAreaSystem}</span>}
           </label>
           <label>
             <RequiredLabel>Incident category</RequiredLabel>
@@ -231,9 +220,10 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             </select>
           </label>
           {showOtherType && (
-            <label>
+            <label className={fi('otherIncidentType')}>
               <RequiredLabel>Other incident type</RequiredLabel>
               <input value={values.otherIncidentType ?? ''} onChange={(e) => update('otherIncidentType', e.target.value)} />
+              {touched && fieldErrors.otherIncidentType && <span className="field-error-msg">{fieldErrors.otherIncidentType}</span>}
             </label>
           )}
           <label>
@@ -271,14 +261,16 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             </select>
           </label>
           {values.systemRestored && (
-            <label>
+            <label className={fi('restoredAt')}>
               <span>Date and time restored</span>
               <input type="datetime-local" value={values.restoredAt ?? ''} onChange={(e) => update('restoredAt', e.target.value)} />
+              {touched && fieldErrors.restoredAt && <span className="field-error-msg">{fieldErrors.restoredAt}</span>}
             </label>
           )}
-          <label className="full-span">
+          <label className={`full-span ${fi('description')}`}>
             <RequiredLabel>Description of incident</RequiredLabel>
             <textarea rows={5} value={values.description} onChange={(e) => update('description', e.target.value)} />
+            {touched && fieldErrors.description && <span className="field-error-msg">{fieldErrors.description}</span>}
           </label>
         </div>
       </section>
@@ -304,9 +296,10 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
       <section className="card form-section">
         <h3>Incident summary and root cause analysis</h3>
         <div className="fields two-column">
-          <label>
+          <label className={fi('incidentSummary')}>
             <RequiredLabel>Incident summary</RequiredLabel>
             <textarea rows={4} value={values.incidentSummary} onChange={(e) => update('incidentSummary', e.target.value)} />
+            {touched && fieldErrors.incidentSummary && <span className="field-error-msg">{fieldErrors.incidentSummary}</span>}
           </label>
           <label>
             <span>Root cause category</span>
@@ -316,25 +309,30 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
               ))}
             </select>
           </label>
-          <label>
+          <label className={fi('why1')}>
             <RequiredLabel>Why 1</RequiredLabel>
             <textarea rows={3} value={values.why1} onChange={(e) => update('why1', e.target.value)} />
+            {touched && fieldErrors.why1 && <span className="field-error-msg">{fieldErrors.why1}</span>}
           </label>
-          <label>
+          <label className={fi('why2')}>
             <RequiredLabel>Why 2</RequiredLabel>
             <textarea rows={3} value={values.why2} onChange={(e) => update('why2', e.target.value)} />
+            {touched && fieldErrors.why2 && <span className="field-error-msg">{fieldErrors.why2}</span>}
           </label>
-          <label>
+          <label className={fi('why3')}>
             <RequiredLabel>Why 3</RequiredLabel>
             <textarea rows={3} value={values.why3} onChange={(e) => update('why3', e.target.value)} />
+            {touched && fieldErrors.why3 && <span className="field-error-msg">{fieldErrors.why3}</span>}
           </label>
-          <label>
+          <label className={fi('why4')}>
             <RequiredLabel>Why 4</RequiredLabel>
             <textarea rows={3} value={values.why4} onChange={(e) => update('why4', e.target.value)} />
+            {touched && fieldErrors.why4 && <span className="field-error-msg">{fieldErrors.why4}</span>}
           </label>
-          <label className="full-span">
+          <label className={`full-span ${fi('why5')}`}>
             <RequiredLabel>Why 5</RequiredLabel>
             <textarea rows={3} value={values.why5} onChange={(e) => update('why5', e.target.value)} />
+            {touched && fieldErrors.why5 && <span className="field-error-msg">{fieldErrors.why5}</span>}
           </label>
         </div>
       </section>
@@ -342,13 +340,15 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
       <section className="card form-section">
         <h3>Recommendations and closure planning</h3>
         <div className="fields two-column">
-          <label className="full-span">
+          <label className={`full-span ${fi('recommendations')}`}>
             <RequiredLabel>Recommendations</RequiredLabel>
             <textarea rows={4} value={values.recommendations} onChange={(e) => update('recommendations', e.target.value)} />
+            {touched && fieldErrors.recommendations && <span className="field-error-msg">{fieldErrors.recommendations}</span>}
           </label>
-          <label className="full-span">
+          <label className={`full-span ${fi('lessonsLearned')}`}>
             <RequiredLabel>Lessons learned</RequiredLabel>
             <textarea rows={4} value={values.lessonsLearned} onChange={(e) => update('lessonsLearned', e.target.value)} />
+            {touched && fieldErrors.lessonsLearned && <span className="field-error-msg">{fieldErrors.lessonsLearned}</span>}
           </label>
           <label className="checkbox-row">
             <input type="checkbox" checked={values.followUpRequired} onChange={(e) => update('followUpRequired', e.target.checked)} />
@@ -361,9 +361,10 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
                 <span>Responsible person</span>
                 <input value={values.responsiblePerson} onChange={(e) => update('responsiblePerson', e.target.value)} />
               </label>
-              <label>
-                <span>Target completion date</span>
+              <label className={fi('targetCompletionDate')}>
+                <RequiredLabel>Target completion date</RequiredLabel>
                 <input type="date" value={values.targetCompletionDate ?? ''} onChange={(e) => update('targetCompletionDate', e.target.value)} />
+                {touched && fieldErrors.targetCompletionDate && <span className="field-error-msg">{fieldErrors.targetCompletionDate}</span>}
               </label>
             </>
           )}
@@ -384,10 +385,19 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
         </div>
       </section>
 
-      {error && <p className="form-error">{error}</p>}
+      {touched && hasErrors && (
+        <div className="validation-summary">
+          <h4>Please fix the following before submitting:</h4>
+          <ul>
+            {Object.values(fieldErrors).map((msg) => (
+              <li key={msg}>{msg}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="form-actions no-print">
-        <button className="solid-button" type="submit" disabled={!canSubmit || submitDisabled}>
+        <button className="solid-button" type="submit" disabled={submitDisabled}>
           {submitLabel}
         </button>
       </div>

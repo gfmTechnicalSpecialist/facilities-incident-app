@@ -110,7 +110,10 @@ export function IncidentViewPage() {
   if (loading) {
     return (
       <div className="page-stack">
-        <p className="muted-text">Loading incident details…</p>
+        <div className="loading-center">
+          <div className="loading-spinner" />
+          <p className="muted-text">Loading incident details…</p>
+        </div>
       </div>
     );
   }
