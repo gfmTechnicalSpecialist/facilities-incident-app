@@ -1,10 +1,58 @@
+import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, FolderClock, Printer, ShieldEllipsis } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { StatCard } from '../components/StatCard';
-import { listIncidents } from '../services/incidentService';
-import { countByMonth, countBySite, countByType } from '../utils/helpers';
+import { incidentTypeColorMap, monthPalette, siteColorMap } from '../utils/helpers';
 
-function LegendList({ items, title }: { items: { name: string; color: string; value: number }[]; title: string }) {
+const DASHBOARD_API_URL =
+  'https://gfmapi-fpgth4e8aqa8auae.northeurope-01.azurewebsites.net/api/GetDashboardData?code=1FyUacAQl5-aBeSRIppmNIv2dfipzTbnhgzajeJTVD-OAzFu5DynZg==';
+
+interface ChartItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface DashboardData {
+  overview: {
+    totalIncidents: number;
+    openIncidents: number;
+    closedIncidents: number;
+    criticalIncidents: number;
+    mostReportedType: string;
+  };
+  charts: {
+    incidentsByType: { type: string; count: number }[];
+    incidentsBySite: { site: string; count: number }[];
+    monthlyTrend: { month: string; count: number }[];
+  };
+}
+
+function mapByType(items: { type: string; count: number }[]): ChartItem[] {
+  return items.map((item) => ({
+    name: item.type,
+    value: item.count,
+    color: incidentTypeColorMap[item.type] ?? '#6c757d',
+  }));
+}
+
+function mapBySite(items: { site: string; count: number }[]): ChartItem[] {
+  return items.map((item) => ({
+    name: item.site,
+    value: item.count,
+    color: siteColorMap[item.site] ?? '#6c757d',
+  }));
+}
+
+function mapByMonth(items: { month: string; count: number }[]): ChartItem[] {
+  return items.map((item, index) => ({
+    name: item.month,
+    value: item.count,
+    color: monthPalette[index % monthPalette.length],
+  }));
+}
+
+function LegendList({ items, title }: { items: ChartItem[]; title: string }) {
   return (
     <aside className="chart-legend-panel" aria-label={title}>
       <h4>{title}</h4>
@@ -22,15 +70,55 @@ function LegendList({ items, title }: { items: { name: string; color: string; va
 }
 
 export function DashboardPage() {
-  const incidents = listIncidents();
-  const byType = countByType(incidents);
-  const bySite = countBySite(incidents);
-  const byMonth = countByMonth(incidents);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const openCount = incidents.filter((incident) => incident.actionStatus !== 'Closed').length;
-  const criticalCount = incidents.filter((incident) => incident.severity === 'Critical').length;
-  const closedCount = incidents.filter((incident) => incident.actionStatus === 'Closed').length;
-  const topType = [...byType].sort((a, b) => b.value - a.value)[0]?.name ?? 'No data';
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetch(DASHBOARD_API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
+        return res.json() as Promise<DashboardData>;
+      })
+      .then((json) => {
+        if (!cancelled) setData(json);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="page-stack">
+        <p className="muted-text">Loading dashboard data…</p>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="page-stack">
+        <p className="muted-text" style={{ color: 'var(--color-danger, #d71920)' }}>
+          {error ?? 'No data available.'}
+        </p>
+      </div>
+    );
+  }
+
+  const { overview, charts } = data;
+  const byType = mapByType(charts.incidentsByType);
+  const bySite = mapBySite(charts.incidentsBySite);
+  const byMonth = mapByMonth(charts.monthlyTrend);
 
   return (
     <div className="page-stack">
@@ -41,16 +129,16 @@ export function DashboardPage() {
       </section>
 
       <section className="stats-grid">
-        <StatCard label="Total incidents" value={incidents.length} subtext="All reports in the system" icon={<ShieldEllipsis />} />
-        <StatCard label="Open incidents" value={openCount} subtext="Items still being worked on" icon={<FolderClock />} />
-        <StatCard label="Closed incidents" value={closedCount} subtext="Resolved and reviewed" icon={<CheckCircle2 />} />
-        <StatCard label="Critical incidents" value={criticalCount} subtext="Highest severity count" icon={<AlertTriangle />} />
+        <StatCard label="Total incidents" value={overview.totalIncidents} subtext="All reports in the system" icon={<ShieldEllipsis />} />
+        <StatCard label="Open incidents" value={overview.openIncidents} subtext="Items still being worked on" icon={<FolderClock />} />
+        <StatCard label="Closed incidents" value={overview.closedIncidents} subtext="Resolved and reviewed" icon={<CheckCircle2 />} />
+        <StatCard label="Critical incidents" value={overview.criticalIncidents} subtext="Highest severity count" icon={<AlertTriangle />} />
       </section>
 
       <section className="card headline-card">
         <div>
           <p className="eyebrow">Most reported incident type</p>
-          <h3>{topType}</h3>
+          <h3>{overview.mostReportedType}</h3>
         </div>
         <p className="muted-text">This helps the team see repeat failures and prioritise preventive action.</p>
       </section>

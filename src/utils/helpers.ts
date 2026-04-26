@@ -1,6 +1,6 @@
 import type { Incident } from '../types';
 
-const incidentTypeColorMap: Record<string, string> = {
+export const incidentTypeColorMap: Record<string, string> = {
   'Personal Injury': '#d71920',
   'Near Miss': '#0057b8',
   'Occupational Illness': '#ff7a00',
@@ -22,7 +22,7 @@ const incidentTypeColorMap: Record<string, string> = {
   Other: '#6c757d',
 };
 
-const siteColorMap: Record<string, string> = {
+export const siteColorMap: Record<string, string> = {
   Centurion: '#d71920',
   PDC: '#0057b8',
   Durban: '#ffb000',
@@ -31,7 +31,7 @@ const siteColorMap: Record<string, string> = {
   Other: '#43a047',
 };
 
-const monthPalette = ['#d71920', '#0057b8', '#ffb000', '#00a6a6', '#7b61ff', '#43a047', '#8d1b3d', '#6c757d', '#ff7a00', '#5c6bc0', '#26a69a', '#9c27b0'];
+export const monthPalette = ['#d71920', '#0057b8', '#ffb000', '#00a6a6', '#7b61ff', '#43a047', '#8d1b3d', '#6c757d', '#ff7a00', '#5c6bc0', '#26a69a', '#9c27b0'];
 
 export function generateId(prefix: string): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
