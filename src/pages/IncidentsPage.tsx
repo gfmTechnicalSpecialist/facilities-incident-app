@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { actionStatuses, severities, sites } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { API_BASE } from '../lib/apiBase';
@@ -24,6 +24,7 @@ interface MonthGroup {
 }
 
 export function IncidentsPage() {
+  const navigate = useNavigate();
   const [groups, setGroups] = useState<MonthGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -179,12 +180,15 @@ export function IncidentsPage() {
                   <th>Action status</th>
                   <th>Approval status</th>
                   <th>Date</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {group.incidents.map((incident) => (
-                  <tr key={incident.incidentId}>
+                  <tr
+                    key={incident.incidentId}
+                    className="clickable-row"
+                    onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+                  >
                     <td>{incident.incidentId}</td>
                     <td>{incident.title}</td>
                     <td>{incident.site}</td>
@@ -199,15 +203,6 @@ export function IncidentsPage() {
                       <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
                     </td>
                     <td>{incident.date}</td>
-                    <td>
-                      <Link
-                        className="text-link"
-                        to={`/incidents/view/${incident.incidentId}`}
-                        state={incident}
-                      >
-                        Open
-                      </Link>
-                    </td>
                   </tr>
                 ))}
               </tbody>

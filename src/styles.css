@@ -276,6 +276,8 @@ label span, label > strong {
 .success-text { color: var(--blue-dark); font-weight: 700; margin: 0; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
+.clickable-row { cursor: pointer; }
+.clickable-row:hover td { background: #f0f4ff; }
 th, td {
   text-align: left;
   padding: 0.95rem 0.75rem;
