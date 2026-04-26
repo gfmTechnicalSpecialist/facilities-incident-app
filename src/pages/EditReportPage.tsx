@@ -117,6 +117,7 @@ export function EditReportPage() {
   const { user } = useAuth();
 
   const [initialValues, setInitialValues] = useState<IncidentFormValues | null>(null);
+  const [rawData, setRawData] = useState<ApiDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -139,7 +140,10 @@ export function EditReportPage() {
         return res.json() as Promise<ApiDetails>;
       })
       .then((data) => {
-        if (!cancelled) setInitialValues(mapToFormValues(data));
+        if (!cancelled) {
+          setRawData(data);
+          setInitialValues(mapToFormValues(data));
+        }
       })
       .catch((err: unknown) => {
         if (!cancelled) setFetchError(err instanceof Error ? err.message : 'Failed to load incident');
@@ -161,15 +165,48 @@ export function EditReportPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           IncidentId: incidentId,
+          ReporterName: values.reporterName,
+          Designation: values.designation,
+          Department: values.department,
+          Contact: values.contact,
+          Email: values.email,
           Title: values.title,
+          IncidentDate: values.incidentDate ? `${values.incidentDate}T00:00:00` : null,
+          IncidentTime: values.incidentTime ? `${values.incidentTime}:00` : null,
           Site: values.site,
-          Severity: values.severity,
-          ActionStatus: values.actionStatus,
+          SpecificLocation: values.specificLocation || null,
+          ImpactedAreaSystem: values.impactedAreaSystem || null,
+          IncidentCategory: values.incidentCategory,
           IncidentType: values.incidentType,
+          OtherIncidentType: values.otherIncidentType || null,
+          Severity: values.severity,
           Description: values.description,
-          SystemRestored: values.systemRestored,
           FacilitiesAction: values.facilitiesAction,
-          RootCauseCategory: values.rootCauseCategory,
+          VendorAction: values.vendorAction,
+          CriticalLoadAffected: values.criticalLoadAffected,
+          MitigationApplied: values.mitigationApplied || null,
+          ImpactOnOperations: values.impactOnOperations || null,
+          JiraTicketReference: values.jiraTicketReference || null,
+          SystemRestored: values.systemRestored,
+          RestoredAt: values.restoredAt || null,
+          IncidentSummary: values.incidentSummary || null,
+          Why1: values.why1 || null,
+          Why2: values.why2 || null,
+          Why3: values.why3 || null,
+          Why4: values.why4 || null,
+          Why5: values.why5 || null,
+          RootCauseCategory: values.rootCauseCategory || null,
+          Recommendations: values.recommendations || null,
+          LessonsLearned: values.lessonsLearned || null,
+          FollowUpRequired: values.followUpRequired,
+          ResponsiblePerson: values.responsiblePerson || null,
+          TargetCompletionDate: values.targetCompletionDate ? `${values.targetCompletionDate}T00:00:00` : null,
+          ActionStatus: values.actionStatus,
+          ApprovalStatus: rawData?.header.approvalStatus ?? null,
+          ReviewedBy: rawData?.workflow.reviewedBy ?? null,
+          ApprovedBy: rawData?.workflow.approvedBy ?? null,
+          ReviewComments: rawData?.workflow.reviewComments ?? null,
+          SubmittedBy: values.submittedBy,
         }),
       });
       const text = await res.text();
