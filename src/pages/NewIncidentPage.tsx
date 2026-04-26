@@ -67,8 +67,27 @@ export function NewIncidentPage() {
   const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [successId, setSuccessId] = useState<string | null>(null);
 
   if (!user) return null;
+
+  if (successId) {
+    return (
+      <div className="page-stack">
+        <div className="card success-banner">
+          <div className="success-banner-icon">✓</div>
+          <div>
+            <h3>Report submitted successfully</h3>
+            <p className="muted-text">Incident <strong>{successId}</strong> has been logged and is now pending review.</p>
+            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem' }}>
+              <button className="solid-button" onClick={() => navigate('/incidents')}>Go to incident workspace</button>
+              <button className="outline-button" onClick={() => { setSuccessId(null); setApiError(null); }}>Log another report</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   async function handleSubmit(values: IncidentFormValues) {
     setSubmitting(true);
@@ -81,7 +100,7 @@ export function NewIncidentPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
-      navigate('/incidents');
+      setSuccessId(payload.incidentId);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Failed to submit incident. Please try again.');
     } finally {

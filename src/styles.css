@@ -459,3 +459,49 @@ th, td {
   font-size: 0.9rem;
   line-height: 1.7;
 }
+
+/* Success banner */
+.success-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  border-left: 4px solid #22c55e;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+.success-banner-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-banner h3 {
+  margin: 0 0 0.25rem;
+  color: #15803d;
+}
+
+/* Outline button */
+.outline-button {
+  padding: 0.55rem 1.25rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.outline-button:hover {
+  background: var(--accent);
+  color: #fff;
+}
