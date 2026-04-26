@@ -1,25 +1,11 @@
-import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ClipboardList, Eye, EyeOff, LogOut, PlusCircle, ShieldAlert, User } from 'lucide-react';
+import { ClipboardList, LogOut, PlusCircle, ShieldAlert, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from './Logo';
 
 export function Layout() {
-  const { user, logout, changePassword } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [showPasswords, setShowPasswords] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState('');
-
-  function handlePasswordChange() {
-    const result = changePassword(currentPassword, newPassword);
-    setPasswordMessage(result.message);
-    if (result.ok) {
-      setCurrentPassword('');
-      setNewPassword('');
-    }
-  }
 
   return (
     <div className="app-shell">
@@ -57,32 +43,6 @@ export function Layout() {
             <p className="user-meta">{user?.role === 'admin' ? 'Admin access' : 'Viewer access'}</p>
           </div>
 
-          <div className="user-card no-print password-card visible-panel">
-            <div className="password-card-header">
-              <p className="user-name">Change password</p>
-              <button className="password-toggle on-dark" type="button" onClick={() => setShowPasswords((value) => !value)}>
-                {showPasswords ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-            <div className="password-card-fields">
-              <input
-                type={showPasswords ? 'text' : 'password'}
-                value={currentPassword}
-                onChange={(event) => setCurrentPassword(event.target.value)}
-                placeholder="Current password"
-              />
-              <input
-                type={showPasswords ? 'text' : 'password'}
-                value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-                placeholder="New password"
-              />
-              <button className="solid-button full-width" type="button" onClick={handlePasswordChange}>
-                Save password
-              </button>
-              {passwordMessage && <p className={passwordMessage.includes('successfully') ? 'sidebar-message success' : 'sidebar-message error'}>{passwordMessage}</p>}
-            </div>
-          </div>
           <button className="ghost-button full-width no-print" type="button" onClick={logout}>
             <LogOut size={16} /> Logout
           </button>
