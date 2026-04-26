@@ -217,7 +217,6 @@ export function EditReportPage() {
           ReviewedBy: rawData?.workflow.reviewedBy ?? undefined,
           ApprovedBy: rawData?.workflow.approvedBy ?? undefined,
           ReviewComments: rawData?.workflow.reviewComments ?? undefined,
-          SubmittedBy: rawData?.incidentDetail.submittedBy ?? undefined,
         }),
       });
       const text = await res.text();
@@ -282,12 +281,9 @@ export function EditReportPage() {
       {/* Locked reporter info */}
       <section className="card">
         <h3 style={{ marginBottom: '0.75rem' }}>Reporter details</h3>
-        <p className="muted-text" style={{ marginBottom: '0.75rem', fontSize: '0.8rem' }}>
+        <p className="muted-text" style={{ fontSize: '0.8rem' }}>
           Reporter information is locked and cannot be changed here.
         </p>
-        <dl className="detail-list">
-          <div><dt>Submitted by</dt><dd>{rawData?.incidentDetail.submittedBy ?? '—'}</dd></div>
-        </dl>
       </section>
 
       {savedBanner && (
