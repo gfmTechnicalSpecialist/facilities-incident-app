@@ -67,11 +67,27 @@ function parseDateTime(raw: string | null): { incidentDate: string; incidentTime
   };
 }
 
+/** Convert any date string (ISO or formatted like "May 15, 2026") to YYYY-MM-DD for <input type="date"> */
+function parseToDateInput(raw: string | null): string {
+  if (!raw) return '';
+  const dt = new Date(raw);
+  if (isNaN(dt.getTime())) return '';
+  return dt.toISOString().slice(0, 10);
+}
+
+/** Handle 'yes'/'no', 'true'/'false', or actual booleans from the API */
+function parseBooleanish(val: string | boolean | null | undefined): boolean {
+  if (typeof val === 'boolean') return val;
+  if (!val) return false;
+  const s = val.toLowerCase();
+  return s === 'yes' || s === 'true' || s === '1';
+}
+
 function mapToFormValues(data: ApiDetails): IncidentFormValues {
   const { incidentDate, incidentTime } = parseDateTime(data.incidentDetail.dateTime);
   return {
     title: data.header.title,
-    reporterName: data.incidentDetail.submittedBy ?? '',
+    reporterName: '',
     designation: '',
     department: '',
     contact: '',
@@ -88,11 +104,11 @@ function mapToFormValues(data: ApiDetails): IncidentFormValues {
     description: data.incidentDetail.description ?? '',
     facilitiesAction: data.actionsTaken.actionByFacilities ?? '',
     vendorAction: data.actionsTaken.actionByVendor ?? '',
-    criticalLoadAffected: data.incidentDetail.criticalLoadAffected?.toLowerCase() === 'yes',
+    criticalLoadAffected: parseBooleanish(data.incidentDetail.criticalLoadAffected),
     mitigationApplied: data.actionsTaken.mitigationApplied ?? '',
     impactOnOperations: (data.incidentDetail.impactOnOperations as Impact) ?? 'Minor',
     jiraTicketReference: data.incidentDetail.jiraTicketReference ?? '',
-    systemRestored: data.incidentDetail.systemRestored?.toLowerCase() === 'yes',
+    systemRestored: parseBooleanish(data.incidentDetail.systemRestored),
     restoredAt: '',
     incidentSummary: data.incidentDetail.incidentSummary ?? '',
     why1: data.rootCauseAnalysis.why1 ?? '',
@@ -105,7 +121,7 @@ function mapToFormValues(data: ApiDetails): IncidentFormValues {
     lessonsLearned: data.workflow.lessonsLearned ?? '',
     followUpRequired: !!(data.workflow.followUpOwner || data.workflow.targetCompletionDate),
     responsiblePerson: data.workflow.followUpOwner ?? '',
-    targetCompletionDate: data.workflow.targetCompletionDate ?? '',
+    targetCompletionDate: parseToDateInput(data.workflow.targetCompletionDate),
     actionStatus: (data.header.actionStatus as ActionStatus) ?? 'Open',
     submittedBy: data.incidentDetail.submittedBy ?? '',
   };
@@ -165,48 +181,43 @@ export function EditReportPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           IncidentId: incidentId,
-          ReporterName: values.reporterName,
-          Designation: values.designation,
-          Department: values.department,
-          Contact: values.contact,
-          Email: values.email,
           Title: values.title,
-          IncidentDate: values.incidentDate ? `${values.incidentDate}T00:00:00` : null,
-          IncidentTime: values.incidentTime ? `${values.incidentTime}:00` : null,
+          IncidentDate: values.incidentDate ? `${values.incidentDate}T00:00:00` : undefined,
+          IncidentTime: values.incidentTime ? `${values.incidentTime}:00` : undefined,
           Site: values.site,
-          SpecificLocation: values.specificLocation || null,
-          ImpactedAreaSystem: values.impactedAreaSystem || null,
+          SpecificLocation: values.specificLocation || undefined,
+          ImpactedAreaSystem: values.impactedAreaSystem || undefined,
           IncidentCategory: values.incidentCategory,
           IncidentType: values.incidentType,
-          OtherIncidentType: values.otherIncidentType || null,
+          OtherIncidentType: values.otherIncidentType || undefined,
           Severity: values.severity,
           Description: values.description,
           FacilitiesAction: values.facilitiesAction,
           VendorAction: values.vendorAction,
           CriticalLoadAffected: values.criticalLoadAffected,
-          MitigationApplied: values.mitigationApplied || null,
-          ImpactOnOperations: values.impactOnOperations || null,
-          JiraTicketReference: values.jiraTicketReference || null,
+          MitigationApplied: values.mitigationApplied || undefined,
+          ImpactOnOperations: values.impactOnOperations || undefined,
+          JiraTicketReference: values.jiraTicketReference || undefined,
           SystemRestored: values.systemRestored,
-          RestoredAt: values.restoredAt || null,
-          IncidentSummary: values.incidentSummary || null,
-          Why1: values.why1 || null,
-          Why2: values.why2 || null,
-          Why3: values.why3 || null,
-          Why4: values.why4 || null,
-          Why5: values.why5 || null,
-          RootCauseCategory: values.rootCauseCategory || null,
-          Recommendations: values.recommendations || null,
-          LessonsLearned: values.lessonsLearned || null,
+          RestoredAt: values.restoredAt || undefined,
+          IncidentSummary: values.incidentSummary || undefined,
+          Why1: values.why1 || undefined,
+          Why2: values.why2 || undefined,
+          Why3: values.why3 || undefined,
+          Why4: values.why4 || undefined,
+          Why5: values.why5 || undefined,
+          RootCauseCategory: values.rootCauseCategory || undefined,
+          Recommendations: values.recommendations || undefined,
+          LessonsLearned: values.lessonsLearned || undefined,
           FollowUpRequired: values.followUpRequired,
-          ResponsiblePerson: values.responsiblePerson || null,
-          TargetCompletionDate: values.targetCompletionDate ? `${values.targetCompletionDate}T00:00:00` : null,
+          ResponsiblePerson: values.responsiblePerson || undefined,
+          TargetCompletionDate: values.targetCompletionDate ? `${values.targetCompletionDate}T00:00:00` : undefined,
           ActionStatus: values.actionStatus,
-          ApprovalStatus: rawData?.header.approvalStatus ?? null,
-          ReviewedBy: rawData?.workflow.reviewedBy ?? null,
-          ApprovedBy: rawData?.workflow.approvedBy ?? null,
-          ReviewComments: rawData?.workflow.reviewComments ?? null,
-          SubmittedBy: rawData?.incidentDetail.submittedBy ?? values.submittedBy,
+          ApprovalStatus: rawData?.header.approvalStatus ?? undefined,
+          ReviewedBy: rawData?.workflow.reviewedBy ?? undefined,
+          ApprovedBy: rawData?.workflow.approvedBy ?? undefined,
+          ReviewComments: rawData?.workflow.reviewComments ?? undefined,
+          SubmittedBy: rawData?.incidentDetail.submittedBy ?? undefined,
         }),
       });
       const text = await res.text();
@@ -268,6 +279,17 @@ export function EditReportPage() {
         <p className="muted-text">Update the incident record below. Fields marked with a red asterisk are required.</p>
       </header>
 
+      {/* Locked reporter info */}
+      <section className="card">
+        <h3 style={{ marginBottom: '0.75rem' }}>Reporter details</h3>
+        <p className="muted-text" style={{ marginBottom: '0.75rem', fontSize: '0.8rem' }}>
+          Reporter information is locked and cannot be changed here.
+        </p>
+        <dl className="detail-list">
+          <div><dt>Submitted by</dt><dd>{rawData?.incidentDetail.submittedBy ?? '—'}</dd></div>
+        </dl>
+      </section>
+
       {savedBanner && (
         <div
           className="card"
@@ -322,6 +344,7 @@ export function EditReportPage() {
         onSubmit={handleSubmit}
         submitLabel={saving ? 'Saving…' : 'Save changes'}
         submitDisabled={saving}
+        hideReporterSection
       />
     </div>
   );

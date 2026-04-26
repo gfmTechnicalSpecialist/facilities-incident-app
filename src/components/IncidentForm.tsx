@@ -16,6 +16,7 @@ interface IncidentFormProps {
   onSubmit: (values: IncidentFormValues) => void;
   submitLabel: string;
   submitDisabled?: boolean;
+  hideReporterSection?: boolean;
 }
 
 function getToday(): string {
@@ -77,7 +78,7 @@ function RequiredLabel({ children }: { children: string }) {
   );
 }
 
-export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled }: IncidentFormProps) {
+export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled, hideReporterSection }: IncidentFormProps) {
   const [values, setValues] = useState<IncidentFormValues>(() => initialValues ?? buildDefaultValues(currentUser));
   const [touched, setTouched] = useState(false);
 
@@ -139,6 +140,7 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
 
   return (
     <form className="form-grid" onSubmit={handleSubmit}>
+      {!hideReporterSection && (
       <section className="card form-section">
         <h3>Reporter details</h3>
         <div className="fields two-column">
@@ -168,6 +170,7 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
           </label>
         </div>
       </section>
+      )}
 
       <section className="card form-section">
         <h3>Incident details</h3>
