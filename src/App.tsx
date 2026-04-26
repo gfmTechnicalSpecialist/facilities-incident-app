@@ -4,6 +4,7 @@ import { AdminRoute, ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditIncidentPage } from './pages/EditIncidentPage';
+import { EditReportPage } from './pages/EditReportPage';
 import { IncidentDetailPage } from './pages/IncidentDetailPage';
 import { IncidentViewPage } from './pages/IncidentViewPage';
 import { IncidentsPage } from './pages/IncidentsPage';
@@ -28,6 +29,7 @@ function App() {
               <Route element={<AdminRoute />}>
                 <Route path="/incidents/new" element={<NewIncidentPage />} />
                 <Route path="/incidents/:id/edit" element={<EditIncidentPage />} />
+                <Route path="/incidents/view/:incidentId/edit" element={<EditReportPage />} />
               </Route>
             </Route>
           </Route>

@@ -239,7 +239,7 @@ export function MyReportsPage() {
                               <button
                                 className="outline-button my-reports-action-btn"
                                 type="button"
-                                onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+                                onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
                                 title="Edit report"
                               >
                                 <ClipboardEdit size={15} /> Edit
