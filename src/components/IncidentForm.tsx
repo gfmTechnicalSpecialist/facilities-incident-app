@@ -15,6 +15,7 @@ interface IncidentFormProps {
   initialValues?: IncidentFormValues;
   onSubmit: (values: IncidentFormValues) => void;
   submitLabel: string;
+  submitDisabled?: boolean;
 }
 
 function getToday(): string {
@@ -76,7 +77,7 @@ function RequiredLabel({ children }: { children: string }) {
   );
 }
 
-export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel }: IncidentFormProps) {
+export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled }: IncidentFormProps) {
   const [values, setValues] = useState<IncidentFormValues>(() => initialValues ?? buildDefaultValues(currentUser));
   const [error, setError] = useState('');
 
@@ -386,7 +387,7 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
       {error && <p className="form-error">{error}</p>}
 
       <div className="form-actions no-print">
-        <button className="solid-button" type="submit" disabled={!canSubmit}>
+        <button className="solid-button" type="submit" disabled={!canSubmit || submitDisabled}>
           {submitLabel}
         </button>
       </div>
