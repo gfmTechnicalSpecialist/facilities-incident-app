@@ -217,7 +217,6 @@ export function EditReportPage() {
           ReviewedBy: rawData?.workflow.reviewedBy ?? undefined,
           ApprovedBy: rawData?.workflow.approvedBy ?? undefined,
           ReviewComments: rawData?.workflow.reviewComments ?? undefined,
-          SubmittedBy: rawData?.incidentDetail.submittedBy ?? undefined,
         }),
       });
       const text = await res.text();
