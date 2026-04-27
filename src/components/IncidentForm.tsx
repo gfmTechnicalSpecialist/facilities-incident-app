@@ -81,6 +81,7 @@ function RequiredLabel({ children }: { children: string }) {
 export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled, hideReporterSection }: IncidentFormProps) {
   const [values, setValues] = useState<IncidentFormValues>(() => initialValues ?? buildDefaultValues(currentUser));
   const [touched, setTouched] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
 
   const availableTypes = incidentCategoryMap[values.incidentCategory] ?? ['Other'];
   const showOtherType = values.incidentType === 'Other';
@@ -379,13 +380,58 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
         <div className="fields two-column">
           <label>
             <span>Action status</span>
-            <select value={values.actionStatus} onChange={(e) => update('actionStatus', e.target.value as IncidentFormValues['actionStatus'])}>
+            <select
+              value={values.actionStatus}
+              onChange={(e) => {
+                const next = e.target.value as IncidentFormValues['actionStatus'];
+                if (next === 'Closed') {
+                  setConfirmClose(true);
+                } else {
+                  setConfirmClose(false);
+                  update('actionStatus', next);
+                }
+              }}
+            >
               {actionStatuses.map((item) => (
                 <option key={item}>{item}</option>
               ))}
             </select>
           </label>
         </div>
+        {confirmClose && (
+          <div
+            style={{
+              marginTop: '1rem',
+              padding: '1rem 1.25rem',
+              borderRadius: '8px',
+              border: '1.5px solid #d71920',
+              background: '#fff5f5',
+            }}
+          >
+            <p style={{ fontWeight: 600, color: '#d71920', marginBottom: '0.4rem' }}>Close this incident?</p>
+            <p className="muted-text" style={{ marginBottom: '0.75rem' }}>
+              Closing an incident locks the record. This action should only be taken once all actions
+              have been completed and the incident is fully resolved.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                type="button"
+                className="solid-button"
+                style={{ background: '#d71920', borderColor: '#d71920' }}
+                onClick={() => { update('actionStatus', 'Closed'); setConfirmClose(false); }}
+              >
+                Yes, close incident
+              </button>
+              <button
+                type="button"
+                className="outline-button"
+                onClick={() => setConfirmClose(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
       {touched && hasErrors && (
