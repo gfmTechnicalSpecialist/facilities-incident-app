@@ -23,7 +23,7 @@ export function Layout() {
             <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               <ShieldAlert size={18} /> Dashboard
             </NavLink>
-            <NavLink to="/incidents" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <NavLink to="/incidents" end className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               <ClipboardList size={18} /> Reports
             </NavLink>
             <NavLink to="/my-reports" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
