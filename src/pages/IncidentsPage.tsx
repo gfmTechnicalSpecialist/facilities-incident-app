@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { actionStatuses, severities, sites } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { MobileReportCard } from '../components/MobileReportCard';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 
 const INCIDENTS_API_URL = REPORTS_DATA_API_URL;
@@ -174,8 +175,8 @@ export function IncidentsPage() {
             <h3>{group.monthGroup}</h3>
             <p className="muted-text">{group.incidents.length} report{group.incidents.length === 1 ? '' : 's'}</p>
           </div>
-          <div className="table-scroll">
-            <table className="responsive-table">
+          <div className="table-scroll desktop-only">
+            <table>
               <thead>
                 <tr>
                   <th>Incident ID</th>
@@ -213,6 +214,39 @@ export function IncidentsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="m-card-list mobile-only">
+            {group.incidents.map((incident) => (
+              <MobileReportCard
+                key={incident.incidentId}
+                reference={incident.incidentId}
+                title={incident.title}
+                badge={<span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>}
+                fields={[
+                  { label: 'Site', value: incident.site },
+                  { label: 'Type', value: incident.type },
+                  {
+                    label: 'Action status',
+                    value: <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{incident.actionStatus}</span>,
+                  },
+                  {
+                    label: 'Approval',
+                    value: <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>,
+                  },
+                  { label: 'Date', value: incident.date },
+                ]}
+                actions={
+                  <button
+                    className="solid-button full-width"
+                    type="button"
+                    onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+                  >
+                    View report
+                  </button>
+                }
+              />
+            ))}
           </div>
         </section>
       ))}

@@ -4,6 +4,7 @@ import { CheckCircle2, ClipboardEdit, Eye, FolderClock, Loader2, ShieldEllipsis 
 import { useAuth } from '../contexts/AuthContext';
 import { actionStatuses } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { MobileReportCard } from '../components/MobileReportCard';
 import { USER_REPORTS_API_URL } from '../lib/apiBase';
 import type { ActionStatus } from '../types';
 
@@ -183,8 +184,8 @@ export function MyReportsPage() {
                   {statusFilter !== 'All' && <span className="my-reports-filter-chip">{statusFilter}</span>}
                 </h3>
               </div>
-              <div className="table-scroll">
-                <table className="responsive-table">
+              <div className="table-scroll desktop-only">
+                <table>
                   <thead>
                     <tr>
                       <th>Reference</th>
@@ -245,6 +246,50 @@ export function MyReportsPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              <div className="m-card-list mobile-only">
+                {filtered.map((incident) => (
+                  <MobileReportCard
+                    key={incident.incidentId}
+                    reference={incident.incidentId}
+                    title={incident.title}
+                    badge={<span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>}
+                    fields={[
+                      { label: 'Site', value: incident.site },
+                      { label: 'Type', value: incident.type },
+                      {
+                        label: 'Action status',
+                        value: <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{incident.actionStatus}</span>,
+                      },
+                      {
+                        label: 'Approval',
+                        value: <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>,
+                      },
+                      { label: 'Date', value: incident.date },
+                    ]}
+                    actions={
+                      <>
+                        <button
+                          className="ghost-button my-reports-action-btn"
+                          type="button"
+                          onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+                        >
+                          <Eye size={15} /> View
+                        </button>
+                        {user?.role === 'admin' && incident.actionStatus !== 'Closed' && (
+                          <button
+                            className="outline-button my-reports-action-btn"
+                            type="button"
+                            onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
+                          >
+                            <ClipboardEdit size={15} /> Edit
+                          </button>
+                        )}
+                      </>
+                    }
+                  />
+                ))}
               </div>
             </section>
           )}
