@@ -70,7 +70,7 @@ export function IncidentDetailPage() {
   }
 
   return (
-    <div className="page-stack incident-print-shell">
+    <div className="page-stack pbi-dashboard incident-print-shell">
       <section className="card detail-header-card print-report-header">
         <div>
           <p className="eyebrow">{incident.incidentId}</p>

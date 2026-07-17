@@ -848,6 +848,55 @@ th, td {
   font-size: 0.83rem;
 }
 
+/* PBI look: forms, detail views, comments */
+.pbi-dashboard .form-section h3,
+.pbi-dashboard .card h3,
+.pbi-dashboard .card h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #252423;
+  letter-spacing: -0.01em;
+}
+.pbi-dashboard .detail-header-card h2 { font-size: 1.25rem; }
+.pbi-dashboard .form-section {
+  border-top: 3px solid #118DFF;
+}
+.pbi-dashboard .detail-list div,
+.pbi-dashboard .full-span-item,
+.pbi-dashboard .summary-pair > div,
+.pbi-dashboard .comment-item {
+  background: #FAF9F8;
+  border: 1px solid #E6E6E6;
+  border-radius: 4px;
+}
+.pbi-dashboard .detail-list dt {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #605E5C;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pbi-dashboard .detail-list dd { font-size: 0.88rem; color: #252423; }
+.pbi-dashboard .comment-meta { font-size: 0.8rem; color: #605E5C; }
+.pbi-dashboard .validation-summary {
+  border-radius: 4px;
+  border: 1px solid #E6B8BA;
+  border-left: 3px solid #A4262C;
+  background: #FDF3F4;
+}
+.pbi-dashboard .validation-summary h4,
+.pbi-dashboard .validation-summary ul { color: #A4262C; }
+.pbi-dashboard .success-banner {
+  border-radius: 4px;
+  border: 1px solid #C4E7C8;
+  border-left: 3px solid #107C10;
+  background: #F1FAF1;
+}
+.pbi-dashboard .success-banner-icon { background: #107C10; border-radius: 4px; }
+.pbi-dashboard .success-banner h3 { color: #107C10; }
+.pbi-dashboard .form-error { color: #A4262C; font-weight: 600; }
+.pbi-dashboard .success-text { color: #107C10; font-weight: 600; }
+
 /* ── My Reports Page ── */
 .my-reports-header {
   display: flex;
@@ -1064,3 +1113,180 @@ th, td {
   background: var(--accent);
   color: #fff;
 }
+
+/* ── Power BI look: app shell (sidebar + topbar) ─────────────── */
+.app-shell {
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #EAEAEA;
+}
+.sidebar {
+  background: #FFFFFF;
+  color: #323130;
+  border-right: 1px solid #E6E6E6;
+  padding: 1.25rem 1rem;
+}
+.sidebar .eyebrow {
+  color: #605E5C;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.brand h1 {
+  color: #252423;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.brand-logo {
+  width: 60px;
+  height: 60px;
+  filter: none;
+}
+.nav-links { gap: 0.2rem; }
+.nav-link {
+  color: #323130;
+  border-radius: 4px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-left: 3px solid transparent;
+  transition: background 0.12s, color 0.12s;
+}
+.nav-link:hover {
+  background: #F3F2F1;
+  color: #252423;
+}
+.nav-link.active {
+  background: #EFF6FC;
+  color: #0B5CAB;
+  border-left-color: #118DFF;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb { background: #C8C6C4; }
+.user-card {
+  background: #FAF9F8;
+  border: 1px solid #E6E6E6;
+  border-radius: 4px;
+  border-top: 3px solid #118DFF;
+}
+.user-name {
+  color: #605E5C;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+}
+.user-meta { color: #605E5C; font-size: 0.85rem; opacity: 1; }
+.user-meta.strong { color: #252423; font-weight: 600; font-size: 0.95rem; }
+.sidebar .ghost-button {
+  background: #FFFFFF;
+  border: 1px solid #C8C6C4;
+  color: #323130;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.9rem;
+}
+.sidebar .ghost-button:hover { background: #F3F2F1; }
+.sidebar-message.success { color: #107C10; }
+.sidebar-message.error { color: #A4262C; }
+.main-content { background: #EAEAEA; }
+.topbar {
+  background: #FFFFFF;
+  border: 1px solid #E6E6E6;
+  border-top: 3px solid #118DFF;
+  border-radius: 4px;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.08);
+  padding: 0.75rem 1.1rem;
+}
+.topbar .eyebrow {
+  color: #605E5C;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.topbar h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #252423;
+  letter-spacing: -0.01em;
+}
+
+/* ── Power BI look: sign-in page ─────────────────────────────── */
+.final-login-shell {
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.final-login-shell .hero-panel {
+  background: linear-gradient(180deg, #0B398F 0%, #0C62A8 100%);
+}
+.final-login-shell .hero-panel .eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+.final-login-shell .hero-panel h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.final-login-shell .hero-panel p { font-size: 0.95rem; }
+.final-login-shell .hero-points {
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+.final-login-shell .hero-points p { font-size: 0.9rem; }
+.final-login-shell .auth-panel { background: #F3F2F1; }
+.final-login-shell .auth-card {
+  background: #FFFFFF;
+  border: 1px solid #E6E6E6;
+  border-top: 3px solid #118DFF;
+  border-radius: 4px;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 1.6rem;
+}
+.final-login-shell .auth-card .eyebrow {
+  color: #0B5CAB;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.final-login-shell .auth-card h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #252423;
+}
+.final-login-shell label span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #605E5C;
+  margin-bottom: 0.3rem;
+}
+.final-login-shell input,
+.final-login-shell select {
+  border-radius: 2px;
+  border: 1px solid #C8C6C4;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  min-height: 0;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.final-login-shell .password-field input { min-height: 0; font-size: 0.9rem; }
+.final-login-shell input:focus,
+.final-login-shell select:focus {
+  outline: none;
+  border-color: #118DFF;
+  box-shadow: 0 0 0 1px #118DFF;
+}
+.final-login-shell .solid-button {
+  background: #118DFF;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.65rem 1.1rem;
+  transition: background 0.12s;
+}
+.final-login-shell .solid-button:hover { background: #0B5CAB; }
+.final-login-shell .solid-button:disabled { background: #C8C6C4; cursor: default; }
+.final-login-shell .form-error { color: #A4262C; font-weight: 600; font-size: 0.85rem; }
+.final-login-shell .success-text { color: #107C10; font-weight: 600; font-size: 0.85rem; }

@@ -109,7 +109,7 @@ export function IncidentViewPage() {
 
   if (loading) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <div className="loading-center">
           <div className="loading-spinner" />
           <p className="muted-text">Loading incident details…</p>
@@ -120,7 +120,7 @@ export function IncidentViewPage() {
 
   if (error || !data) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <section className="card">
           <p style={{ color: 'var(--color-danger, #d71920)' }}>{error ?? 'Incident not found.'}</p>
           <button className="outline-button" type="button" onClick={() => navigate('/incidents')}>
@@ -134,7 +134,7 @@ export function IncidentViewPage() {
   const { header, incidentDetail, actionsTaken, rootCauseAnalysis, workflow, viewerComments } = data;
 
   return (
-    <div className="page-stack incident-print-shell">
+    <div className="page-stack pbi-dashboard incident-print-shell">
       {/* Header */}
       <section className="card detail-header-card print-report-header">
         <div>

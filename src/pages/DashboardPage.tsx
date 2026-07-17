@@ -93,7 +93,7 @@ export function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <div className="loading-center">
           <div className="loading-spinner" />
           <p className="muted-text">Loading dashboard…</p>
@@ -104,7 +104,7 @@ export function DashboardPage() {
 
   if (error || !data) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <p className="muted-text" style={{ color: 'var(--color-danger, #d71920)' }}>
           {error ?? 'No data available.'}
         </p>

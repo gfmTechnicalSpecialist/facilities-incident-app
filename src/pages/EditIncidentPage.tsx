@@ -16,7 +16,7 @@ export function EditIncidentPage() {
 
   if (incident.actionStatus === 'Closed') {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <div className="card">
           <h3>Report locked</h3>
           <p className="muted-text">Closed reports can no longer be edited. Reopen the report through the action status flow first if changes are needed.</p>
@@ -74,7 +74,7 @@ export function EditIncidentPage() {
   }
 
   return (
-    <div className="page-stack">
+    <div className="page-stack pbi-dashboard">
       <div className="card">
         <h3>Edit report</h3>
         <p className="muted-text">Admin users can update the incident record and the action status.</p>

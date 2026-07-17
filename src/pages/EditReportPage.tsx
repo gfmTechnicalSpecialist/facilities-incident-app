@@ -244,7 +244,7 @@ export function EditReportPage() {
 
   if (loading) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <div className="loading-center">
           <div className="loading-spinner" />
           <p className="muted-text">Loading incident…</p>
@@ -255,7 +255,7 @@ export function EditReportPage() {
 
   if (fetchError || !initialValues) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <section className="card">
           <p style={{ color: 'var(--color-danger, #d71920)' }}>{fetchError ?? 'Incident not found.'}</p>
           <button className="outline-button" type="button" onClick={() => navigate(-1)}>
@@ -267,7 +267,7 @@ export function EditReportPage() {
   }
 
   return (
-    <div className="page-stack">
+    <div className="page-stack pbi-dashboard">
       <header className="card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <button className="outline-button" type="button" onClick={() => navigate(`/incidents/view/${incidentId}`)}>

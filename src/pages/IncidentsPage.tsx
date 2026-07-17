@@ -93,7 +93,7 @@ export function IncidentsPage() {
 
   if (loading) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <div className="loading-center">
           <div className="loading-spinner" />
           <p className="muted-text">Loading incidents…</p>
@@ -104,7 +104,7 @@ export function IncidentsPage() {
 
   if (error) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <p className="muted-text" style={{ color: 'var(--color-danger, #d71920)' }}>{error}</p>
       </div>
     );

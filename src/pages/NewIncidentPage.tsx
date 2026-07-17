@@ -73,7 +73,7 @@ export function NewIncidentPage() {
 
   if (successId) {
     return (
-      <div className="page-stack">
+      <div className="page-stack pbi-dashboard">
         <div className="card success-banner">
           <div className="success-banner-icon">✓</div>
           <div>
@@ -109,7 +109,7 @@ export function NewIncidentPage() {
   }
 
   return (
-    <div className="page-stack">
+    <div className="page-stack pbi-dashboard">
       <div className="card">
         <h3>Log a new report</h3>
         <p className="muted-text">Only admin users can create or edit incident reports.</p>
