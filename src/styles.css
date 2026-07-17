@@ -1120,30 +1120,29 @@ th, td {
   background: #EAEAEA;
 }
 .sidebar {
-  background: #FFFFFF;
-  color: #323130;
-  border-right: 1px solid #E6E6E6;
+  background: linear-gradient(180deg, var(--blue-dark), var(--blue));
+  color: #fff;
+  border-right: none;
   padding: 1.25rem 1rem;
 }
 .sidebar .eyebrow {
-  color: #605E5C;
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   font-weight: 600;
 }
 .brand h1 {
-  color: #252423;
+  color: #fff;
   font-size: 1.1rem;
   font-weight: 600;
 }
 .brand-logo {
   width: 60px;
   height: 60px;
-  filter: none;
 }
 .nav-links { gap: 0.2rem; }
 .nav-link {
-  color: #323130;
+  color: rgba(255, 255, 255, 0.88);
   border-radius: 4px;
   padding: 0.6rem 0.8rem;
   font-size: 0.88rem;
@@ -1152,42 +1151,41 @@ th, td {
   transition: background 0.12s, color 0.12s;
 }
 .nav-link:hover {
-  background: #F3F2F1;
-  color: #252423;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 .nav-link.active {
-  background: #EFF6FC;
-  color: #0B5CAB;
-  border-left-color: #118DFF;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border-left-color: #fff;
 }
-.sidebar-scroll::-webkit-scrollbar-thumb { background: #C8C6C4; }
 .user-card {
-  background: #FAF9F8;
-  border: 1px solid #E6E6E6;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 4px;
-  border-top: 3px solid #118DFF;
+  border-top: 3px solid rgba(255, 255, 255, 0.85);
 }
 .user-name {
-  color: #605E5C;
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   font-weight: 600;
 }
-.user-meta { color: #605E5C; font-size: 0.85rem; opacity: 1; }
-.user-meta.strong { color: #252423; font-weight: 600; font-size: 0.95rem; }
+.user-meta { color: rgba(255, 255, 255, 0.85); font-size: 0.85rem; opacity: 1; }
+.user-meta.strong { color: #fff; font-weight: 600; font-size: 0.95rem; }
 .sidebar .ghost-button {
-  background: #FFFFFF;
-  border: 1px solid #C8C6C4;
-  color: #323130;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.85rem;
   padding: 0.55rem 0.9rem;
 }
-.sidebar .ghost-button:hover { background: #F3F2F1; }
-.sidebar-message.success { color: #107C10; }
-.sidebar-message.error { color: #A4262C; }
+.sidebar .ghost-button:hover { background: rgba(255, 255, 255, 0.2); }
+.sidebar-message.success { color: #d7f8df; }
+.sidebar-message.error { color: #ffd7da; }
 .main-content { background: #EAEAEA; }
 .topbar {
   background: #FFFFFF;
