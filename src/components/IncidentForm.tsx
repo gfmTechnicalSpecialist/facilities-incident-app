@@ -88,7 +88,7 @@ function FormSection({
   progress?: { done: number; total: number };
   children: ReactNode;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const complete = progress ? progress.done >= progress.total : false;
   return (
     <section className={open ? 'card form-section' : 'card form-section collapsed'}>
