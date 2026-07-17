@@ -376,13 +376,17 @@ th, td {
   .final-login-shell select { min-height: 44px; font-size: 16px; }
   .pbi-dashboard label span { font-size: 0.8rem; }
 
-  /* Compact login on phones */
-  .final-login-shell .hero-panel { padding: 1.75rem 1.5rem; }
-  .final-login-shell .hero-logo { width: 72px; height: 72px; margin-bottom: 0.5rem; }
-  .final-login-shell .hero-panel h1 { font-size: 1.7rem; }
-  .final-login-shell .hero-panel p { font-size: 0.9rem; }
-  .final-login-shell .hero-points { padding: 1rem 1.15rem; }
-  .final-login-shell .auth-panel { padding: 1.5rem 1.25rem; }
+  /* Compact login on phones — show the sign-in form first, trim the hero */
+  .final-login-shell { min-height: auto; }
+  .final-login-shell .hero-panel { order: 2; padding: 1.25rem 1.25rem 1.75rem; text-align: center; }
+  .final-login-shell .auth-panel { order: 1; padding: 1.25rem 1rem; }
+  .final-login-shell .hero-logo { width: 56px; height: 56px; margin: 0 auto 0.5rem; }
+  .final-login-shell .hero-panel h1 { font-size: 1.35rem; margin-bottom: 0.4rem; }
+  .final-login-shell .hero-panel p { font-size: 0.85rem; margin: 0 auto; }
+  .final-login-shell .hero-points { display: none; }
+  .final-login-shell .auth-card-grid { gap: 1rem; }
+  .final-login-shell .auth-card { padding: 1.15rem; gap: 0.75rem; }
+  .final-login-shell .auth-card h2 { font-size: 1.25rem; }
 }
 
 @media print {
@@ -680,6 +684,26 @@ th, td {
   font-size: 0.83rem;
   font-weight: 600;
   color: #252423;
+}
+.filters-card {
+  padding: 0.55rem 0.85rem;
+  gap: 0.35rem;
+}
+.filters-card .pbi-visual-header {
+  padding-bottom: 0.2rem;
+  margin-bottom: 0;
+}
+.filters-card .filters-grid {
+  gap: 0.55rem;
+}
+.filters-card label span {
+  margin-bottom: 0.2rem;
+  font-size: 0.76rem;
+}
+.filters-card input,
+.filters-card select {
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
 }
 .pbi-insight {
   display: flex;
