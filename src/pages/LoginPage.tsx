@@ -35,7 +35,7 @@ function LoginCard({
   }
 
   return (
-    <section className="card auth-card">
+    <div className="auth-tab-panel">
       <div>
         <p className="eyebrow">{role === 'admin' ? 'Enter as Admin' : 'Enter as Viewer'}</p>
         <h2>{heading}</h2>
@@ -71,12 +71,13 @@ function LoginCard({
         <KeyRound size={16} /> {isLoading ? 'Signing in…' : 'Log in'}
       </button>
       {message && <p className={message.includes('successful') ? 'success-text' : 'form-error'}>{message}</p>}
-    </section>
+    </div>
   );
 }
 
 export function LoginPage() {
   const { user, adminUsers, viewerUsers } = useAuth();
+  const [activeTab, setActiveTab] = useState<UserRole>('admin');
 
   if (user) {
     return <Navigate to="/dashboard" replace />;
@@ -100,19 +101,39 @@ export function LoginPage() {
       </div>
 
       <div className="login-panel auth-panel">
-        <div className="auth-card-grid">
-          <LoginCard
-            role="admin"
-            heading="Admin sign in"
-            users={adminUsers.map((item) => ({ id: item.id, fullName: item.fullName }))}
-          />
-          <LoginCard
-            role="viewer"
-            heading="Viewer sign in"
-            users={viewerUsers.map((item) => ({ id: item.id, fullName: item.fullName }))}
-          />
-        </div>
+        <section className="card auth-card auth-card-tabbed">
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={activeTab === 'admin' ? 'auth-tab active' : 'auth-tab'}
+              onClick={() => setActiveTab('admin')}
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              className={activeTab === 'viewer' ? 'auth-tab active' : 'auth-tab'}
+              onClick={() => setActiveTab('viewer')}
+            >
+              Viewer
+            </button>
+          </div>
+          {activeTab === 'admin' ? (
+            <LoginCard
+              role="admin"
+              heading="Admin sign in"
+              users={adminUsers.map((item) => ({ id: item.id, fullName: item.fullName }))}
+            />
+          ) : (
+            <LoginCard
+              role="viewer"
+              heading="Viewer sign in"
+              users={viewerUsers.map((item) => ({ id: item.id, fullName: item.fullName }))}
+            />
+          )}
+        </section>
       </div>
     </div>
   );
 }
+
