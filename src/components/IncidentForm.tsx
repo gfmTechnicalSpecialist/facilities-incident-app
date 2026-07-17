@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { Check, ChevronDown } from 'lucide-react';
 import type { AppUser, IncidentCategory, IncidentFormValues } from '../types';
 import {
   actionStatuses,
@@ -78,6 +79,41 @@ function RequiredLabel({ children }: { children: string }) {
   );
 }
 
+function FormSection({
+  title,
+  progress,
+  children,
+}: {
+  title: string;
+  progress?: { done: number; total: number };
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(true);
+  const complete = progress ? progress.done >= progress.total : false;
+  return (
+    <section className={open ? 'card form-section' : 'card form-section collapsed'}>
+      <button
+        type="button"
+        className="form-section-head"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+      >
+        <h3>{title}</h3>
+        <span className="form-section-head-right">
+          {progress && (
+            <span className={complete ? 'form-section-count complete' : 'form-section-count'}>
+              {complete && <Check size={13} />}
+              {progress.done}/{progress.total}
+            </span>
+          )}
+          <ChevronDown size={18} className="form-section-chevron" />
+        </span>
+      </button>
+      <div className="form-section-body">{children}</div>
+    </section>
+  );
+}
+
 export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled, hideReporterSection }: IncidentFormProps) {
   const [values, setValues] = useState<IncidentFormValues>(() => initialValues ?? buildDefaultValues(currentUser));
   const [touched, setTouched] = useState(false);
@@ -114,6 +150,30 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
 
   const hasErrors = Object.keys(fieldErrors).length > 0;
 
+  const sectionProgress = useMemo(() => {
+    const required = {
+      incident: [
+        'title',
+        'specificLocation',
+        'impactedAreaSystem',
+        'description',
+        ...(showOtherType ? ['otherIncidentType'] : []),
+        ...(values.systemRestored ? ['restoredAt'] : []),
+      ],
+      rca: ['incidentSummary', 'why1', 'why2', 'why3', 'why4', 'why5'],
+      closure: ['recommendations', 'lessonsLearned', ...(values.followUpRequired ? ['targetCompletionDate'] : [])],
+    };
+    const calc = (fields: string[]) => ({
+      total: fields.length,
+      done: fields.filter((field) => !fieldErrors[field]).length,
+    });
+    return {
+      incident: calc(required.incident),
+      rca: calc(required.rca),
+      closure: calc(required.closure),
+    };
+  }, [fieldErrors, showOtherType, values.systemRestored, values.followUpRequired]);
+
   function fi(field: string) {
     return touched && fieldErrors[field] ? 'field-invalid' : '';
   }
@@ -142,8 +202,7 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
   return (
     <form className="form-grid" onSubmit={handleSubmit}>
       {!hideReporterSection && (
-      <section className="card form-section">
-        <h3>Reporter details</h3>
+      <FormSection title="Reporter details">
         <div className="fields two-column">
           <label>
             <span>Reporter name</span>
@@ -170,11 +229,10 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             <input value={values.submittedBy} onChange={(e) => update('submittedBy', e.target.value)} />
           </label>
         </div>
-      </section>
+      </FormSection>
       )}
 
-      <section className="card form-section">
-        <h3>Incident details</h3>
+      <FormSection title="Incident details" progress={sectionProgress.incident}>
         <div className="fields two-column">
           <label className={fi('title')}>
             <RequiredLabel>Short title</RequiredLabel>
@@ -277,10 +335,9 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             {touched && fieldErrors.description && <span className="field-error-msg">{fieldErrors.description}</span>}
           </label>
         </div>
-      </section>
+      </FormSection>
 
-      <section className="card form-section">
-        <h3>Immediate actions taken</h3>
+      <FormSection title="Immediate actions taken">
         <div className="fields two-column">
           <label className="full-span">
             <span>Action taken by facilities team</span>
@@ -295,10 +352,9 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             <textarea rows={3} value={values.mitigationApplied} onChange={(e) => update('mitigationApplied', e.target.value)} />
           </label>
         </div>
-      </section>
+      </FormSection>
 
-      <section className="card form-section">
-        <h3>Incident summary and root cause analysis</h3>
+      <FormSection title="Incident summary and root cause analysis" progress={sectionProgress.rca}>
         <div className="fields two-column">
           <label className={fi('incidentSummary')}>
             <RequiredLabel>Incident summary</RequiredLabel>
@@ -339,10 +395,9 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             {touched && fieldErrors.why5 && <span className="field-error-msg">{fieldErrors.why5}</span>}
           </label>
         </div>
-      </section>
+      </FormSection>
 
-      <section className="card form-section">
-        <h3>Recommendations and closure planning</h3>
+      <FormSection title="Recommendations and closure planning" progress={sectionProgress.closure}>
         <div className="fields two-column">
           <label className={`full-span ${fi('recommendations')}`}>
             <RequiredLabel>Recommendations</RequiredLabel>
@@ -373,10 +428,9 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             </>
           )}
         </div>
-      </section>
+      </FormSection>
 
-      <section className="card form-section">
-        <h3>Action tracking</h3>
+      <FormSection title="Action tracking">
         <div className="fields two-column">
           <label>
             <span>Action status</span>
@@ -432,7 +486,7 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
             </div>
           </div>
         )}
-      </section>
+      </FormSection>
 
       {touched && hasErrors && (
         <div className="validation-summary">

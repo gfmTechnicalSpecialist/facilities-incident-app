@@ -840,6 +840,54 @@ th, td {
   .mobile-only { display: block; }
 }
 
+/* ── Collapsible form sections ──────────────────────────────── */
+.form-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: default;
+}
+.form-section-head h3 { margin: 0; }
+.form-section-head-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.form-section-count {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #605E5C;
+  background: #F3F2F1;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-variant-numeric: tabular-nums;
+}
+.form-section-count.complete { background: #DFF6DD; color: #107C10; }
+.form-section-chevron {
+  display: none;
+  color: #605E5C;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+@media (max-width: 760px) {
+  .form-section-head { cursor: pointer; }
+  .form-section-count { display: inline-flex; }
+  .form-section-chevron { display: inline-flex; }
+  .form-section.collapsed .form-section-chevron { transform: rotate(-90deg); }
+  .form-section.collapsed .form-section-body { display: none; }
+}
+
 /* ── Mobile collapsible report cards ────────────────────────── */
 .m-card-list { display: grid; gap: 0.55rem; }
 .m-card {
