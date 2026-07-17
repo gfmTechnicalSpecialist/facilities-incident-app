@@ -365,6 +365,8 @@ th, td {
   .login-panel, .main-content { padding: 1rem; }
   .fields.two-column, .filters-grid, .detail-list, .summary-pair { grid-template-columns: 1fr; }
   .detail-header-card, .quick-status-card, .detail-header-actions, .quick-status-controls, .comment-form { flex-direction: column; align-items: stretch; }
+  .sidebar { display: none; }
+  .main-content { padding-bottom: 6rem; }
 }
 
 @media print {
@@ -740,8 +742,83 @@ th, td {
   .pbi-header { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 560px) {
-  .pbi-kpi-row { grid-template-columns: 1fr; }
+  .pbi-kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
   .pbi-insight { flex-direction: column; align-items: flex-start; }
+  .pbi-kpi-value { font-size: 1.4rem; }
+  .pbi-title { font-size: 0.98rem; }
+  .pbi-tile { padding: 0.75rem 0.85rem; }
+  .pbi-header-right { width: 100%; justify-content: space-between; }
+}
+
+/* ── Mobile floating bottom nav ───────────────────────────── */
+.mobile-nav { display: none; }
+
+@media (max-width: 760px) {
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    left: 0.75rem;
+    right: 0.75rem;
+    z-index: 100;
+    background: linear-gradient(180deg, var(--blue-dark), var(--blue));
+    border-radius: 14px;
+    padding: 0.4rem 0.5rem;
+    justify-content: space-around;
+    align-items: stretch;
+    gap: 0.15rem;
+    box-shadow: 0 8px 24px rgba(0, 10, 92, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  .mobile-nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.45rem 0.25rem;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    text-align: center;
+  }
+  .mobile-nav-link span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .mobile-nav-link.active {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+  }
+  .mobile-nav-link:hover { color: #fff; }
+
+  /* Phone-fit adjustments */
+  .topbar { padding: 0.55rem 0.85rem; }
+  .topbar h2 { font-size: 1.1rem; }
+  .main-content { padding: 0.75rem 0.75rem 6rem; }
+  .pbi-dashboard table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chart-canvas { overflow-x: hidden; }
+  .my-reports-kpi-row { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .my-reports-actions { flex-wrap: wrap; }
+  .page-actions { flex-direction: column; align-items: stretch; }
+  .form-actions { justify-content: stretch; }
+  .form-actions .solid-button { width: 100%; }
+}
+
+@media print {
+  .mobile-nav { display: none !important; }
 }
 
 /* ── Power BI look for all sections (scoped to .pbi-dashboard pages) ── */

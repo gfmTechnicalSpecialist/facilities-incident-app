@@ -67,6 +67,31 @@ export function Layout() {
 
         <Outlet key={location.pathname} />
       </main>
+
+      <nav className="mobile-nav no-print">
+        <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
+          <ShieldAlert size={20} />
+          <span>Dashboard</span>
+        </NavLink>
+        <NavLink to="/incidents" end className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
+          <ClipboardList size={20} />
+          <span>Reports</span>
+        </NavLink>
+        <NavLink to="/my-reports" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
+          <User size={20} />
+          <span>Mine</span>
+        </NavLink>
+        {user?.role === 'admin' && (
+          <NavLink to="/incidents/new" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
+            <PlusCircle size={20} />
+            <span>Log</span>
+          </NavLink>
+        )}
+        <button className="mobile-nav-link mobile-nav-logout" type="button" onClick={logout}>
+          <LogOut size={20} />
+          <span>Logout</span>
+        </button>
+      </nav>
     </div>
   );
 }
