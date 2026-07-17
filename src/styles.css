@@ -559,7 +559,7 @@ th, td {
 /* ── Power BI style dashboard ── */
 .pbi-dashboard {
   font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, sans-serif;
-  gap: 0.7rem;
+  gap: 0.55rem;
 }
 .pbi-tile {
   background: #ffffff;
@@ -577,19 +577,19 @@ th, td {
   border: 1px solid #E6E6E6;
   border-radius: 4px;
   border-top: 3px solid #118DFF;
-  padding: 0.85rem 1.1rem;
+  padding: 0.55rem 1rem;
   box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.08);
 }
 .pbi-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #252423;
   letter-spacing: -0.01em;
 }
 .pbi-subtitle {
-  margin: 0.15rem 0 0;
-  font-size: 0.78rem;
+  margin: 0.1rem 0 0;
+  font-size: 0.74rem;
   color: #605E5C;
 }
 .pbi-header-right {
@@ -612,8 +612,8 @@ th, td {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.85rem 1rem 1rem;
+  gap: 0.25rem;
+  padding: 0.6rem 0.9rem 0.7rem;
   overflow: hidden;
 }
 .pbi-kpi::before {
@@ -647,7 +647,7 @@ th, td {
 }
 .pbi-kpi-value {
   margin: 0;
-  font-size: 2.35rem;
+  font-size: 1.7rem;
   font-weight: 600;
   line-height: 1.05;
   color: #252423;
@@ -668,10 +668,11 @@ th, td {
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
+  padding: 0.6rem 1.1rem;
 }
 .pbi-insight-value {
-  margin: 0.2rem 0 0;
-  font-size: 1.2rem;
+  margin: 0.1rem 0 0;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #252423;
 }
@@ -683,8 +684,8 @@ th, td {
   color: #797673;
   border: 1px solid #F2E7B3;
   border-radius: 3px;
-  padding: 0.45rem 0.8rem;
-  font-size: 0.76rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.74rem;
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
