@@ -556,6 +556,193 @@ th, td {
 }
 .legend-row-item strong { color: var(--text); }
 
+/* ── Power BI style dashboard ── */
+.pbi-dashboard {
+  font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, sans-serif;
+  gap: 0.7rem;
+}
+.pbi-tile {
+  background: #ffffff;
+  border: 1px solid #E6E6E6;
+  border-radius: 4px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.08), 0 0.3px 0.9px rgba(0, 0, 0, 0.05);
+}
+.pbi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #E6E6E6;
+  border-radius: 4px;
+  border-top: 3px solid #118DFF;
+  padding: 0.85rem 1.1rem;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.08);
+}
+.pbi-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #252423;
+  letter-spacing: -0.01em;
+}
+.pbi-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #605E5C;
+}
+.pbi-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-shrink: 0;
+}
+.pbi-refresh {
+  font-size: 0.74rem;
+  color: #605E5C;
+  white-space: nowrap;
+}
+.pbi-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.pbi-kpi {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem 1rem;
+  overflow: hidden;
+}
+.pbi-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--kpi-accent, #118DFF);
+}
+.pbi-kpi-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.pbi-kpi-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--kpi-accent, #118DFF) 12%, #fff);
+  color: var(--kpi-accent, #118DFF);
+  flex-shrink: 0;
+}
+.pbi-kpi-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #605E5C;
+}
+.pbi-kpi-value {
+  margin: 0;
+  font-size: 2.35rem;
+  font-weight: 600;
+  line-height: 1.05;
+  color: #252423;
+  font-variant-numeric: tabular-nums;
+}
+.pbi-visual-header {
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.3rem;
+}
+.pbi-visual-title {
+  margin: 0;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #252423;
+}
+.pbi-insight {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+.pbi-insight-value {
+  margin: 0.2rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #252423;
+}
+.pbi-insight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #FFF4CE;
+  color: #797673;
+  border: 1px solid #F2E7B3;
+  border-radius: 3px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pbi-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.9rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #E6E6E6;
+  margin-top: 0.2rem;
+}
+.pbi-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  color: #605E5C;
+}
+.pbi-legend-item strong { color: #252423; font-weight: 600; }
+.pbi-legend-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.pbi-donut-wrap { position: relative; }
+.pbi-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.pbi-donut-center strong {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #252423;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.pbi-donut-center span {
+  font-size: 0.72rem;
+  color: #605E5C;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+@media (max-width: 900px) {
+  .pbi-kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pbi-header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 560px) {
+  .pbi-kpi-row { grid-template-columns: 1fr; }
+  .pbi-insight { flex-direction: column; align-items: flex-start; }
+}
+
 /* ── My Reports Page ── */
 .my-reports-header {
   display: flex;
