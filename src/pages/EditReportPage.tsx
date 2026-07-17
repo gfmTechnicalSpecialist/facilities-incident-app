@@ -3,11 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
-import { API_BASE } from '../lib/apiBase';
+import { INCIDENT_DETAILS_API_URL, UPDATE_INCIDENT_API_URL } from '../lib/apiBase';
 import type { IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
 
-const DETAILS_API_URL = `${API_BASE}/api/GetIncidentDetails?code=GbtQx8CyGWG21uVQZJjDJjMqarS-syWVkawI47Qm23tOAzFuvxz2zQ==`;
-const UPDATE_API_URL = `${API_BASE}/api/UpdateIncident?code=qGmWbQ3Jl5r0XfMtapKC13yTcty9KU-7JI0mG0z2DeRLAzFu0TzZaw==`;
+const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
+const UPDATE_API_URL = UPDATE_INCIDENT_API_URL;
 
 interface ApiDetails {
   header: {

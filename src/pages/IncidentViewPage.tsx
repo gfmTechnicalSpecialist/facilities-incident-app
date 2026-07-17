@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
-import { API_BASE } from '../lib/apiBase';
+import { INCIDENT_DETAILS_API_URL } from '../lib/apiBase';
 
-const DETAILS_API_URL = `${API_BASE}/api/GetIncidentDetails?code=GbtQx8CyGWG21uVQZJjDJjMqarS-syWVkawI47Qm23tOAzFuvxz2zQ==`;
+const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
 
 interface IncidentDetails {
   header: {

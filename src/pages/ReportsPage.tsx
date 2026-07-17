@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
-import { API_BASE } from '../lib/apiBase';
+import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 
-const REPORTS_API_URL =
-  `${API_BASE}/api/GetReportsData?code=0kvBybL_C3lVuX5kuG2KjA1vUox0iXnt_GrJYgFMqatZAzFuJjpabQ==`;
+const REPORTS_API_URL = REPORTS_DATA_API_URL;
 
 interface ReportIncident {
   incidentId: string;

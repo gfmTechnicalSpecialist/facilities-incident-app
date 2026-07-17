@@ -4,10 +4,10 @@ import { CheckCircle2, ClipboardEdit, Eye, FolderClock, Loader2, ShieldEllipsis 
 import { useAuth } from '../contexts/AuthContext';
 import { actionStatuses } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
-import { API_BASE } from '../lib/apiBase';
+import { USER_REPORTS_API_URL } from '../lib/apiBase';
 import type { ActionStatus } from '../types';
 
-const USER_REPORTS_URL = `${API_BASE}/api/GetUserReports?code=awKAfLvDmotkEbqd2UUHUs_Ca3lSLfmH-91Fss_I2zsoAzFuEdhOow==`;
+const USER_REPORTS_URL = USER_REPORTS_API_URL;
 
 interface ApiUserReport {
   incidentId: string;

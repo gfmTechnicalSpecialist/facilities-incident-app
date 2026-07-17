@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
-import { API_BASE } from '../lib/apiBase';
+import { ADD_INCIDENT_API_URL } from '../lib/apiBase';
 import type { IncidentFormValues } from '../types';
 
-const ADD_INCIDENT_URL = `${API_BASE}/api/AddIncident?code=NLIsBe2nLKFW1T8N6zb6TWqIVeqIPM-HFU9eIH7p0TNwAzFu-49PgQ==`;
+const ADD_INCIDENT_URL = ADD_INCIDENT_API_URL;
 
 function buildPayload(values: IncidentFormValues, userEmail: string) {
   const now = new Date().toISOString();

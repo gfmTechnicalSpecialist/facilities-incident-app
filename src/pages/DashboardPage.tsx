@@ -3,10 +3,7 @@ import { AlertTriangle, CheckCircle2, FolderClock, Printer, ShieldEllipsis, Tren
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { StatCard } from '../components/StatCard';
 import { incidentTypeColorMap, monthPalette, siteColorMap } from '../utils/helpers';
-import { API_BASE } from '../lib/apiBase';
-
-const DASHBOARD_API_URL =
-  `${API_BASE}/api/GetDashboardData?code=1FyUacAQl5-aBeSRIppmNIv2dfipzTbnhgzajeJTVD-OAzFu5DynZg==`;
+import { DASHBOARD_API_URL } from '../lib/apiBase';
 
 interface ChartItem {
   name: string;

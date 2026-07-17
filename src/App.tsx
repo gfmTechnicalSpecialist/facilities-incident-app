@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { AdminRoute, ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { HEALTH_CHECK_URL } from './lib/apiBase';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditIncidentPage } from './pages/EditIncidentPage';
 import { EditReportPage } from './pages/EditReportPage';
@@ -13,6 +15,18 @@ import { MyReportsPage } from './pages/MyReportsPage';
 import { NewIncidentPage } from './pages/NewIncidentPage';
 
 function App() {
+  useEffect(() => {
+    fetch(HEALTH_CHECK_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Health check returned ${res.status}`);
+        return res.text();
+      })
+      .then((body) => console.info('API health check OK', body))
+      .catch((err: unknown) =>
+        console.warn('API health check failed', err instanceof Error ? err.message : err),
+      );
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>

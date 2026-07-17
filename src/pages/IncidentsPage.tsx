@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { actionStatuses, severities, sites } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
-import { API_BASE } from '../lib/apiBase';
+import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 
-const INCIDENTS_API_URL = `${API_BASE}/api/GetReportsData?code=0kvBybL_C3lVuX5kuG2KjA1vUox0iXnt_GrJYgFMqatZAzFuJjpabQ==`;
+const INCIDENTS_API_URL = REPORTS_DATA_API_URL;
 
 interface ApiIncident {
   incidentId: string;
