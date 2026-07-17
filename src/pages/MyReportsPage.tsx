@@ -66,14 +66,13 @@ export function MyReportsPage() {
   const closedCount = reports.filter((i) => i.actionStatus === 'Closed').length;
 
   return (
-    <div className="page-stack">
+    <div className="page-stack pbi-dashboard">
 
       {/* Header */}
-      <header className="card my-reports-header">
+      <header className="pbi-header">
         <div className="my-reports-header-left">
-          <p className="eyebrow">Personal records</p>
-          <h2 className="dashboard-title">My Reports</h2>
-          <p className="dashboard-subtitle">
+          <h2 className="pbi-title">My Reports</h2>
+          <p className="pbi-subtitle">
             Incidents submitted under your account - track status, approval and make edits where permitted.
           </p>
         </div>
@@ -102,47 +101,42 @@ export function MyReportsPage() {
       {!loading && !error && (
         <>
           {/* KPI summary */}
-          <section className="my-reports-kpi-row">
-            <div className="card my-reports-kpi-card" style={{ borderLeft: '5px solid #0057b8' }}>
-              <span className="my-reports-kpi-icon" style={{ background: '#0057b81a', color: '#0057b8' }}>
-                <ShieldEllipsis size={18} />
-              </span>
-              <div>
-                <p className="stat-label-v2">Total submitted</p>
-                <p className="my-reports-kpi-value">{totalCount}</p>
+          <section className="pbi-kpi-row">
+            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#118DFF' }}>
+              <div className="pbi-kpi-head">
+                <span className="pbi-kpi-icon"><ShieldEllipsis size={16} /></span>
+                <span className="pbi-kpi-label">Total Submitted</span>
               </div>
+              <p className="pbi-kpi-value">{totalCount}</p>
             </div>
-            <div className="card my-reports-kpi-card" style={{ borderLeft: '5px solid #ffb000' }}>
-              <span className="my-reports-kpi-icon" style={{ background: '#ffb0001a', color: '#b07800' }}>
-                <FolderClock size={18} />
-              </span>
-              <div>
-                <p className="stat-label-v2">Open</p>
-                <p className="my-reports-kpi-value">{openCount}</p>
+            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#E66C37' }}>
+              <div className="pbi-kpi-head">
+                <span className="pbi-kpi-icon"><FolderClock size={16} /></span>
+                <span className="pbi-kpi-label">Open</span>
               </div>
+              <p className="pbi-kpi-value">{openCount}</p>
             </div>
-            <div className="card my-reports-kpi-card" style={{ borderLeft: '5px solid #7b61ff' }}>
-              <span className="my-reports-kpi-icon" style={{ background: '#7b61ff1a', color: '#5a41d9' }}>
-                <Loader2 size={18} />
-              </span>
-              <div>
-                <p className="stat-label-v2">In progress / review</p>
-                <p className="my-reports-kpi-value">{inProgressCount}</p>
+            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#6B007B' }}>
+              <div className="pbi-kpi-head">
+                <span className="pbi-kpi-icon"><Loader2 size={16} /></span>
+                <span className="pbi-kpi-label">In Progress / Review</span>
               </div>
+              <p className="pbi-kpi-value">{inProgressCount}</p>
             </div>
-            <div className="card my-reports-kpi-card" style={{ borderLeft: '5px solid #43a047' }}>
-              <span className="my-reports-kpi-icon" style={{ background: '#43a0471a', color: '#2e7031' }}>
-                <CheckCircle2 size={18} />
-              </span>
-              <div>
-                <p className="stat-label-v2">Closed</p>
-                <p className="my-reports-kpi-value">{closedCount}</p>
+            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#107C10' }}>
+              <div className="pbi-kpi-head">
+                <span className="pbi-kpi-icon"><CheckCircle2 size={16} /></span>
+                <span className="pbi-kpi-label">Closed</span>
               </div>
+              <p className="pbi-kpi-value">{closedCount}</p>
             </div>
           </section>
 
           {/* Filters */}
-          <section className="card filters-card no-print">
+          <section className="pbi-tile filters-card no-print">
+            <div className="pbi-visual-header">
+              <p className="pbi-visual-title">Filters</p>
+            </div>
             <div className="my-reports-filters">
               <label className="my-reports-search-label">
                 <span>Search</span>
@@ -166,7 +160,7 @@ export function MyReportsPage() {
 
           {/* Table */}
           {filtered.length === 0 ? (
-            <section className="card">
+            <section className="pbi-tile">
               {totalCount === 0 ? (
                 <div className="my-reports-empty">
                   <p className="eyebrow">No reports found</p>
@@ -182,7 +176,7 @@ export function MyReportsPage() {
               )}
             </section>
           ) : (
-            <section className="card table-card">
+            <section className="pbi-tile table-card">
               <div className="my-reports-table-header">
                 <h3 className="my-reports-table-title">
                   {filtered.length} report{filtered.length === 1 ? '' : 's'}

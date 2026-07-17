@@ -111,8 +111,11 @@ export function IncidentsPage() {
   }
 
   return (
-    <div className="page-stack">
-      <section className="card filters-card no-print">
+    <div className="page-stack pbi-dashboard">
+      <section className="pbi-tile filters-card no-print">
+        <div className="pbi-visual-header">
+          <p className="pbi-visual-title">Filters</p>
+        </div>
         <div className="filters-grid filters-grid-wide final-filters-grid">
           <label>
             <span>Search</span>
@@ -166,7 +169,7 @@ export function IncidentsPage() {
       </section>
 
       {filteredGroups.map((group) => (
-        <section className="card table-card" key={group.monthGroup}>
+        <section className="pbi-tile table-card" key={group.monthGroup}>
           <div className="grouped-header">
             <h3>{group.monthGroup}</h3>
             <p className="muted-text">{group.incidents.length} report{group.incidents.length === 1 ? '' : 's'}</p>
@@ -215,7 +218,7 @@ export function IncidentsPage() {
       ))}
 
       {!loading && totalFiltered === 0 && (
-        <section className="card"><p>No reports match the current filters.</p></section>
+        <section className="pbi-tile"><p className="muted-text">No reports match the current filters.</p></section>
       )}
     </div>
   );

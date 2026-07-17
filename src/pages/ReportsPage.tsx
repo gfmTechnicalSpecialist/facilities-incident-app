@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 
@@ -97,18 +97,19 @@ export function ReportsPage() {
   const bySite = tally(allIncidents.map((i) => i.site), siteColorMap);
 
   return (
-    <div className="page-stack">
-      <section className="card headline-card">
+    <div className="page-stack pbi-dashboard">
+      <header className="pbi-header">
         <div>
-          <p className="eyebrow">Analysis</p>
-          <h3>Which incidents are reported the most?</h3>
+          <h2 className="pbi-title">Incident Analysis</h2>
+          <p className="pbi-subtitle">Which incidents are reported the most? Rankings and distributions across types and sites.</p>
         </div>
-        <p className="muted-text">The ranking cards and charts below make the most common incident types and affected sites easier to read.</p>
-      </section>
+      </header>
 
       <section className="detail-grid">
-        <div className="card">
-          <h3>Incident type ranking</h3>
+        <div className="pbi-tile">
+          <div className="pbi-visual-header">
+            <p className="pbi-visual-title">Incident Type Ranking</p>
+          </div>
           <ol className="ranking-list">
             {byType.map((item) => (
               <li key={item.name}>
@@ -119,8 +120,10 @@ export function ReportsPage() {
           </ol>
         </div>
 
-        <div className="card">
-          <h3>Site ranking</h3>
+        <div className="pbi-tile">
+          <div className="pbi-visual-header">
+            <p className="pbi-visual-title">Site Ranking</p>
+          </div>
           <ol className="ranking-list">
             {bySite.map((item) => (
               <li key={item.name}>
@@ -133,15 +136,18 @@ export function ReportsPage() {
       </section>
 
       <section className="charts-grid">
-        <div className="card chart-card">
-          <h3>Incident type distribution</h3>
+        <div className="pbi-tile chart-card">
+          <div className="pbi-visual-header">
+            <p className="pbi-visual-title">Incident Count by Type</p>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={byType} margin={{ top: 10, right: 10, left: 0, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-20} textAnchor="end" height={80} interval={0} />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+            <BarChart data={byType} margin={{ top: 18, right: 8, left: -14, bottom: 58 }} barCategoryGap="28%">
+              <CartesianGrid strokeDasharray="0" vertical={false} stroke="#E6E6E6" />
+              <XAxis dataKey="name" angle={-30} textAnchor="end" height={78} interval={0} tick={{ fontSize: 10, fill: '#605E5C' }} axisLine={{ stroke: '#E6E6E6' }} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#605E5C' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ fill: 'rgba(17, 141, 255, 0.06)' }} contentStyle={{ borderRadius: 4, border: '1px solid #E6E6E6', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} />
+              <Bar dataKey="value" name="Incidents" radius={[2, 2, 0, 0]} maxBarSize={40}>
+                <LabelList dataKey="value" position="top" style={{ fontSize: 11, fontWeight: 600, fill: '#252423' }} />
                 {byType.map((entry) => (
                   <Cell key={entry.name} fill={entry.color} />
                 ))}
@@ -150,15 +156,18 @@ export function ReportsPage() {
           </ResponsiveContainer>
         </div>
 
-        <div className="card chart-card">
-          <h3>Site distribution</h3>
+        <div className="pbi-tile chart-card">
+          <div className="pbi-visual-header">
+            <p className="pbi-visual-title">Incident Count by Site</p>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={bySite} margin={{ top: 10, right: 10, left: 0, bottom: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" interval={0} />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+            <BarChart data={bySite} margin={{ top: 18, right: 8, left: -14, bottom: 8 }} barCategoryGap="32%">
+              <CartesianGrid strokeDasharray="0" vertical={false} stroke="#E6E6E6" />
+              <XAxis dataKey="name" interval={0} tick={{ fontSize: 10, fill: '#605E5C' }} axisLine={{ stroke: '#E6E6E6' }} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#605E5C' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ fill: 'rgba(17, 141, 255, 0.06)' }} contentStyle={{ borderRadius: 4, border: '1px solid #E6E6E6', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} />
+              <Bar dataKey="value" name="Incidents" radius={[2, 2, 0, 0]} maxBarSize={40}>
+                <LabelList dataKey="value" position="top" style={{ fontSize: 11, fontWeight: 600, fill: '#252423' }} />
                 {bySite.map((entry) => (
                   <Cell key={entry.name} fill={entry.color} />
                 ))}
@@ -169,8 +178,8 @@ export function ReportsPage() {
       </section>
 
       {groups.map((group) => (
-        <section key={group.monthGroup} className="card">
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '1rem' }}>
+        <section key={group.monthGroup} className="pbi-tile">
+          <div className="grouped-header" style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <h3 style={{ margin: 0 }}>{group.monthGroup}</h3>
             <span className="muted-text">{group.reportCount} incident{group.reportCount !== 1 ? 's' : ''}</span>
           </div>
