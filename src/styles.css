@@ -279,10 +279,15 @@ label span, label > strong {
   align-items: center;
 }
 .legend-key { width: 14px; height: 14px; border-radius: 4px; }
-.filters-grid, .fields.two-column, .fields.one-column {
+.filters-grid, .fields.two-column {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.fields.one-column {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
 }
 .final-filters-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .full-span { grid-column: 1 / -1; }
