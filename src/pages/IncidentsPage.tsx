@@ -175,7 +175,7 @@ export function IncidentsPage() {
             <p className="muted-text">{group.incidents.length} report{group.incidents.length === 1 ? '' : 's'}</p>
           </div>
           <div className="table-scroll">
-            <table>
+            <table className="responsive-table">
               <thead>
                 <tr>
                   <th>Incident ID</th>
@@ -195,20 +195,20 @@ export function IncidentsPage() {
                     className="clickable-row"
                     onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
                   >
-                    <td>{incident.incidentId}</td>
-                    <td>{incident.title}</td>
-                    <td>{incident.site}</td>
-                    <td>{incident.type}</td>
-                    <td>
+                    <td data-label="Incident ID">{incident.incidentId}</td>
+                    <td data-label="Title">{incident.title}</td>
+                    <td data-label="Site">{incident.site}</td>
+                    <td data-label="Type">{incident.type}</td>
+                    <td data-label="Severity">
                       <span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>
                     </td>
-                    <td>
+                    <td data-label="Action status">
                       <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{incident.actionStatus}</span>
                     </td>
-                    <td>
+                    <td data-label="Approval status">
                       <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
                     </td>
-                    <td>{incident.date}</td>
+                    <td data-label="Date">{incident.date}</td>
                   </tr>
                 ))}
               </tbody>

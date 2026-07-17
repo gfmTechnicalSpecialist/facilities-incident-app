@@ -184,7 +184,7 @@ export function MyReportsPage() {
                 </h3>
               </div>
               <div className="table-scroll">
-                <table>
+                <table className="responsive-table">
                   <thead>
                     <tr>
                       <th>Reference</th>
@@ -201,25 +201,25 @@ export function MyReportsPage() {
                   <tbody>
                     {filtered.map((incident) => (
                       <tr key={incident.incidentId}>
-                        <td><span className="my-reports-ref">{incident.incidentId}</span></td>
-                        <td><span className="my-reports-title-cell">{incident.title}</span></td>
-                        <td>{incident.site}</td>
-                        <td>{incident.type}</td>
-                        <td>
+                        <td data-label="Reference"><span className="my-reports-ref">{incident.incidentId}</span></td>
+                        <td data-label="Title"><span className="my-reports-title-cell">{incident.title}</span></td>
+                        <td data-label="Site">{incident.site}</td>
+                        <td data-label="Type">{incident.type}</td>
+                        <td data-label="Severity">
                           <span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>
                         </td>
-                        <td>
+                        <td data-label="Action status">
                           <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>
                             {incident.actionStatus}
                           </span>
                         </td>
-                        <td>
+                        <td data-label="Approval">
                           <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>
                             {approvalStatusLabel(incident.approvalStatus)}
                           </span>
                         </td>
-                        <td>{incident.date}</td>
-                        <td>
+                        <td data-label="Date">{incident.date}</td>
+                        <td data-label="Actions">
                           <div className="my-reports-actions">
                             <button
                               className="ghost-button my-reports-action-btn"
