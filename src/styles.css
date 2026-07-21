@@ -310,7 +310,7 @@ th, td {
   text-align: left;
   padding: 0.95rem 0.75rem;
   border-bottom: 1px solid var(--line);
-  vertical-align: top;
+  vertical-align: middle;
 }
 .badge, .status-pill, .approval-pill {
   display: inline-flex;
