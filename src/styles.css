@@ -896,10 +896,10 @@ th, td {
 }
 
 /* ── Desktop / mobile visibility helpers ────────────────────── */
-.mobile-only { display: none; }
+.mobile-only { display: none !important; }
 @media (max-width: 760px) {
-  .desktop-only { display: none; }
-  .mobile-only { display: block; }
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block !important; }
 }
 
 /* ── Collapsible form sections ──────────────────────────────── */
