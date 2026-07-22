@@ -13,6 +13,7 @@ import { IncidentsPage } from './pages/IncidentsPage';
 import { LoginPage } from './pages/LoginPage';
 import { MyReportsPage } from './pages/MyReportsPage';
 import { NewIncidentPage } from './pages/NewIncidentPage';
+import { ApprovalsPage } from './pages/ApprovalsPage';
 
 function App() {
   useEffect(() => {
@@ -45,6 +46,7 @@ function App() {
                 <Route path="/incidents/:id/edit" element={<EditIncidentPage />} />
                 <Route path="/incidents/view/:incidentId/edit" element={<EditReportPage />} />
               </Route>
+              <Route path="/approvals" element={<ApprovalsPage />} />
             </Route>
           </Route>
         </Routes>

@@ -6,6 +6,7 @@ import { addComment, getIncidentById, listComments, updateIncidentReview, update
 import { actionStatuses, approvalStatuses } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel, formatDateTime } from '../utils/helpers';
 import type { ActionStatus, ApprovalStatus } from '../types';
+import { ApprovalDialog } from '../components/ApprovalDialog';
 
 export function IncidentDetailPage() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export function IncidentDetailPage() {
   const [reviewComments, setReviewComments] = useState('');
   const [message, setMessage] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
 
   const incident = useMemo(() => (id ? getIncidentById(id) : undefined), [id, refreshKey]);
   const comments = useMemo(() => (incident ? listComments(incident.id) : []), [incident, refreshKey]);
@@ -82,6 +84,9 @@ export function IncidentDetailPage() {
           <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{incident.actionStatus}</span>
           <span className={`approval-pill detail-approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
           {user.role === 'admin' && incident.actionStatus !== 'Closed' && <Link className="solid-button" to={`/incidents/${incident.id}/edit`}>Edit report</Link>}
+          {user.role === 'approver' && incident.approvalStatus === 'Pending' && (
+            <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
+          )}
           {incident.actionStatus === 'Closed' && (
             <button className="outline-button" type="button" onClick={() => window.print()}>
               <Printer size={16} /> Print PDF
@@ -247,6 +252,10 @@ export function IncidentDetailPage() {
           {!comments.length && <p className="muted-text">No comments yet.</p>}
         </div>
       </section>
+
+      {isApprovalDialogOpen && (
+        <ApprovalDialog incidentId={incident.id} onClose={() => setIsApprovalDialogOpen(false)} />
+      )}
     </div>
   );
 }

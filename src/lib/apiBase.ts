@@ -14,6 +14,7 @@ const updateIncidentFunctionCode = import.meta.env.VITE_UPDATE_INCIDENT_FUNCTION
 const reportsDataFunctionCode = import.meta.env.VITE_REPORTS_DATA_FUNCTION_CODE;
 const userReportsFunctionCode = import.meta.env.VITE_USER_REPORTS_FUNCTION_CODE;
 const addIncidentFunctionCode = import.meta.env.VITE_ADD_INCIDENT_FUNCTION_CODE;
+const approveIncidentFunctionCode = import.meta.env.VITE_APPROVE_INCIDENT_FUNCTION_CODE;
 
 function getFunctionUrl(path: string, code?: string) {
   const url = `${API_BASE}${path}`;
@@ -28,3 +29,4 @@ export const UPDATE_INCIDENT_API_URL = getFunctionUrl('/api/UpdateIncident', upd
 export const REPORTS_DATA_API_URL = getFunctionUrl('/api/GetReportsData', reportsDataFunctionCode);
 export const USER_REPORTS_API_URL = getFunctionUrl('/api/GetUserReports', userReportsFunctionCode);
 export const ADD_INCIDENT_API_URL = getFunctionUrl('/api/AddIncident', addIncidentFunctionCode);
+export const APPROVE_INCIDENT_API_URL = getFunctionUrl('/api/ApproveIncident', approveIncidentFunctionCode);

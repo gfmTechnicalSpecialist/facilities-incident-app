@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL } from '../lib/apiBase';
+import { useAuth } from '../contexts/AuthContext';
+import { ApprovalDialog } from '../components/ApprovalDialog';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
 
@@ -74,10 +76,12 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 export function IncidentViewPage() {
   const { incidentId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [data, setData] = useState<IncidentDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!incidentId) return;
@@ -148,6 +152,9 @@ export function IncidentViewPage() {
           <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
           <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
           <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
+          {user?.role === 'approver' && header.approvalStatus === 'Pending' && (
+            <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
+          )}
           <button className="outline-button" type="button" onClick={() => window.print()}>
             <Printer size={16} /> Print PDF
           </button>
@@ -264,7 +271,30 @@ export function IncidentViewPage() {
             <dd>{workflow.reviewComments || 'No review comments yet.'}</dd>
           </div>
         </dl>
+        {user?.role === 'approver' && header.approvalStatus === 'Pending' && (
+          <div className="form-actions inline-actions no-print">
+            <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Approve / Reject</button>
+          </div>
+        )}
       </section>
+
+      {isApprovalDialogOpen && incidentId && (
+        <ApprovalDialog
+          incidentId={incidentId}
+          onClose={() => setIsApprovalDialogOpen(false)}
+          onSubmitted={(status) =>
+            setData((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    header: { ...prev.header, approvalStatus: status },
+                    workflow: { ...prev.workflow, approvedBy: status === 'Approved' ? (user?.fullName ?? prev.workflow.approvedBy) : prev.workflow.approvedBy, reviewedBy: user?.fullName ?? prev.workflow.reviewedBy },
+                  }
+                : prev,
+            )
+          }
+        />
+      )}
 
       {/* Viewer comments */}
       <section className="card">

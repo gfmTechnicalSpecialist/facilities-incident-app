@@ -34,6 +34,11 @@ export function Layout() {
                 <PlusCircle size={18} /> Log report
               </NavLink>
             )}
+            {user?.role === 'approver' && (
+              <NavLink to="/approvals" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+                <ClipboardList size={18} /> Approvals
+              </NavLink>
+            )}
           </nav>
 
           <div className="sidebar-footer">
@@ -60,6 +65,7 @@ export function Layout() {
               : location.pathname.includes('/incidents/view/') ? 'Incident detail'
               : location.pathname === '/incidents' ? 'Incident workspace'
               : location.pathname === '/reports' ? 'Reports'
+              : location.pathname === '/approvals' ? 'Approvals'
               : 'Incident workspace'
             }</h2>
           </div>
@@ -85,6 +91,12 @@ export function Layout() {
           <NavLink to="/incidents/new" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
             <PlusCircle size={20} />
             <span>Log</span>
+          </NavLink>
+        )}
+        {user?.role === 'approver' && (
+          <NavLink to="/approvals" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
+            <ClipboardList size={20} />
+            <span>Approvals</span>
           </NavLink>
         )}
         <button className="mobile-nav-link mobile-nav-logout" type="button" onClick={logout}>

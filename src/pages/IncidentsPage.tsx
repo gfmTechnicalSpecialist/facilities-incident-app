@@ -4,6 +4,8 @@ import { actionStatuses, severities, sites } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
+import { useAuth } from '../contexts/AuthContext';
+import { ApprovalDialog } from '../components/ApprovalDialog';
 
 const INCIDENTS_API_URL = REPORTS_DATA_API_URL;
 
@@ -26,9 +28,11 @@ interface MonthGroup {
 
 export function IncidentsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [groups, setGroups] = useState<MonthGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reviewIncidentId, setReviewIncidentId] = useState<string | null>(null);
 
   const [search, setSearch] = useState('');
   const [site, setSite] = useState('All');
@@ -37,6 +41,8 @@ export function IncidentsPage() {
   const [status, setStatus] = useState('All');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+
+  const isApprover = user?.role === 'approver';
 
   useEffect(() => {
     let cancelled = false;
@@ -187,6 +193,7 @@ export function IncidentsPage() {
                   <th>Action status</th>
                   <th>Approval status</th>
                   <th>Date</th>
+                  {isApprover && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -210,6 +217,22 @@ export function IncidentsPage() {
                       <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
                     </td>
                     <td data-label="Date">{incident.date}</td>
+                    {isApprover && (
+                      <td data-label="Actions">
+                        {incident.approvalStatus === 'Pending' && (
+                          <button
+                            className="outline-button"
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setReviewIncidentId(incident.incidentId);
+                            }}
+                          >
+                            Review
+                          </button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -237,13 +260,24 @@ export function IncidentsPage() {
                   { label: 'Date', value: incident.date },
                 ]}
                 actions={
-                  <button
-                    className="solid-button full-width"
-                    type="button"
-                    onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
-                  >
-                    View report
-                  </button>
+                  <div className="inline-actions">
+                    <button
+                      className="solid-button full-width"
+                      type="button"
+                      onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+                    >
+                      View report
+                    </button>
+                    {isApprover && incident.approvalStatus === 'Pending' && (
+                      <button
+                        className="outline-button full-width"
+                        type="button"
+                        onClick={() => setReviewIncidentId(incident.incidentId)}
+                      >
+                        Review
+                      </button>
+                    )}
+                  </div>
                 }
               />
             ))}
@@ -253,6 +287,23 @@ export function IncidentsPage() {
 
       {!loading && totalFiltered === 0 && (
         <section className="pbi-tile"><p className="muted-text">No reports match the current filters.</p></section>
+      )}
+
+      {reviewIncidentId && (
+        <ApprovalDialog
+          incidentId={reviewIncidentId}
+          onClose={() => setReviewIncidentId(null)}
+          onSubmitted={(status) => {
+            setGroups((prev) =>
+              prev.map((group) => ({
+                ...group,
+                incidents: group.incidents.map((incident) =>
+                  incident.incidentId === reviewIncidentId ? { ...incident, approvalStatus: status } : incident,
+                ),
+              })),
+            );
+          }}
+        />
       )}
     </div>
   );
