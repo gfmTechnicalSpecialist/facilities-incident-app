@@ -1,6 +1,13 @@
-import type { IncidentCategory, IncidentType, Impact, Severity, ActionStatus, ApprovalStatus } from '../types';
+import type { IncidentCategory, IncidentType, Impact, Severity, ActionStatus, ApprovalStatus, AppUser } from '../types';
 
 export const sites = ['Centurion', 'PDC', 'Durban', 'Cape Town', 'Sandton', 'Other'];
+
+// Users allowed to approve/reject incident reports, regardless of their base role.
+export const APPROVER_USER_IDS = ['admin_jacob_lesale', 'approver_noba_d', 'approver_jason_m'];
+
+export function isApprover(user: AppUser | null | undefined): boolean {
+  return !!user && APPROVER_USER_IDS.includes(user.id);
+}
 
 export const incidentCategoryMap: Record<IncidentCategory, IncidentType[]> = {
   'Safety & Health': ['Personal Injury', 'Near Miss', 'Occupational Illness'],

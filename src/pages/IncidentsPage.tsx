@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { actionStatuses, severities, sites } from '../utils/constants';
+import { actionStatuses, severities, sites, isApprover } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
@@ -42,7 +42,7 @@ export function IncidentsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  const isApprover = user?.role === 'approver';
+  const canApprove = isApprover(user);
 
   useEffect(() => {
     let cancelled = false;
@@ -193,7 +193,7 @@ export function IncidentsPage() {
                   <th>Action status</th>
                   <th>Approval status</th>
                   <th>Date</th>
-                  {isApprover && <th>Actions</th>}
+                  {canApprove && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -217,7 +217,7 @@ export function IncidentsPage() {
                       <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
                     </td>
                     <td data-label="Date">{incident.date}</td>
-                    {isApprover && (
+                    {canApprove && (
                       <td data-label="Actions">
                         {incident.approvalStatus === 'Pending' && (
                           <button
@@ -268,7 +268,7 @@ export function IncidentsPage() {
                     >
                       View report
                     </button>
-                    {isApprover && incident.approvalStatus === 'Pending' && (
+                    {canApprove && incident.approvalStatus === 'Pending' && (
                       <button
                         className="outline-button full-width"
                         type="button"

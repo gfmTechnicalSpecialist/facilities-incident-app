@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Printer } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { addComment, getIncidentById, listComments, updateIncidentReview, updateIncidentStatus } from '../services/incidentService';
-import { actionStatuses, approvalStatuses } from '../utils/constants';
+import { actionStatuses, approvalStatuses, isApprover } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel, formatDateTime } from '../utils/helpers';
 import type { ActionStatus, ApprovalStatus } from '../types';
 import { ApprovalDialog } from '../components/ApprovalDialog';
@@ -84,7 +84,7 @@ export function IncidentDetailPage() {
           <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{incident.actionStatus}</span>
           <span className={`approval-pill detail-approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
           {user.role === 'admin' && incident.actionStatus !== 'Closed' && <Link className="solid-button" to={`/incidents/${incident.id}/edit`}>Edit report</Link>}
-          {user.role === 'approver' && incident.approvalStatus === 'Pending' && (
+          {isApprover(user) && incident.approvalStatus === 'Pending' && (
             <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
           )}
           {incident.actionStatus === 'Closed' && (

@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { ClipboardList, LogOut, PlusCircle, ShieldAlert, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from './Logo';
+import { isApprover } from '../utils/constants';
 
 export function Layout() {
   const { user, logout } = useAuth();
@@ -34,7 +35,7 @@ export function Layout() {
                 <PlusCircle size={18} /> Log report
               </NavLink>
             )}
-            {user?.role === 'approver' && (
+            {isApprover(user) && (
               <NavLink to="/approvals" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
                 <ClipboardList size={18} /> Approvals
               </NavLink>
@@ -93,7 +94,7 @@ export function Layout() {
             <span>Log</span>
           </NavLink>
         )}
-        {user?.role === 'approver' && (
+        {isApprover(user) && (
           <NavLink to="/approvals" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
             <ClipboardList size={20} />
             <span>Approvals</span>

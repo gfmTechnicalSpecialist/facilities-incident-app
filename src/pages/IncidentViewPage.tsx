@@ -5,6 +5,7 @@ import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
+import { isApprover } from '../utils/constants';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
 
@@ -152,7 +153,7 @@ export function IncidentViewPage() {
           <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
           <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
           <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
-          {user?.role === 'approver' && header.approvalStatus === 'Pending' && (
+          {isApprover(user) && header.approvalStatus === 'Pending' && (
             <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
           )}
           <button className="outline-button" type="button" onClick={() => window.print()}>
@@ -271,7 +272,7 @@ export function IncidentViewPage() {
             <dd>{workflow.reviewComments || 'No review comments yet.'}</dd>
           </div>
         </dl>
-        {user?.role === 'approver' && header.approvalStatus === 'Pending' && (
+        {isApprover(user) && header.approvalStatus === 'Pending' && (
           <div className="form-actions inline-actions no-print">
             <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Approve / Reject</button>
           </div>
