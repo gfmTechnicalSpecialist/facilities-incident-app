@@ -64,6 +64,7 @@ label span, label > strong {
   padding: 0.85rem 1.15rem;
   font-weight: 700;
   border: none;
+  cursor: pointer;
 }
 .solid-button { background: linear-gradient(135deg, var(--red), var(--blue)); color: #fff; }
 .outline-button { background: transparent; border: 1px solid var(--blue); color: var(--blue); }
@@ -143,12 +144,23 @@ label span, label > strong {
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.65rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 0.25rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(0, 87, 184, 0.08);
 }
+.modal-actions button {
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 0.83rem;
+  padding: 0.5rem 0.95rem;
+}
+.modal-actions .approve-button { background: #107C41; color: #fff; }
+.modal-actions .approve-button:hover:not(:disabled) { background: #0c6234; }
+.modal-actions .reject-button { background: #D13438; color: #fff; }
+.modal-actions .reject-button:hover:not(:disabled) { background: #a72b2e; }
+.modal-actions .outline-button { border: 1px solid #118DFF; color: #118DFF; }
 @keyframes modal-overlay-in {
   from { opacity: 0; }
   to { opacity: 1; }
