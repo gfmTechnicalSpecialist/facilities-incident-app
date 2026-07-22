@@ -97,22 +97,6 @@ export const appUsers: UserRecord[] = [
     department: 'Facilities',
     initialPassword: 'MV#MGroup26',
   },
-  {
-    id: 'approver_noba_d',
-    fullName: 'Noba D',
-    email: 'noba.d@momentum.co.za',
-    role: 'approver',
-    department: 'Facilities',
-    initialPassword: 'ND!MGroup26',
-  },
-  {
-    id: 'approver_jason_m',
-    fullName: 'Jason M',
-    email: 'jason.m@momentum.co.za',
-    role: 'approver',
-    department: 'Facilities',
-    initialPassword: 'JM!MGroup26',
-  },
 ];
 
 const adminReporter = appUsers[0];
