@@ -2,15 +2,14 @@ import type { IncidentCategory, IncidentType, Impact, Severity, ActionStatus, Ap
 
 export const sites = ['Centurion', 'PDC', 'Durban', 'Cape Town', 'Sandton', 'Other'];
 
-// Users allowed to approve/reject incident reports, regardless of their base role.
-// Matched by full name (case-insensitive) since the backend user id (e.g. "user-01")
-// does not correspond to any id used elsewhere in this app.
-// TODO: update 'Noba ...' and 'Jason ...' with their exact full names once their
-// accounts exist in the backend users table.
-export const APPROVER_FULL_NAMES = ['jacob lesale', 'noba', 'jason'];
+// Additional users allowed to approve/reject incident reports even if their base
+// role is not 'admin'. Matched by full name (case-insensitive) since the backend
+// user id (e.g. "user-01") does not correspond to any id used elsewhere in this app.
+export const APPROVER_FULL_NAMES: string[] = [];
 
 export function isApprover(user: AppUser | null | undefined): boolean {
   if (!user) return false;
+  if (user.role === 'admin') return true;
   const name = user.fullName.trim().toLowerCase();
   return APPROVER_FULL_NAMES.some((approverName) => name === approverName || name.includes(approverName));
 }

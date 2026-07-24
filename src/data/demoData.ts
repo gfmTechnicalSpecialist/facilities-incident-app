@@ -4,7 +4,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_jacob_lesale',
     fullName: 'Jacob Lesale',
-    email: 'jlesale@momentum.co.za',
+    email: 'jacob.lesale@mmltd.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'JL!MGroup26',
@@ -12,23 +12,15 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_william_mcpherson',
     fullName: 'William McPherson',
-    email: 'wmcpherson@momentum.co.za',
+    email: 'william.mcpherson@mmltd.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'WM#MGroup26',
   },
   {
-    id: 'admin_martin_munzhedi',
-    fullName: 'Martin Munzhedi',
-    email: 'mmunzhedi@momentum.co.za',
-    role: 'admin',
-    department: 'Facilities',
-    initialPassword: 'MM@MGroup26',
-  },
-  {
     id: 'admin_teinie_potgieter',
     fullName: 'Teinie Potgieter',
-    email: 'tpotgieter@momentum.co.za',
+    email: 'teinie.potgieter@mmltd.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'TP$MGroup26',
@@ -36,7 +28,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'admin_nadia_van_zyl',
     fullName: 'Nadia van Zyl',
-    email: 'nvanzyl@momentum.co.za',
+    email: 'nadia.vanzyl@mmltd.co.za',
     role: 'admin',
     department: 'Facilities',
     initialPassword: 'NVZ%MGroup26',
@@ -44,7 +36,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_debbi_smyly',
     fullName: 'Debbi Smyly',
-    email: 'dsmyly@momentum.co.za',
+    email: 'debbi.smyly@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'DS!MGroup26',
@@ -52,7 +44,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_gavin_williams',
     fullName: 'Gavin Williams',
-    email: 'gwilliams@momentum.co.za',
+    email: 'gavin.williams@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'GW#MGroup26',
@@ -60,7 +52,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_ezekiel_mabowe',
     fullName: 'Ezekiel Mabowe',
-    email: 'emabowe@momentum.co.za',
+    email: 'ezekiel.mabowe@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'EM@MGroup26',
@@ -68,7 +60,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_mazwikayise_sibiya',
     fullName: 'Mazwikayise Sibiya',
-    email: 'msibiya@momentum.co.za',
+    email: 'mazwikayise.sibiya@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'MS$MGroup26',
@@ -76,7 +68,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_klynboy_kwakwa',
     fullName: 'Klynboy Kwakwa',
-    email: 'kkwakwa@momentum.co.za',
+    email: 'klynboy.kwakwa@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'KK%MGroup26',
@@ -84,7 +76,7 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_kenny_kabini',
     fullName: 'Kenny Kabini',
-    email: 'kkabini@momentum.co.za',
+    email: 'kenny.kabini@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'KKa!MGroup26',
@@ -92,16 +84,40 @@ export const appUsers: UserRecord[] = [
   {
     id: 'viewer_michael_venter',
     fullName: 'Michael Venter',
-    email: 'mventer@momentum.co.za',
+    email: 'michael.venter@mmltd.co.za',
     role: 'viewer',
     department: 'Facilities',
     initialPassword: 'MV#MGroup26',
   },
+  {
+    id: 'admin_jason_fourie',
+    fullName: 'Jason Fourie',
+    email: 'jason.fourie@mmltd.co.za',
+    role: 'admin',
+    department: 'Facilities',
+    initialPassword: 'JF^MGroup26',
+  },
+  {
+    id: 'admin_nobathembu_yekiso',
+    fullName: 'Nobathembu Yekiso',
+    email: 'nobathembu.yekiso@mmltd.co.za',
+    role: 'admin',
+    department: 'Facilities',
+    initialPassword: 'NY&MGroup26',
+  },
+  {
+    id: 'admin_denzil_gambino',
+    fullName: 'Denzil Gambino',
+    email: 'denzil.gambino@mmltd.co.za',
+    role: 'admin',
+    department: 'Facilities',
+    initialPassword: 'DG*MGroup26',
+  },
 ];
 
-const adminReporter = appUsers[0];
-const viewerReviewer = appUsers[5];
-const viewerApprover = appUsers[6];
+const adminReporter = appUsers.find((u) => u.id === 'admin_jacob_lesale')!;
+const viewerReviewer = appUsers.find((u) => u.id === 'viewer_debbi_smyly')!;
+const viewerApprover = appUsers.find((u) => u.id === 'viewer_gavin_williams')!;
 
 export const demoIncidents: Incident[] = [
   {
