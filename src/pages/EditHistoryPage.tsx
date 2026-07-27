@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { History } from 'lucide-react';
 import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { MobileReportCard } from '../components/MobileReportCard';
@@ -36,64 +36,63 @@ function formatTimestamp(value: string): string {
 
 export function EditHistoryPage() {
   const [edits, setEdits] = useState<IncidentEdit[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
+  const runSearch = (rawId: string) => {
+    const incidentId = rawId.trim();
     setError(null);
-    fetch(EDIT_HISTORY_API_URL)
+    if (!incidentId) {
+      setEdits([]);
+      setHasSearched(false);
+      return;
+    }
+    setLoading(true);
+    setHasSearched(true);
+    fetch(EDIT_HISTORY_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ incidentId }),
+    })
       .then((res) => {
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         return res.json() as Promise<IncidentEdit[]>;
       })
       .then((json) => {
-        if (!cancelled) setEdits(Array.isArray(json) ? json : []);
+        setEdits(Array.isArray(json) ? json : []);
       })
       .catch((err: unknown) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load edit history');
+        setError(err instanceof Error ? err.message : 'Failed to load edit history');
+        setEdits([]);
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  };
 
-  const filtered = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) return edits;
-    return edits.filter((edit) => {
-      const haystack = [
-        edit.incidentId,
-        edit.editedByName,
-        edit.editedByUserId,
-        edit.fieldChanged,
-        edit.oldValue ?? '',
-        edit.newValue ?? '',
-      ]
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(term);
-    });
-  }, [edits, search]);
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    runSearch(search);
+  };
 
   return (
     <div className="page-stack pbi-dashboard">
       <CollapsibleFiltersCard title="Filters" className="no-print">
-        <div className="my-reports-filters">
+        <form className="my-reports-filters" onSubmit={handleSubmit}>
           <label className="my-reports-search-label">
-            <span>Search</span>
+            <span>Incident ID</span>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by incident, editor, field or value..."
+              placeholder="Enter incident ID (e.g. INC-2026-001)"
             />
           </label>
-        </div>
+          <button type="submit" className="solid-button" disabled={loading}>
+            {loading ? 'Searching…' : 'Search'}
+          </button>
+        </form>
       </CollapsibleFiltersCard>
 
       {loading && (
@@ -113,17 +112,27 @@ export function EditHistoryPage() {
         </section>
       )}
 
-      {!loading && !error && (
+      {!loading && !error && !hasSearched && (
+        <section className="pbi-tile edit-history-empty">
+          <span className="edit-history-empty-icon"><History size={22} /></span>
+          <div>
+            <p className="pbi-visual-title">Search for an incident</p>
+            <p className="muted-text">Enter an incident ID above to view its full edit history.</p>
+          </div>
+        </section>
+      )}
+
+      {!loading && !error && hasSearched && (
         <section className="pbi-tile table-card">
           <div className="grouped-header">
             <h3>Incident edits</h3>
             <p className="muted-text">
-              {filtered.length} change{filtered.length === 1 ? '' : 's'} recorded
+              {edits.length} change{edits.length === 1 ? '' : 's'} recorded
             </p>
           </div>
 
-          {filtered.length === 0 ? (
-            <p className="muted-text">No edits match the current search.</p>
+          {edits.length === 0 ? (
+            <p className="muted-text">No edits found for “{search.trim()}”.</p>
           ) : (
             <>
               <div className="table-scroll desktop-only">
@@ -140,7 +149,7 @@ export function EditHistoryPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((edit) => (
+                    {edits.map((edit) => (
                       <tr key={edit.id}>
                         <td data-label="Incident ID"><span className="my-reports-ref">{edit.incidentId}</span></td>
                         <td data-label="Field changed"><span className="edit-history-field">{edit.fieldChanged}</span></td>
@@ -156,7 +165,7 @@ export function EditHistoryPage() {
               </div>
 
               <div className="m-card-list mobile-only">
-                {filtered.map((edit) => (
+                {edits.map((edit) => (
                   <MobileReportCard
                     key={edit.id}
                     reference={edit.incidentId}
