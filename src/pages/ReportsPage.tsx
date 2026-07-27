@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, incidentTypeColorMap, siteColorMap } from '../utils/helpers';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
+import { MobileReportCard } from '../components/MobileReportCard';
 
 const REPORTS_API_URL = REPORTS_DATA_API_URL;
 
@@ -183,7 +184,7 @@ export function ReportsPage() {
             <h3 style={{ margin: 0 }}>{group.monthGroup}</h3>
             <span className="muted-text">{group.reportCount} incident{group.reportCount !== 1 ? 's' : ''}</span>
           </div>
-          <div className="table-scroll">
+          <div className="table-scroll desktop-only">
             <table>
               <thead>
                 <tr>
@@ -212,6 +213,26 @@ export function ReportsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="m-card-list mobile-only">
+            {group.incidents.map((incident) => (
+              <MobileReportCard
+                key={incident.incidentId}
+                reference={incident.incidentId}
+                title={incident.title}
+                badge={<span className={severityClass(incident.severity)}>{incident.severity}</span>}
+                fields={[
+                  { label: 'Site', value: incident.site },
+                  { label: 'Type', value: incident.type },
+                  { label: 'Status', value: incident.actionStatus },
+                  {
+                    label: 'Approval',
+                    value: <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>,
+                  },
+                  { label: 'Date', value: incident.date },
+                ]}
+              />
+            ))}
           </div>
         </section>
       ))}

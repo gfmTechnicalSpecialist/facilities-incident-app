@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { MobileReportCard } from '../components/MobileReportCard';
 
 interface ApiIncident {
   incidentId: string;
@@ -113,6 +114,33 @@ export function ApprovalsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="m-card-list mobile-only">
+          {pendingIncidents.map((incident) => (
+            <MobileReportCard
+              key={incident.incidentId}
+              reference={incident.incidentId}
+              title={incident.title}
+              badge={<span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>}
+              fields={[
+                { label: 'Site', value: incident.site },
+                {
+                  label: 'Approval',
+                  value: <span className={`approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>,
+                },
+                { label: 'Date', value: incident.date },
+              ]}
+              actions={
+                <button
+                  className="ghost-button my-reports-action-btn"
+                  type="button"
+                  onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+                >
+                  View
+                </button>
+              }
+            />
+          ))}
         </div>
         {!pendingIncidents.length && <p className="muted-text">No incidents are currently awaiting approval.</p>}
       </section>

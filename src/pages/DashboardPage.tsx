@@ -171,8 +171,8 @@ export function DashboardPage() {
         </span>
       </section>
 
-      {/* ── Charts: by type & by site ── */}
-      <div className="charts-two-col">
+      {/* ── Charts: by type & by site (hidden on mobile) ── */}
+      <div className="charts-two-col desktop-only">
         <section className="pbi-tile">
           <div className="pbi-visual-header">
             <p className="pbi-visual-title">Incident Count by Type</p>
@@ -228,8 +228,8 @@ export function DashboardPage() {
         </section>
       </div>
 
-      {/* ── Monthly trend ── */}
-      <section className="pbi-tile">
+      {/* ── Monthly trend (hidden on mobile) ── */}
+      <section className="pbi-tile desktop-only">
         <div className="pbi-visual-header">
           <p className="pbi-visual-title">Incident Count by Month</p>
         </div>
