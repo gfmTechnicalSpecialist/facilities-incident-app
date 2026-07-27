@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { actionStatuses } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
+import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { USER_REPORTS_API_URL } from '../lib/apiBase';
 import type { ActionStatus } from '../types';
 
@@ -134,10 +135,7 @@ export function MyReportsPage() {
           </section>
 
           {/* Filters */}
-          <section className="pbi-tile filters-card no-print">
-            <div className="pbi-visual-header">
-              <p className="pbi-visual-title">Filters</p>
-            </div>
+          <CollapsibleFiltersCard title="Filters" className="no-print">
             <div className="my-reports-filters">
               <label className="my-reports-search-label">
                 <span>Search</span>
@@ -157,7 +155,7 @@ export function MyReportsPage() {
                 </select>
               </label>
             </div>
-          </section>
+          </CollapsibleFiltersCard>
 
           {/* Table */}
           {filtered.length === 0 ? (

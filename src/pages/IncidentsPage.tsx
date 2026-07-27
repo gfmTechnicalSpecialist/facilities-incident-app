@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { actionStatuses, severities, sites, isApprover } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
+import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
@@ -119,10 +120,7 @@ export function IncidentsPage() {
 
   return (
     <div className="page-stack pbi-dashboard">
-      <section className="pbi-tile filters-card no-print">
-        <div className="pbi-visual-header">
-          <p className="pbi-visual-title">Filters</p>
-        </div>
+      <CollapsibleFiltersCard title="Filters" className="no-print">
         <div className="filters-grid filters-grid-wide final-filters-grid">
           <label>
             <span>Search</span>
@@ -173,7 +171,7 @@ export function IncidentsPage() {
             <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
           </label>
         </div>
-      </section>
+      </CollapsibleFiltersCard>
 
       {filteredGroups.map((group) => (
         <section className="pbi-tile table-card" key={group.monthGroup}>

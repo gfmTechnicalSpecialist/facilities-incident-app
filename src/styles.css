@@ -1060,6 +1060,11 @@ th, td {
   .form-section-chevron { display: inline-flex; }
   .form-section.collapsed .form-section-chevron { transform: rotate(-90deg); }
   .form-section.collapsed .form-section-body { display: none; }
+
+  .collapsible-filters-card-head { cursor: pointer; }
+  .collapsible-filters-card-chevron { display: inline-flex; }
+  .collapsible-filters-card.collapsed .collapsible-filters-card-body { display: none; }
+  .collapsible-filters-card.collapsed { gap: 0; }
 }
 
 /* ── Mobile collapsible report cards ────────────────────────── */
@@ -1073,9 +1078,9 @@ th, td {
 }
 .m-card.open { border-color: #C7E0F4; box-shadow: 0 2px 8px rgba(17, 141, 255, 0.12); }
 .m-card-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 0.75rem;
   width: 100%;
   padding: 0.7rem 0.85rem;
@@ -1100,13 +1105,17 @@ th, td {
   font-size: 0.9rem;
   font-weight: 600;
   color: #252423;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 .m-card-summary-side {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
   flex-shrink: 0;
 }
@@ -1126,9 +1135,9 @@ th, td {
   margin: 0;
 }
 .m-card-fields > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 8rem) minmax(0, 1fr);
+  align-items: start;
   gap: 1rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid #F3F2F1;
@@ -1147,15 +1156,50 @@ th, td {
   font-size: 0.85rem;
   color: #252423;
   text-align: right;
+  justify-self: end;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 .m-card-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
-.m-card-actions > button { flex: 1 1 0; justify-content: center; }
+.m-card-actions > * {
+  min-width: 0;
+  width: 100%;
+  justify-content: center;
+}
+
+.collapsible-filters-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: default;
+}
+.collapsible-filters-card-head .pbi-visual-header {
+  padding-bottom: 0.2rem;
+  margin-bottom: 0;
+  min-width: 0;
+}
+.collapsible-filters-card-body {
+  display: grid;
+  gap: 0.35rem;
+}
+.collapsible-filters-card-chevron {
+  display: none;
+  color: #605E5C;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+.collapsible-filters-card.open .collapsible-filters-card-chevron { transform: rotate(180deg); }
 
 @media print {
   .mobile-nav { display: none !important; }
@@ -1423,6 +1467,20 @@ th, td {
 @media (max-width: 760px) {
   .my-reports-kpi-row { grid-template-columns: 1fr 1fr; }
   .my-reports-header { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 560px) {
+  .m-card-fields > div {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .m-card-fields dd {
+    justify-self: start;
+    text-align: left;
+  }
+  .m-card-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── Page & loading transitions ─────────────────────────────── */
