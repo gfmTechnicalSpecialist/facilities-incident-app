@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, Eye, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardList, Eye, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { approvalStatusClass, approvalStatusLabel, incidentTypeColorMap, siteColorMap } from '../utils/helpers';
 import { DASHBOARD_API_URL } from '../lib/apiBase';
@@ -144,6 +144,7 @@ export function DashboardPage() {
     { label: 'Open Incidents', value: overview.openIncidents, icon: <FolderClock size={16} />, accent: '#E66C37' },
     { label: 'Closed Incidents', value: overview.closedIncidents, icon: <CheckCircle2 size={16} />, accent: '#6B007B' },
     { label: 'Critical Incidents', value: overview.criticalIncidents, icon: <AlertTriangle size={16} />, accent: '#D64550' },
+    { label: 'Pending Approvals', value: pendingApprovalsCount, icon: <ClipboardList size={16} />, accent: '#8A8886' },
   ];
 
   return (
