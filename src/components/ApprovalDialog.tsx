@@ -34,6 +34,11 @@ export function ApprovalDialog({ incidentId, onClose, onSubmitted }: ApprovalDia
 
   async function handleSubmit(approvalStatus: 'Approved' | 'Rejected') {
     if (!user) return;
+    if (approvalStatus === 'Rejected' && !comments.trim()) {
+      setError('Please add a review comment explaining the rejection.');
+      textareaRef.current?.focus();
+      return;
+    }
     setIsSubmitting(true);
     setError('');
     try {
@@ -73,7 +78,10 @@ export function ApprovalDialog({ incidentId, onClose, onSubmitted }: ApprovalDia
             rows={4}
             placeholder="Add your review comments..."
             value={comments}
-            onChange={(e) => setComments(e.target.value)}
+            onChange={(e) => {
+              setComments(e.target.value);
+              if (error) setError('');
+            }}
           />
         </label>
         {error && <p className="modal-error">{error}</p>}
