@@ -14,6 +14,7 @@ import { LoginPage } from './pages/LoginPage';
 import { MyReportsPage } from './pages/MyReportsPage';
 import { NewIncidentPage } from './pages/NewIncidentPage';
 import { ApprovalsPage } from './pages/ApprovalsPage';
+import { EditHistoryPage } from './pages/EditHistoryPage';
 
 function App() {
   useEffect(() => {
@@ -47,6 +48,7 @@ function App() {
                 <Route path="/incidents/view/:incidentId/edit" element={<EditReportPage />} />
               </Route>
               <Route path="/approvals" element={<ApprovalsPage />} />
+              <Route path="/edit-history" element={<EditHistoryPage />} />
             </Route>
           </Route>
         </Routes>

@@ -15,6 +15,7 @@ const reportsDataFunctionCode = import.meta.env.VITE_REPORTS_DATA_FUNCTION_CODE;
 const userReportsFunctionCode = import.meta.env.VITE_USER_REPORTS_FUNCTION_CODE;
 const addIncidentFunctionCode = import.meta.env.VITE_ADD_INCIDENT_FUNCTION_CODE;
 const approveIncidentFunctionCode = import.meta.env.VITE_APPROVE_INCIDENT_FUNCTION_CODE;
+const editHistoryFunctionCode = import.meta.env.VITE_EDIT_HISTORY_FUNCTION_CODE;
 
 function getFunctionUrl(path: string, code?: string) {
   const url = `${API_BASE}${path}`;
@@ -30,3 +31,4 @@ export const REPORTS_DATA_API_URL = getFunctionUrl('/api/GetReportsData', report
 export const USER_REPORTS_API_URL = getFunctionUrl('/api/GetUserReports', userReportsFunctionCode);
 export const ADD_INCIDENT_API_URL = getFunctionUrl('/api/AddIncident', addIncidentFunctionCode);
 export const APPROVE_INCIDENT_API_URL = getFunctionUrl('/api/ApproveIncident', approveIncidentFunctionCode);
+export const EDIT_HISTORY_API_URL = getFunctionUrl('/api/GetIncidentEdits', editHistoryFunctionCode);

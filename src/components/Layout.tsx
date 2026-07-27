@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ClipboardList, LogOut, PlusCircle, ShieldAlert, User } from 'lucide-react';
+import { ClipboardList, History, LogOut, PlusCircle, ShieldAlert, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from './Logo';
 import { isApprover } from '../utils/constants';
@@ -40,6 +40,9 @@ export function Layout() {
                 <ClipboardList size={18} /> Approvals
               </NavLink>
             )}
+            <NavLink to="/edit-history" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <History size={18} /> Edit History
+            </NavLink>
           </nav>
 
           <div className="sidebar-footer">
@@ -67,6 +70,7 @@ export function Layout() {
               : location.pathname === '/incidents' ? 'Incident workspace'
               : location.pathname === '/reports' ? 'Reports'
               : location.pathname === '/approvals' ? 'Approvals'
+              : location.pathname === '/edit-history' ? 'Edit history'
               : 'Incident workspace'
             }</h2>
           </div>
@@ -100,6 +104,10 @@ export function Layout() {
             <span>Approvals</span>
           </NavLink>
         )}
+        <NavLink to="/edit-history" className={({ isActive }) => (isActive ? 'mobile-nav-link active' : 'mobile-nav-link')}>
+          <History size={20} />
+          <span>Edits</span>
+        </NavLink>
         <button className="mobile-nav-link mobile-nav-logout" type="button" onClick={logout}>
           <LogOut size={20} />
           <span>Logout</span>
