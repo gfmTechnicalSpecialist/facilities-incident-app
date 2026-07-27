@@ -272,6 +272,20 @@ export function EditReportPage() {
     );
   }
 
+  if (initialValues.approvalStatus === 'Approved' || (initialValues.actionStatus === 'Closed' && initialValues.approvalStatus !== 'Rejected')) {
+    return (
+      <div className="page-stack pbi-dashboard">
+        <div className="card">
+          <h3>Report locked</h3>
+          <p className="muted-text">Approved or closed reports can no longer be edited. Reopen the report through the action status flow first if changes are needed.</p>
+          <button className="outline-button" type="button" onClick={() => navigate(-1)} style={{ marginTop: '1rem' }}>
+            <ArrowLeft size={16} /> Go back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-stack pbi-dashboard">
       <header className="card">

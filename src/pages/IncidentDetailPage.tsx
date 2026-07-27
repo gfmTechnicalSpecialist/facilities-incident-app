@@ -84,7 +84,7 @@ export function IncidentDetailPage() {
           <span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>
           <span className={`status-pill status-${incident.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{incident.actionStatus}</span>
           <span className={`approval-pill detail-approval-pill ${approvalStatusClass(incident.approvalStatus)}`}>{approvalStatusLabel(incident.approvalStatus)}</span>
-          {user.role === 'admin' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && <Link className="solid-button" to={`/incidents/${incident.id}/edit`}>Edit report</Link>}
+          {user.role === 'admin' && incident.approvalStatus !== 'Approved' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && <Link className="solid-button" to={`/incidents/${incident.id}/edit`}>Edit report</Link>}
           {isApprover(user) && incident.approvalStatus === 'Pending' && (
             <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
           )}

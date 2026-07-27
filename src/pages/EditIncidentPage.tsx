@@ -14,12 +14,12 @@ export function EditIncidentPage() {
     return <div className="card">Incident not found.</div>;
   }
 
-  if (incident.actionStatus === 'Closed' && incident.approvalStatus !== 'Rejected') {
+  if (incident.approvalStatus === 'Approved' || (incident.actionStatus === 'Closed' && incident.approvalStatus !== 'Rejected')) {
     return (
       <div className="page-stack pbi-dashboard">
         <div className="card">
           <h3>Report locked</h3>
-          <p className="muted-text">Closed reports can no longer be edited. Reopen the report through the action status flow first if changes are needed.</p>
+          <p className="muted-text">Approved or closed reports can no longer be edited. Reopen the report through the action status flow first if changes are needed.</p>
         </div>
       </div>
     );
