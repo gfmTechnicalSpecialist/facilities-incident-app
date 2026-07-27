@@ -30,6 +30,7 @@ jobs:
           VITE_REPORTS_DATA_FUNCTION_CODE: ${{ secrets.VITE_REPORTS_DATA_FUNCTION_CODE }}
           VITE_USER_REPORTS_FUNCTION_CODE: ${{ secrets.VITE_USER_REPORTS_FUNCTION_CODE }}
           VITE_ADD_INCIDENT_FUNCTION_CODE: ${{ secrets.VITE_ADD_INCIDENT_FUNCTION_CODE }}
+          VITE_APPROVE_INCIDENT_FUNCTION_CODE: ${{ secrets.VITE_APPROVE_INCIDENT_FUNCTION_CODE }}
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_COAST_0F740E103 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)

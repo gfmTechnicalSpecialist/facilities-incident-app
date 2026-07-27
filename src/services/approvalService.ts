@@ -12,7 +12,7 @@ export async function approveIncident(approvalData: ApprovalData) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      inidentId: approvalData.incidentId,
+      incidentId: approvalData.incidentId,
       approvalStatus: approvalData.approvalStatus,
       reviewComments: approvalData.reviewComments,
       reviewerName: approvalData.reviewerName,
