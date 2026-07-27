@@ -4,7 +4,7 @@ import { Printer } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { addComment, getIncidentById, listComments, updateIncidentReview, updateIncidentStatus } from '../services/incidentService';
 import { actionStatuses, approvalStatuses, isApprover } from '../utils/constants';
-import { approvalStatusClass, approvalStatusLabel, formatDateTime } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, formatDateTime, parseJiraTicketReferences } from '../utils/helpers';
 import type { ActionStatus, ApprovalStatus } from '../types';
 import { ApprovalDialog } from '../components/ApprovalDialog';
 
@@ -36,6 +36,7 @@ export function IncidentDetailPage() {
 
   const currentIncident = incident;
   const currentUser = user;
+  const jiraTicketReferences = parseJiraTicketReferences(currentIncident.jiraTicketReference);
 
   function handleCommentSubmit() {
     if (!commentText.trim() || currentUser.role !== 'viewer') return;
@@ -154,7 +155,20 @@ export function IncidentDetailPage() {
             <div><dt>Impact on operations</dt><dd>{incident.impactOnOperations}</dd></div>
             <div><dt>Critical load affected</dt><dd>{incident.criticalLoadAffected ? 'Yes' : 'No'}</dd></div>
             <div><dt>System restored</dt><dd>{incident.systemRestored ? 'Yes' : 'No'}</dd></div>
-            <div><dt>Jira ticket reference</dt><dd>{incident.jiraTicketReference || 'Not captured yet.'}</dd></div>
+            <div className="full-span-item">
+              <dt>Jira ticket references</dt>
+              <dd>
+                {jiraTicketReferences.length > 0 ? (
+                  <ul className="jira-ticket-list">
+                    {jiraTicketReferences.map((ticket, index) => (
+                      <li key={`${ticket}-${index}`}>{ticket}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  'Not captured yet.'
+                )}
+              </dd>
+            </div>
             <div><dt>Impacted system</dt><dd>{incident.impactedAreaSystem}</dd></div>
             <div><dt>Date / time</dt><dd>{incident.incidentDate} {incident.incidentTime}</dd></div>
             <div><dt>Submitted by</dt><dd>{incident.submittedBy}</dd></div>

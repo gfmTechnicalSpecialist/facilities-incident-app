@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
 import { ADD_INCIDENT_API_URL } from '../lib/apiBase';
+import { stringifyJiraTicketReferences } from '../utils/helpers';
 import type { IncidentFormValues } from '../types';
 
 const ADD_INCIDENT_URL = ADD_INCIDENT_API_URL;
@@ -36,7 +37,7 @@ function buildPayload(values: IncidentFormValues, userEmail: string) {
     criticalLoadAffected: values.criticalLoadAffected,
     mitigationApplied: values.mitigationApplied || null,
     impactOnOperations: values.impactOnOperations,
-    jiraTicketReference: values.jiraTicketReference || null,
+    jiraTicketReference: stringifyJiraTicketReferences(values.jiraTicketReference),
     systemRestored: values.systemRestored,
     restoredAt: values.restoredAt ? new Date(values.restoredAt).toISOString() : null,
     incidentSummary: values.incidentSummary || null,

@@ -311,9 +311,15 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
               <option value="Yes">Yes</option>
             </select>
           </label>
-          <label>
-            <span>Jira ticket reference</span>
-            <input value={values.jiraTicketReference} onChange={(e) => update('jiraTicketReference', e.target.value)} placeholder="FAC-1024" />
+          <label className="full-span">
+            <span>Jira ticket references</span>
+            <textarea
+              rows={3}
+              value={values.jiraTicketReference}
+              onChange={(e) => update('jiraTicketReference', e.target.value)}
+              placeholder={"SD-12345\nSD-12346"}
+            />
+            <span className="jira-ticket-help">Enter one Jira ticket per line. Values are stored as JSON in the database.</span>
           </label>
           <label>
             <span>System restored</span>

@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
 import { INCIDENT_DETAILS_API_URL, UPDATE_INCIDENT_API_URL } from '../lib/apiBase';
+import { parseJiraTicketReferences, stringifyJiraTicketReferences } from '../utils/helpers';
 import type { IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
@@ -107,7 +108,7 @@ function mapToFormValues(data: ApiDetails): IncidentFormValues {
     criticalLoadAffected: parseBooleanish(data.incidentDetail.criticalLoadAffected),
     mitigationApplied: data.actionsTaken.mitigationApplied ?? '',
     impactOnOperations: (data.incidentDetail.impactOnOperations as Impact) ?? 'Minor',
-    jiraTicketReference: data.incidentDetail.jiraTicketReference ?? '',
+    jiraTicketReference: parseJiraTicketReferences(data.incidentDetail.jiraTicketReference).join('\n'),
     systemRestored: parseBooleanish(data.incidentDetail.systemRestored),
     restoredAt: '',
     incidentSummary: data.incidentDetail.incidentSummary ?? '',
@@ -197,7 +198,7 @@ export function EditReportPage() {
           CriticalLoadAffected: values.criticalLoadAffected,
           MitigationApplied: values.mitigationApplied || undefined,
           ImpactOnOperations: values.impactOnOperations || undefined,
-          JiraTicketReference: values.jiraTicketReference || undefined,
+          JiraTicketReference: stringifyJiraTicketReferences(values.jiraTicketReference) ?? undefined,
           SystemRestored: values.systemRestored,
           RestoredAt: values.restoredAt || undefined,
           IncidentSummary: values.incidentSummary || undefined,

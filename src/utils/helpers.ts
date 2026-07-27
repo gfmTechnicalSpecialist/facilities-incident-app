@@ -54,6 +54,39 @@ export function monthYearLabel(dateString: string): string {
   return new Date(dateString).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 }
 
+export function parseJiraTicketReferences(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+    if (Array.isArray(parsed)) {
+      return parsed
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.trim())
+        .filter(Boolean);
+    }
+    if (typeof parsed === 'string') {
+      const parsedValue = parsed.trim();
+      return parsedValue ? [parsedValue] : [];
+    }
+  } catch {
+    // Fall through to legacy plain-text parsing.
+  }
+
+  return trimmed
+    .split(/[\r\n,;]+/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+export function stringifyJiraTicketReferences(raw: string | null | undefined): string | null {
+  const values = parseJiraTicketReferences(raw);
+  return values.length > 0 ? JSON.stringify(values) : null;
+}
+
 
 export function approvalStatusLabel(status: string): string {
   return status === 'Pending' ? 'Pending Approval' : status;

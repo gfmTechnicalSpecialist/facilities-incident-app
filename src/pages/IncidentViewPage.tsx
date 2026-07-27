@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Printer } from 'lucide-react';
-import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
@@ -137,6 +137,7 @@ export function IncidentViewPage() {
   }
 
   const { header, incidentDetail, actionsTaken, rootCauseAnalysis, workflow, viewerComments } = data;
+  const jiraTicketReferences = parseJiraTicketReferences(incidentDetail.jiraTicketReference);
 
   return (
     <div className="page-stack pbi-dashboard incident-print-shell">
@@ -179,7 +180,20 @@ export function IncidentViewPage() {
             <Field label="Impact on operations" value={incidentDetail.impactOnOperations} />
             <Field label="Critical load affected" value={incidentDetail.criticalLoadAffected} />
             <Field label="System restored" value={incidentDetail.systemRestored} />
-            <Field label="Jira ticket reference" value={incidentDetail.jiraTicketReference} />
+            <div className="full-span-item">
+              <dt>Jira ticket references</dt>
+              <dd>
+                {jiraTicketReferences.length > 0 ? (
+                  <ul className="jira-ticket-list">
+                    {jiraTicketReferences.map((ticket, index) => (
+                      <li key={`${ticket}-${index}`}>{ticket}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  NA
+                )}
+              </dd>
+            </div>
             <Field label="Impacted system" value={incidentDetail.impactedSystem} />
             <Field label="Date / time" value={incidentDetail.dateTime} />
             <Field label="Submitted by" value={incidentDetail.submittedBy} />
