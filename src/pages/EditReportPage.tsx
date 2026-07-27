@@ -259,7 +259,7 @@ export function EditReportPage() {
     );
   }
 
-  if (fetchError || !initialValues) {
+  if (fetchError || !initialValues || !rawData) {
     return (
       <div className="page-stack pbi-dashboard">
         <section className="card">
@@ -272,7 +272,7 @@ export function EditReportPage() {
     );
   }
 
-  if (initialValues.approvalStatus === 'Approved' || (initialValues.actionStatus === 'Closed' && initialValues.approvalStatus !== 'Rejected')) {
+  if (rawData.header.approvalStatus === 'Approved' || (initialValues.actionStatus === 'Closed' && rawData.header.approvalStatus !== 'Rejected')) {
     return (
       <div className="page-stack pbi-dashboard">
         <div className="card">
