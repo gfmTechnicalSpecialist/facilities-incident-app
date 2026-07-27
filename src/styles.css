@@ -771,6 +771,22 @@ th, td {
   padding: 0.6rem 0.9rem 0.7rem;
   overflow: hidden;
 }
+.pbi-kpi-button {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #E6E6E6;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.pbi-kpi-button:hover {
+  border-color: #C7E0F4;
+  box-shadow: 0 2px 8px rgba(17, 141, 255, 0.12);
+}
+.pbi-kpi-button:focus-visible {
+  outline: 2px solid #118DFF;
+  outline-offset: 2px;
+}
 .pbi-kpi::before {
   content: '';
   position: absolute;

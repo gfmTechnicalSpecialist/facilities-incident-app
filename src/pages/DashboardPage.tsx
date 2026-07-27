@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, ClipboardList, Eye, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardList, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { approvalStatusClass, approvalStatusLabel, incidentTypeColorMap, siteColorMap } from '../utils/helpers';
+import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
 import { DASHBOARD_API_URL } from '../lib/apiBase';
-import { MobileReportCard } from '../components/MobileReportCard';
 
 interface ChartItem {
   name: string;
@@ -130,8 +129,7 @@ export function DashboardPage() {
   const byType = mapByType(charts.incidentsByType);
   const bySite = mapBySite(charts.incidentsBySite);
   const byMonth = mapByMonth(charts.monthlyTrend);
-  const pendingApprovals = data.pendingApprovals ?? [];
-  const pendingApprovalsCount = overview.pendingApprovalsCount ?? pendingApprovals.length;
+  const pendingApprovalsCount = overview.pendingApprovalsCount ?? data.pendingApprovals?.length ?? 0;
 
   const reportDate = new Date().toLocaleDateString(undefined, {
     year: 'numeric',
@@ -144,7 +142,13 @@ export function DashboardPage() {
     { label: 'Open Incidents', value: overview.openIncidents, icon: <FolderClock size={16} />, accent: '#E66C37' },
     { label: 'Closed Incidents', value: overview.closedIncidents, icon: <CheckCircle2 size={16} />, accent: '#6B007B' },
     { label: 'Critical Incidents', value: overview.criticalIncidents, icon: <AlertTriangle size={16} />, accent: '#D64550' },
-    { label: 'Pending Approvals', value: pendingApprovalsCount, icon: <ClipboardList size={16} />, accent: '#8A8886' },
+    {
+      label: 'Pending Approvals',
+      value: pendingApprovalsCount,
+      icon: <ClipboardList size={16} />,
+      accent: '#8A8886',
+      onClick: () => navigate('/approvals'),
+    },
   ];
 
   return (
@@ -166,13 +170,30 @@ export function DashboardPage() {
       {/* ── KPI card visuals ── */}
       <section className="pbi-kpi-row">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: kpi.accent }}>
-            <div className="pbi-kpi-head">
-              <span className="pbi-kpi-icon">{kpi.icon}</span>
-              <span className="pbi-kpi-label">{kpi.label}</span>
+          kpi.onClick ? (
+            <button
+              key={kpi.label}
+              className="pbi-tile pbi-kpi pbi-kpi-button"
+              style={{ ['--kpi-accent' as string]: kpi.accent }}
+              type="button"
+              onClick={kpi.onClick}
+              aria-label={`Open ${kpi.label}`}
+            >
+              <div className="pbi-kpi-head">
+                <span className="pbi-kpi-icon">{kpi.icon}</span>
+                <span className="pbi-kpi-label">{kpi.label}</span>
+              </div>
+              <p className="pbi-kpi-value">{kpi.value}</p>
+            </button>
+          ) : (
+            <div key={kpi.label} className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: kpi.accent }}>
+              <div className="pbi-kpi-head">
+                <span className="pbi-kpi-icon">{kpi.icon}</span>
+                <span className="pbi-kpi-label">{kpi.label}</span>
+              </div>
+              <p className="pbi-kpi-value">{kpi.value}</p>
             </div>
-            <p className="pbi-kpi-value">{kpi.value}</p>
-          </div>
+          )
         ))}
       </section>
 
@@ -186,84 +207,6 @@ export function DashboardPage() {
           <TrendingUp size={13} />
           Highest volume category
         </span>
-      </section>
-
-      <section className="pbi-tile table-card">
-        <div className="grouped-header">
-          <h3>Pending approvals</h3>
-          <p className="muted-text">
-            {pendingApprovalsCount} report{pendingApprovalsCount === 1 ? '' : 's'} awaiting review
-          </p>
-        </div>
-        {pendingApprovals.length > 0 ? (
-          <>
-            <div className="table-scroll desktop-only">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Report ID</th>
-                    <th>Report name</th>
-                    <th>Submitted by</th>
-                    <th>Site</th>
-                    <th>Status</th>
-                    <th>Date submitted</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingApprovals.map((report) => (
-                    <tr
-                      key={report.reportId}
-                      className="clickable-row"
-                      onClick={() => navigate(`/incidents/view/${report.reportId}`)}
-                    >
-                      <td><span className="my-reports-ref">{report.reportId}</span></td>
-                      <td><span className="my-reports-title-cell">{report.reportName}</span></td>
-                      <td>{report.submittedBy}</td>
-                      <td>{report.site}</td>
-                      <td>
-                        <span className={`approval-pill ${approvalStatusClass(report.status)}`}>
-                          {approvalStatusLabel(report.status)}
-                        </span>
-                      </td>
-                      <td>{report.dateSubmitted}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="m-card-list mobile-only">
-              {pendingApprovals.map((report) => (
-                <MobileReportCard
-                  key={report.reportId}
-                  reference={report.reportId}
-                  title={report.reportName}
-                  badge={<span className={`approval-pill ${approvalStatusClass(report.status)}`}>{approvalStatusLabel(report.status)}</span>}
-                  fields={[
-                    { label: 'Submitted by', value: report.submittedBy },
-                    { label: 'Site', value: report.site },
-                    {
-                      label: 'Status',
-                      value: <span className={`approval-pill ${approvalStatusClass(report.status)}`}>{approvalStatusLabel(report.status)}</span>,
-                    },
-                    { label: 'Date submitted', value: report.dateSubmitted },
-                  ]}
-                  actions={
-                    <button
-                      className="ghost-button my-reports-action-btn"
-                      type="button"
-                      onClick={() => navigate(`/incidents/view/${report.reportId}`)}
-                    >
-                      <Eye size={15} /> View
-                    </button>
-                  }
-                />
-              ))}
-            </div>
-          </>
-        ) : (
-          <p className="muted-text">No incidents are currently awaiting approval.</p>
-        )}
       </section>
 
       {/* ── Charts: by type & by site (hidden on mobile) ── */}
