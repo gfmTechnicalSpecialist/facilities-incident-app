@@ -42,6 +42,7 @@ export function ApprovalDialog({ incidentId, onClose, onSubmitted }: ApprovalDia
         approvalStatus,
         reviewComments: comments,
         reviewerName: user.fullName,
+        reviewerUserId: user.id,
       });
       onSubmitted?.(approvalStatus);
       onClose();

@@ -5,6 +5,7 @@ export interface ApprovalData {
   approvalStatus: 'Approved' | 'Rejected';
   reviewComments: string;
   reviewerName: string;
+  reviewerUserId: string;
 }
 
 export async function approveIncident(approvalData: ApprovalData) {
@@ -14,8 +15,9 @@ export async function approveIncident(approvalData: ApprovalData) {
     body: JSON.stringify({
       incidentId: approvalData.incidentId,
       approvalStatus: approvalData.approvalStatus,
-      reviewComments: approvalData.reviewComments,
       reviewerName: approvalData.reviewerName,
+      reviewerUserId: approvalData.reviewerUserId,
+      reviewComments: approvalData.reviewComments,
     }),
   });
 
