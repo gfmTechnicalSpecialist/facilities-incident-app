@@ -83,13 +83,6 @@ export function EditHistoryPage() {
 
   return (
     <div className="page-stack pbi-dashboard">
-      <header className="pbi-header">
-        <div>
-          <h2 className="pbi-title">Edit History</h2>
-          <p className="pbi-subtitle">Audit trail of every change made to incident reports — who changed what, and when.</p>
-        </div>
-      </header>
-
       <CollapsibleFiltersCard title="Filters" className="no-print">
         <div className="my-reports-filters">
           <label className="my-reports-search-label">
