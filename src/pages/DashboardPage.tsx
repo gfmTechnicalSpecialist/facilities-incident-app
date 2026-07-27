@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { AlertTriangle, CheckCircle2, Eye, FolderClock, Printer, ShieldEllipsis, TrendingUp } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, incidentTypeColorMap, siteColorMap } from '../utils/helpers';
 import { DASHBOARD_API_URL } from '../lib/apiBase';
+import { MobileReportCard } from '../components/MobileReportCard';
 
 interface ChartItem {
   name: string;
   value: number;
   color: string;
+}
+
+interface PendingApprovalItem {
+  reportId: string;
+  reportName: string;
+  submittedBy: string;
+  dateSubmitted: string;
+  status: string;
+  site: string;
 }
 
 interface DashboardData {
@@ -16,6 +27,7 @@ interface DashboardData {
     openIncidents: number;
     closedIncidents: number;
     criticalIncidents: number;
+    pendingApprovalsCount?: number;
     mostReportedType: string;
   };
   charts: {
@@ -23,6 +35,7 @@ interface DashboardData {
     incidentsBySite: { site: string; count: number }[];
     monthlyTrend: { month: string; count: number }[];
   };
+  pendingApprovals?: PendingApprovalItem[];
 }
 
 function mapByType(items: { type: string; count: number }[]): ChartItem[] {
@@ -64,6 +77,7 @@ function LegendRow({ items }: { items: ChartItem[] }) {
 }
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +130,8 @@ export function DashboardPage() {
   const byType = mapByType(charts.incidentsByType);
   const bySite = mapBySite(charts.incidentsBySite);
   const byMonth = mapByMonth(charts.monthlyTrend);
+  const pendingApprovals = data.pendingApprovals ?? [];
+  const pendingApprovalsCount = overview.pendingApprovalsCount ?? pendingApprovals.length;
 
   const reportDate = new Date().toLocaleDateString(undefined, {
     year: 'numeric',
@@ -169,6 +185,84 @@ export function DashboardPage() {
           <TrendingUp size={13} />
           Highest volume category
         </span>
+      </section>
+
+      <section className="pbi-tile table-card">
+        <div className="grouped-header">
+          <h3>Pending approvals</h3>
+          <p className="muted-text">
+            {pendingApprovalsCount} report{pendingApprovalsCount === 1 ? '' : 's'} awaiting review
+          </p>
+        </div>
+        {pendingApprovals.length > 0 ? (
+          <>
+            <div className="table-scroll desktop-only">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Report ID</th>
+                    <th>Report name</th>
+                    <th>Submitted by</th>
+                    <th>Site</th>
+                    <th>Status</th>
+                    <th>Date submitted</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingApprovals.map((report) => (
+                    <tr
+                      key={report.reportId}
+                      className="clickable-row"
+                      onClick={() => navigate(`/incidents/view/${report.reportId}`)}
+                    >
+                      <td><span className="my-reports-ref">{report.reportId}</span></td>
+                      <td><span className="my-reports-title-cell">{report.reportName}</span></td>
+                      <td>{report.submittedBy}</td>
+                      <td>{report.site}</td>
+                      <td>
+                        <span className={`approval-pill ${approvalStatusClass(report.status)}`}>
+                          {approvalStatusLabel(report.status)}
+                        </span>
+                      </td>
+                      <td>{report.dateSubmitted}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="m-card-list mobile-only">
+              {pendingApprovals.map((report) => (
+                <MobileReportCard
+                  key={report.reportId}
+                  reference={report.reportId}
+                  title={report.reportName}
+                  badge={<span className={`approval-pill ${approvalStatusClass(report.status)}`}>{approvalStatusLabel(report.status)}</span>}
+                  fields={[
+                    { label: 'Submitted by', value: report.submittedBy },
+                    { label: 'Site', value: report.site },
+                    {
+                      label: 'Status',
+                      value: <span className={`approval-pill ${approvalStatusClass(report.status)}`}>{approvalStatusLabel(report.status)}</span>,
+                    },
+                    { label: 'Date submitted', value: report.dateSubmitted },
+                  ]}
+                  actions={
+                    <button
+                      className="ghost-button my-reports-action-btn"
+                      type="button"
+                      onClick={() => navigate(`/incidents/view/${report.reportId}`)}
+                    >
+                      <Eye size={15} /> View
+                    </button>
+                  }
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="muted-text">No incidents are currently awaiting approval.</p>
+        )}
       </section>
 
       {/* ── Charts: by type & by site (hidden on mobile) ── */}
