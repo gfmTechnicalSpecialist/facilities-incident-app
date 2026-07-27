@@ -14,7 +14,7 @@ export function EditIncidentPage() {
     return <div className="card">Incident not found.</div>;
   }
 
-  if (incident.actionStatus === 'Closed') {
+  if (incident.actionStatus === 'Closed' && incident.approvalStatus !== 'Rejected') {
     return (
       <div className="page-stack pbi-dashboard">
         <div className="card">

@@ -228,7 +228,7 @@ export function MyReportsPage() {
                             >
                               <Eye size={15} /> View
                             </button>
-                            {user?.role === 'admin' && incident.actionStatus !== 'Closed' && (
+                            {user?.role === 'admin' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && (
                               <button
                                 className="outline-button my-reports-action-btn"
                                 type="button"
@@ -275,7 +275,7 @@ export function MyReportsPage() {
                         >
                           <Eye size={15} /> View
                         </button>
-                        {user?.role === 'admin' && incident.actionStatus !== 'Closed' && (
+                        {user?.role === 'admin' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && (
                           <button
                             className="outline-button my-reports-action-btn"
                             type="button"
