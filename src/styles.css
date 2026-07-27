@@ -986,7 +986,14 @@ th, td {
   /* Phone-fit adjustments */
   .topbar { padding: 0.55rem 0.85rem; }
   .topbar h2 { font-size: 1.1rem; }
-  .main-content { padding: 0.75rem 0.75rem 6rem; }
+  .main-content { padding: 0.75rem 0.75rem 6rem; overflow-x: hidden; }
+  /* Prevent grid/flex children from pushing the page wider than the viewport.
+     Grid items default to min-width:auto, which lets wide tables/charts overflow. */
+  .page-stack,
+  .pbi-dashboard { min-width: 0; }
+  .page-stack > *,
+  .pbi-dashboard > * { min-width: 0; max-width: 100%; }
+  .table-scroll { max-width: 100%; }
   .pbi-dashboard table {
     display: block;
     overflow-x: auto;
@@ -1140,6 +1147,8 @@ th, td {
   font-size: 0.85rem;
   color: #252423;
   text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .m-card-actions {
   display: flex;
