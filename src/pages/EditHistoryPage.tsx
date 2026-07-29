@@ -40,6 +40,12 @@ function formatTimestamp(value: string): string {
   });
 }
 
+const APPROVAL_FIELDS = new Set(['approval_status', 'reviewed_by', 'review_comments', 'approved_by']);
+
+function isApprovalChangeSet(changeSet: IncidentChangeSet): boolean {
+  return changeSet.changes.some((change) => APPROVAL_FIELDS.has(change.fieldChanged));
+}
+
 export function EditHistoryPage() {
   const [changeSets, setChangeSets] = useState<IncidentChangeSet[]>([]);
   const [loading, setLoading] = useState(false);
@@ -166,12 +172,16 @@ export function EditHistoryPage() {
                   </thead>
                   {changeSets.map((changeSet) => {
                     const isOpen = expandedSets.has(changeSet.changeSetId);
+                    const isApproval = isApprovalChangeSet(changeSet);
                     return (
                       <tbody key={changeSet.changeSetId} className={isOpen ? 'edit-history-group open' : 'edit-history-group'}>
                         <tr className="edit-history-group-header" onClick={() => toggleSet(changeSet.changeSetId)}>
                           <td colSpan={3}>
                             <span className="edit-history-group-toggle">
                               <ChevronDown size={16} className="edit-history-group-chevron" />
+                              <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
+                                {isApproval ? 'Approval action' : 'Edit'}
+                              </span>
                               <span className="my-reports-ref">{changeSet.incidentId}</span>
                               <span className="edit-history-group-author">{changeSet.editedByName}</span>
                               <span className="edit-history-group-date">{formatTimestamp(changeSet.editedAt)}</span>
@@ -195,28 +205,35 @@ export function EditHistoryPage() {
               </div>
 
               <div className="m-card-list mobile-only">
-                {changeSets.map((changeSet) => (
-                  <MobileReportCard
-                    key={changeSet.changeSetId}
-                    reference={changeSet.incidentId}
-                    title={formatTimestamp(changeSet.editedAt)}
-                    badge={<span className="edit-history-chip">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>}
-                    fields={[
-                      ...changeSet.changes.map((change) => ({
-                        label: change.fieldChanged,
-                        value: (
-                          <span className="edit-history-change-inline">
-                            <span className="edit-history-old">{formatValue(change.oldValue)}</span>
-                            {' → '}
-                            <span className="edit-history-new">{formatValue(change.newValue)}</span>
-                          </span>
-                        ),
-                      })),
-                      { label: 'Edited by', value: changeSet.editedByName },
-                      { label: 'User ID', value: changeSet.editedByUserId },
-                    ]}
-                  />
-                ))}
+                {changeSets.map((changeSet) => {
+                  const isApproval = isApprovalChangeSet(changeSet);
+                  return (
+                    <MobileReportCard
+                      key={changeSet.changeSetId}
+                      reference={changeSet.incidentId}
+                      title={formatTimestamp(changeSet.editedAt)}
+                      badge={(
+                        <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
+                          {isApproval ? 'Approval action' : 'Edit'}
+                        </span>
+                      )}
+                      fields={[
+                        ...changeSet.changes.map((change) => ({
+                          label: change.fieldChanged,
+                          value: (
+                            <span className="edit-history-change-inline">
+                              <span className="edit-history-old">{formatValue(change.oldValue)}</span>
+                              {' → '}
+                              <span className="edit-history-new">{formatValue(change.newValue)}</span>
+                            </span>
+                          ),
+                        })),
+                        { label: 'Edited by', value: changeSet.editedByName },
+                        { label: 'User ID', value: changeSet.editedByUserId },
+                      ]}
+                    />
+                  );
+                })}
               </div>
             </>
           )}
