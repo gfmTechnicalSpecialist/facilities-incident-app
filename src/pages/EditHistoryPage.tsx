@@ -166,8 +166,7 @@ export function EditHistoryPage() {
                   <thead>
                     <tr>
                       <th>Field changed</th>
-                      <th>Old value</th>
-                      <th>New value</th>
+                      <th>Change</th>
                     </tr>
                   </thead>
                   {changeSets.map((changeSet) => {
@@ -176,7 +175,7 @@ export function EditHistoryPage() {
                     return (
                       <tbody key={changeSet.changeSetId} className={isOpen ? 'edit-history-group open' : 'edit-history-group'}>
                         <tr className="edit-history-group-header" onClick={() => toggleSet(changeSet.changeSetId)}>
-                          <td colSpan={3}>
+                          <td colSpan={2}>
                             <span className="edit-history-group-toggle">
                               <ChevronDown size={16} className="edit-history-group-chevron" />
                               <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
@@ -194,8 +193,13 @@ export function EditHistoryPage() {
                         {isOpen && changeSet.changes.map((change) => (
                           <tr key={change.id} className="edit-history-detail-row">
                             <td data-label="Field changed"><span className="edit-history-field">{change.fieldChanged}</span></td>
-                            <td data-label="Old value"><span className="edit-history-old">{formatValue(change.oldValue)}</span></td>
-                            <td data-label="New value"><span className="edit-history-new">{formatValue(change.newValue)}</span></td>
+                            <td data-label="Change">
+                              <span className="edit-history-change-inline">
+                                <span className="edit-history-old">{formatValue(change.oldValue)}</span>
+                                <span className="edit-history-arrow" aria-hidden="true">→</span>
+                                <span className="edit-history-new">{formatValue(change.newValue)}</span>
+                              </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
