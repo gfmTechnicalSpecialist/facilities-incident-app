@@ -4,16 +4,22 @@ import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { EDIT_HISTORY_API_URL } from '../lib/apiBase';
 
-interface IncidentEdit {
+interface IncidentChange {
   id: string;
+  fieldChanged: string;
+  oldValue: string | null;
+  newValue: string | null;
+}
+
+interface IncidentChangeSet {
+  changeSetId: string;
   incidentPk: string;
   incidentId: string;
   editedByUserId: string;
   editedByName: string;
   editedAt: string;
-  fieldChanged: string;
-  oldValue: string | null;
-  newValue: string | null;
+  changeCount: number;
+  changes: IncidentChange[];
 }
 
 function formatValue(value: string | null): string {
@@ -35,7 +41,7 @@ function formatTimestamp(value: string): string {
 }
 
 export function EditHistoryPage() {
-  const [edits, setEdits] = useState<IncidentEdit[]>([]);
+  const [changeSets, setChangeSets] = useState<IncidentChangeSet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -45,7 +51,7 @@ export function EditHistoryPage() {
     const incidentId = rawId.trim();
     setError(null);
     if (!incidentId) {
-      setEdits([]);
+      setChangeSets([]);
       setHasSearched(false);
       return;
     }
@@ -58,14 +64,14 @@ export function EditHistoryPage() {
     })
       .then((res) => {
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        return res.json() as Promise<IncidentEdit[]>;
+        return res.json() as Promise<IncidentChangeSet[]>;
       })
       .then((json) => {
-        setEdits(Array.isArray(json) ? json : []);
+        setChangeSets(Array.isArray(json) ? json : []);
       })
       .catch((err: unknown) => {
         setError(err instanceof Error ? err.message : 'Failed to load edit history');
-        setEdits([]);
+        setChangeSets([]);
       })
       .finally(() => {
         setLoading(false);
@@ -127,11 +133,11 @@ export function EditHistoryPage() {
           <div className="grouped-header">
             <h3>Incident edits</h3>
             <p className="muted-text">
-              {edits.length} change{edits.length === 1 ? '' : 's'} recorded
+              {changeSets.length} change{changeSets.length === 1 ? '' : 's'} recorded
             </p>
           </div>
 
-          {edits.length === 0 ? (
+          {changeSets.length === 0 ? (
             <p className="muted-text">No edits found for “{search.trim()}”.</p>
           ) : (
             <>
@@ -139,44 +145,55 @@ export function EditHistoryPage() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Incident ID</th>
                       <th>Field changed</th>
                       <th>Old value</th>
                       <th>New value</th>
-                      <th>Edited by</th>
-                      <th>User ID</th>
-                      <th>Edited at</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {edits.map((edit) => (
-                      <tr key={edit.id}>
-                        <td data-label="Incident ID"><span className="my-reports-ref">{edit.incidentId}</span></td>
-                        <td data-label="Field changed"><span className="edit-history-field">{edit.fieldChanged}</span></td>
-                        <td data-label="Old value"><span className="edit-history-old">{formatValue(edit.oldValue)}</span></td>
-                        <td data-label="New value"><span className="edit-history-new">{formatValue(edit.newValue)}</span></td>
-                        <td data-label="Edited by">{edit.editedByName}</td>
-                        <td data-label="User ID"><span className="my-reports-ref">{edit.editedByUserId}</span></td>
-                        <td data-label="Edited at">{formatTimestamp(edit.editedAt)}</td>
+                  {changeSets.map((changeSet) => (
+                    <tbody key={changeSet.changeSetId} className="edit-history-group">
+                      <tr className="edit-history-group-header">
+                        <td colSpan={3}>
+                          <span className="my-reports-ref">{changeSet.incidentId}</span>
+                          <span className="edit-history-group-author">{changeSet.editedByName}</span>
+                          <span className="edit-history-group-date">{formatTimestamp(changeSet.editedAt)}</span>
+                          <span className="edit-history-group-count">
+                            {changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}
+                          </span>
+                        </td>
                       </tr>
-                    ))}
-                  </tbody>
+                      {changeSet.changes.map((change) => (
+                        <tr key={change.id}>
+                          <td data-label="Field changed"><span className="edit-history-field">{change.fieldChanged}</span></td>
+                          <td data-label="Old value"><span className="edit-history-old">{formatValue(change.oldValue)}</span></td>
+                          <td data-label="New value"><span className="edit-history-new">{formatValue(change.newValue)}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  ))}
                 </table>
               </div>
 
               <div className="m-card-list mobile-only">
-                {edits.map((edit) => (
+                {changeSets.map((changeSet) => (
                   <MobileReportCard
-                    key={edit.id}
-                    reference={edit.incidentId}
-                    title={edit.fieldChanged}
-                    badge={<span className="edit-history-chip">{edit.fieldChanged}</span>}
+                    key={changeSet.changeSetId}
+                    reference={changeSet.incidentId}
+                    title={formatTimestamp(changeSet.editedAt)}
+                    badge={<span className="edit-history-chip">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>}
                     fields={[
-                      { label: 'Old value', value: <span className="edit-history-old">{formatValue(edit.oldValue)}</span> },
-                      { label: 'New value', value: <span className="edit-history-new">{formatValue(edit.newValue)}</span> },
-                      { label: 'Edited by', value: edit.editedByName },
-                      { label: 'User ID', value: edit.editedByUserId },
-                      { label: 'Edited at', value: formatTimestamp(edit.editedAt) },
+                      ...changeSet.changes.map((change) => ({
+                        label: change.fieldChanged,
+                        value: (
+                          <span className="edit-history-change-inline">
+                            <span className="edit-history-old">{formatValue(change.oldValue)}</span>
+                            {' → '}
+                            <span className="edit-history-new">{formatValue(change.newValue)}</span>
+                          </span>
+                        ),
+                      })),
+                      { label: 'Edited by', value: changeSet.editedByName },
+                      { label: 'User ID', value: changeSet.editedByUserId },
                     ]}
                   />
                 ))}

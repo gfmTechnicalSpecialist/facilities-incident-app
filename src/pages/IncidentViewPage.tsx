@@ -64,16 +64,22 @@ interface IncidentDetails {
   }[];
 }
 
-interface IncidentEdit {
+interface IncidentChange {
   id: string;
+  fieldChanged: string;
+  oldValue: string | null;
+  newValue: string | null;
+}
+
+interface IncidentChangeSet {
+  changeSetId: string;
   incidentPk: string;
   incidentId: string;
   editedByUserId: string;
   editedByName: string;
   editedAt: string;
-  fieldChanged: string;
-  oldValue: string | null;
-  newValue: string | null;
+  changeCount: number;
+  changes: IncidentChange[];
 }
 
 const NA = 'Not captured yet.';
@@ -114,7 +120,7 @@ export function IncidentViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
-  const [edits, setEdits] = useState<IncidentEdit[]>([]);
+  const [changeSets, setChangeSets] = useState<IncidentChangeSet[]>([]);
   const [editsLoading, setEditsLoading] = useState(true);
   const [editsError, setEditsError] = useState<string | null>(null);
 
@@ -159,10 +165,10 @@ export function IncidentViewPage() {
     })
       .then((res) => {
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        return res.json() as Promise<IncidentEdit[]>;
+        return res.json() as Promise<IncidentChangeSet[]>;
       })
       .then((json) => {
-        if (!cancelled) setEdits(Array.isArray(json) ? json : []);
+        if (!cancelled) setChangeSets(Array.isArray(json) ? json : []);
       })
       .catch((err: unknown) => {
         if (!cancelled) setEditsError(err instanceof Error ? err.message : 'Failed to load report history');
@@ -405,7 +411,7 @@ export function IncidentViewPage() {
             <h3>Report history</h3>
             {!editsLoading && !editsError && (
               <p className="muted-text">
-                {edits.length} change{edits.length === 1 ? '' : 's'} recorded
+                {changeSets.length} change{changeSets.length === 1 ? '' : 's'} recorded
               </p>
             )}
           </div>
@@ -417,24 +423,31 @@ export function IncidentViewPage() {
             </div>
           ) : editsError ? (
             <p className="muted-text">Report history is unavailable right now.</p>
-          ) : edits.length === 0 ? (
+          ) : changeSets.length === 0 ? (
             <p className="muted-text">No changes recorded yet.</p>
           ) : (
             <ol className="report-history-timeline">
-              {edits.map((edit) => (
-                <li className="report-history-entry" key={edit.id}>
+              {changeSets.map((changeSet) => (
+                <li className="report-history-entry" key={changeSet.changeSetId}>
                   <div className="report-history-marker" aria-hidden="true" />
                   <div className="report-history-body">
                     <div className="report-history-head">
-                      <span className="report-history-field">{edit.fieldChanged}</span>
-                      <span className="report-history-time">{formatHistoryTimestamp(edit.editedAt)}</span>
+                      <span className="report-history-time">{formatHistoryTimestamp(changeSet.editedAt)}</span>
+                      <span className="report-history-count">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>
                     </div>
-                    <div className="report-history-change">
-                      <span className="report-history-old">{formatHistoryValue(edit.oldValue)}</span>
-                      <span className="report-history-arrow" aria-hidden="true">→</span>
-                      <span className="report-history-new">{formatHistoryValue(edit.newValue)}</span>
-                    </div>
-                    <p className="report-history-author">by {edit.editedByName}</p>
+                    <ul className="report-history-fields">
+                      {changeSet.changes.map((change) => (
+                        <li className="report-history-field-row" key={change.id}>
+                          <span className="report-history-field">{change.fieldChanged}</span>
+                          <div className="report-history-change">
+                            <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
+                            <span className="report-history-arrow" aria-hidden="true">→</span>
+                            <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="report-history-author">by {changeSet.editedByName}</p>
                   </div>
                 </li>
               ))}
