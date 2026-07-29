@@ -98,6 +98,12 @@ function formatHistoryValue(value: string | null): string {
   return value;
 }
 
+const LONG_VALUE_THRESHOLD = 40;
+
+function isLongChange(change: IncidentChange): boolean {
+  return (change.oldValue?.length ?? 0) > LONG_VALUE_THRESHOLD || (change.newValue?.length ?? 0) > LONG_VALUE_THRESHOLD;
+}
+
 const APPROVAL_FIELDS = new Set(['approval_status', 'reviewed_by', 'review_comments', 'approved_by']);
 
 function isApprovalChangeSet(changeSet: IncidentChangeSet): boolean {
@@ -484,16 +490,19 @@ export function IncidentViewPage() {
                       {isOpen && (
                         <>
                           <ul className="report-history-fields">
-                            {changeSet.changes.map((change) => (
-                              <li className="report-history-field-row" key={change.id}>
-                                <span className="report-history-field">{change.fieldChanged}</span>
-                                <div className="report-history-change">
-                                  <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
-                                  <span className="report-history-arrow" aria-hidden="true">→</span>
-                                  <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
-                                </div>
-                              </li>
-                            ))}
+                            {changeSet.changes.map((change) => {
+                              const stacked = isLongChange(change);
+                              return (
+                                <li className="report-history-field-row" key={change.id}>
+                                  <span className="report-history-field">{change.fieldChanged}</span>
+                                  <div className={stacked ? 'report-history-change stacked' : 'report-history-change'}>
+                                    <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
+                                    <span className="report-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
+                                    <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
+                                  </div>
+                                </li>
+                              );
+                            })}
                           </ul>
                         </>
                       )}

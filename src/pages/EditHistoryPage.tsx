@@ -27,6 +27,12 @@ function formatValue(value: string | null): string {
   return value;
 }
 
+const LONG_VALUE_THRESHOLD = 40;
+
+function isLongChange(change: IncidentChange): boolean {
+  return (change.oldValue?.length ?? 0) > LONG_VALUE_THRESHOLD || (change.newValue?.length ?? 0) > LONG_VALUE_THRESHOLD;
+}
+
 function formatTimestamp(value: string): string {
   if (!value) return '—';
   const dt = new Date(value);
@@ -204,18 +210,21 @@ export function EditHistoryPage() {
                             </span>
                           </td>
                         </tr>
-                        {isOpen && changeSet.changes.map((change) => (
-                          <tr key={change.id} className="edit-history-detail-row">
-                            <td data-label="Field changed"><span className="edit-history-field">{change.fieldChanged}</span></td>
-                            <td data-label="Change">
-                              <span className="edit-history-change-inline">
-                                <span className="edit-history-old">{formatValue(change.oldValue)}</span>
-                                <span className="edit-history-arrow" aria-hidden="true">→</span>
-                                <span className="edit-history-new">{formatValue(change.newValue)}</span>
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
+                        {isOpen && changeSet.changes.map((change) => {
+                          const stacked = isLongChange(change);
+                          return (
+                            <tr key={change.id} className="edit-history-detail-row">
+                              <td data-label="Field changed"><span className="edit-history-field">{change.fieldChanged}</span></td>
+                              <td data-label="Change">
+                                <span className={stacked ? 'edit-history-change-inline stacked' : 'edit-history-change-inline'}>
+                                  <span className="edit-history-old">{formatValue(change.oldValue)}</span>
+                                  <span className="edit-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
+                                  <span className="edit-history-new">{formatValue(change.newValue)}</span>
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     );
                   })}
@@ -236,16 +245,19 @@ export function EditHistoryPage() {
                         </span>
                       )}
                       fields={[
-                        ...changeSet.changes.map((change) => ({
-                          label: change.fieldChanged,
-                          value: (
-                            <span className="edit-history-change-inline">
-                              <span className="edit-history-old">{formatValue(change.oldValue)}</span>
-                              {' → '}
-                              <span className="edit-history-new">{formatValue(change.newValue)}</span>
-                            </span>
-                          ),
-                        })),
+                        ...changeSet.changes.map((change) => {
+                          const stacked = isLongChange(change);
+                          return {
+                            label: change.fieldChanged,
+                            value: (
+                              <span className={stacked ? 'edit-history-change-inline stacked' : 'edit-history-change-inline'}>
+                                <span className="edit-history-old">{formatValue(change.oldValue)}</span>
+                                <span className="edit-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
+                                <span className="edit-history-new">{formatValue(change.newValue)}</span>
+                              </span>
+                            ),
+                          };
+                        }),
                         { label: 'Edited by', value: changeSet.editedByName },
                         { label: 'User ID', value: changeSet.editedByUserId },
                       ]}
