@@ -425,9 +425,11 @@ table { width: 100%; border-collapse: collapse; }
 }
 .edit-history-group-header:hover td { background: #f0f4ff; }
 .edit-history-group-toggle {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 20px 132px 120px 1fr 148px 68px;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 .edit-history-group-chevron {
   color: var(--muted);
@@ -435,16 +437,21 @@ table { width: 100%; border-collapse: collapse; }
   transition: transform 0.18s ease;
 }
 .edit-history-group.open .edit-history-group-chevron { transform: rotate(180deg); }
-.edit-history-group-header .my-reports-ref { margin-right: 0.35rem; }
+.edit-history-group-header .my-reports-ref { margin-right: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .edit-history-group-author {
   font-weight: 700;
   color: #252423;
-  margin-right: 0.85rem;
+  margin-right: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .edit-history-group-date {
   color: var(--muted);
   font-size: 0.85rem;
-  margin-right: 0.85rem;
+  margin-right: 0;
+  white-space: nowrap;
 }
 .edit-history-group-count {
   font-size: 0.7rem;
@@ -453,6 +460,8 @@ table { width: 100%; border-collapse: collapse; }
   background: #eaf4ff;
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
+  justify-self: start;
+  white-space: nowrap;
 }
 .edit-history-detail-row td { background: #fbfcfe; }
 .edit-history-field { font-weight: 600; }
@@ -580,10 +589,10 @@ th, td {
   box-shadow: 0 0 0 1px #6B007B;
 }
 .report-history-head {
-  display: flex;
+  display: grid;
+  grid-template-columns: 18px 132px 1fr 148px 68px;
   align-items: center;
   gap: 0.6rem;
-  flex-wrap: wrap;
   width: 100%;
   background: none;
   border: none;
@@ -607,7 +616,8 @@ th, td {
   letter-spacing: 0.04em;
   border-radius: 999px;
   padding: 0.15rem 0.55rem;
-  flex-shrink: 0;
+  justify-self: start;
+  white-space: nowrap;
 }
 .report-history-type-badge.edit {
   color: #118DFF;
@@ -621,6 +631,10 @@ th, td {
   font-weight: 700;
   font-size: 0.83rem;
   color: #252423;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .report-history-count {
   font-size: 0.7rem;
@@ -629,7 +643,8 @@ th, td {
   background: #eaf4ff;
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
-  margin-left: auto;
+  justify-self: start;
+  white-space: nowrap;
 }
 .report-history-fields {
   list-style: none;
