@@ -101,7 +101,14 @@ function formatHistoryValue(value: string | null): string {
 const APPROVAL_FIELDS = new Set(['approval_status', 'reviewed_by', 'review_comments', 'approved_by']);
 
 function isApprovalChangeSet(changeSet: IncidentChangeSet): boolean {
-  return changeSet.changes.some((change) => APPROVAL_FIELDS.has(change.fieldChanged));
+  return changeSet.changes.length > 0 && changeSet.changes.every((change) => APPROVAL_FIELDS.has(change.fieldChanged));
+}
+
+function approvalActionLabel(changeSet: IncidentChangeSet): string {
+  const status = changeSet.changes.find((change) => change.fieldChanged === 'approval_status')?.newValue;
+  if (status === 'Pending') return 'Pending Review';
+  if (status === 'Approved' || status === 'Rejected') return status;
+  return 'Approval action';
 }
 
 function formatHistoryTimestamp(value: string): string {
@@ -461,7 +468,7 @@ export function IncidentViewPage() {
                       >
                         <ChevronDown size={15} className="report-history-chevron" />
                         <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
-                          {isApproval ? 'Approval action' : 'Edit'}
+                          {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
                         </span>
                         <span className="report-history-editor">{changeSet.editedByName}</span>
                         <span className="report-history-time">{formatHistoryTimestamp(changeSet.editedAt)}</span>

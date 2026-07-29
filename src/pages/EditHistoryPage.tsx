@@ -43,7 +43,14 @@ function formatTimestamp(value: string): string {
 const APPROVAL_FIELDS = new Set(['approval_status', 'reviewed_by', 'review_comments', 'approved_by']);
 
 function isApprovalChangeSet(changeSet: IncidentChangeSet): boolean {
-  return changeSet.changes.some((change) => APPROVAL_FIELDS.has(change.fieldChanged));
+  return changeSet.changes.length > 0 && changeSet.changes.every((change) => APPROVAL_FIELDS.has(change.fieldChanged));
+}
+
+function approvalActionLabel(changeSet: IncidentChangeSet): string {
+  const status = changeSet.changes.find((change) => change.fieldChanged === 'approval_status')?.newValue;
+  if (status === 'Pending') return 'Pending Review';
+  if (status === 'Approved' || status === 'Rejected') return status;
+  return 'Approval action';
 }
 
 export function EditHistoryPage() {
@@ -179,7 +186,7 @@ export function EditHistoryPage() {
                             <span className="edit-history-group-toggle">
                               <ChevronDown size={16} className="edit-history-group-chevron" />
                               <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
-                                {isApproval ? 'Approval action' : 'Edit'}
+                                {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
                               </span>
                               <span className="my-reports-ref">{changeSet.incidentId}</span>
                               <span className="edit-history-group-author">{changeSet.editedByName}</span>
@@ -218,7 +225,7 @@ export function EditHistoryPage() {
                       title={formatTimestamp(changeSet.editedAt)}
                       badge={(
                         <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
-                          {isApproval ? 'Approval action' : 'Edit'}
+                          {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
                         </span>
                       )}
                       fields={[
