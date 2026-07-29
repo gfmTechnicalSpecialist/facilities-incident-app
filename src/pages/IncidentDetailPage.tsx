@@ -7,6 +7,7 @@ import { actionStatuses, approvalStatuses, isApprover } from '../utils/constants
 import { approvalStatusClass, approvalStatusLabel, formatDateTime, parseJiraTicketReferences } from '../utils/helpers';
 import type { ActionStatus, ApprovalStatus } from '../types';
 import { ApprovalDialog } from '../components/ApprovalDialog';
+import { PrintHeader } from '../components/PrintHeader';
 
 export function IncidentDetailPage() {
   const { id } = useParams();
@@ -74,6 +75,11 @@ export function IncidentDetailPage() {
 
   return (
     <div className="page-stack pbi-dashboard incident-print-shell">
+      <PrintHeader
+        title={incident.title}
+        subtitle={`${incident.site}${incident.specificLocation ? ` • ${incident.specificLocation}` : ''}`}
+        reference={incident.incidentId}
+      />
       <section className="card detail-header-card print-report-header">
         <div>
           <p className="eyebrow">{incident.incidentId}</p>

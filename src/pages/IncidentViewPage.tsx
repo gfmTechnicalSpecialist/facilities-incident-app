@@ -5,6 +5,7 @@ import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } f
 import { INCIDENT_DETAILS_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
+import { PrintHeader } from '../components/PrintHeader';
 import { isApprover } from '../utils/constants';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
@@ -141,6 +142,11 @@ export function IncidentViewPage() {
 
   return (
     <div className="page-stack pbi-dashboard incident-print-shell">
+      <PrintHeader
+        title={header.title}
+        subtitle={`${header.site}${header.specificLocation ? ` • ${header.specificLocation}` : ''}`}
+        reference={header.incidentId}
+      />
       {/* Header */}
       <section className="card detail-header-card print-report-header">
         <div>

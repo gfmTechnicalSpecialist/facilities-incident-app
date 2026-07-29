@@ -481,6 +481,9 @@ th, td {
 }
 .no-print { }
 
+/* Print-only content is hidden on screen and revealed by @media print. */
+.print-only { display: none; }
+
 @media (max-width: 1120px) {
   .login-shell, .final-login-shell .auth-card-grid, .app-shell, .stats-grid, .detail-grid, .chart-card-split .chart-layout, .detail-list, .final-filters-grid, .charts-two-col {
     grid-template-columns: 1fr;
@@ -523,36 +526,170 @@ th, td {
 }
 
 @media print {
-  body {
-    background: #fff;
-    color: #000;
-    font-size: 11pt;
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
   }
-  .sidebar, .topbar, .no-print, button, .comment-form {
+
+  html, body {
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 10.5pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sidebar, .topbar, .no-print, button, .comment-form, .mobile-nav {
     display: none !important;
   }
+
   .app-shell {
     display: block;
   }
   .main-content {
     padding: 0;
+    margin: 0;
+    max-width: none;
   }
+
+  .page-stack {
+    gap: 12px;
+  }
+
+  /* Branded document header shown only when printing */
+  .print-only { display: block; }
+
+  .print-doc-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 0 12px;
+    margin-bottom: 14px;
+    border-bottom: 2.5px solid #d71920;
+  }
+  .print-doc-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .print-doc-logo {
+    height: 46px;
+    width: auto;
+    object-fit: contain;
+  }
+  .print-doc-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .print-doc-brand-name {
+    font-size: 12pt;
+    font-weight: 800;
+    color: #1a1a1a;
+    letter-spacing: -0.01em;
+  }
+  .print-doc-brand-tag {
+    font-size: 8pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #d71920;
+  }
+  .print-doc-header-meta {
+    text-align: right;
+    max-width: 60%;
+  }
+  .print-doc-title {
+    margin: 0;
+    font-size: 14pt;
+    font-weight: 800;
+    color: #1a1a1a;
+    letter-spacing: -0.01em;
+  }
+  .print-doc-subtitle {
+    margin: 2px 0 0;
+    font-size: 9pt;
+    color: #555;
+  }
+  .print-doc-meta-line {
+    margin-top: 6px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 8pt;
+    color: #666;
+  }
+  .print-doc-ref {
+    font-weight: 700;
+    color: #d71920;
+  }
+
   .card {
-    box-shadow: none;
-    border: 1px solid #ddd;
-    border-radius: 0;
+    box-shadow: none !important;
+    border: 1px solid #d9d9d9 !important;
+    border-radius: 4px !important;
+    padding: 12px 14px;
     page-break-inside: avoid;
+    break-inside: avoid;
   }
-  .page-stack, .detail-grid, .stats-grid {
+  .card h3, .card h4 {
+    color: #1a1a1a;
+  }
+  .card h3 {
+    font-size: 11pt;
+    border-bottom: 1px solid #ececec;
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+  }
+
+  .page-stack, .detail-grid, .stats-grid, .summary-pair, .viewer-review-grid {
     display: block;
   }
   .detail-grid > *, .stats-grid > * {
-    margin-bottom: 1rem;
+    margin-bottom: 12px;
   }
+
+  .detail-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 24px;
+  }
+  .detail-list dt {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #777;
+  }
+  .detail-list dd {
+    font-size: 9.5pt;
+    color: #1a1a1a;
+    margin: 0 0 4px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+  th, td {
+    border: 1px solid #e2e2e2 !important;
+    padding: 5px 7px !important;
+    background: #fff !important;
+  }
+  th {
+    background: #f4f4f4 !important;
+    font-weight: 700;
+  }
+  tr, .comment-item, section { page-break-inside: avoid; break-inside: avoid; }
+
   .print-report-header {
-    border: none;
+    border: none !important;
     padding-top: 0;
   }
+
+  /* Keep chart colours in print */
+  .recharts-surface, .pbi-legend-swatch { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
 .success-banner { border: 1px solid rgba(33, 138, 72, 0.2); background: linear-gradient(180deg, #f3fff7, #ebfff2); }

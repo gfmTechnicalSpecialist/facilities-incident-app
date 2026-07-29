@@ -4,6 +4,7 @@ import { AlertTriangle, CheckCircle2, ClipboardList, FolderClock, Printer, Shiel
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { incidentTypeColorMap, siteColorMap } from '../utils/helpers';
 import { DASHBOARD_API_URL } from '../lib/apiBase';
+import { PrintHeader } from '../components/PrintHeader';
 
 interface ChartItem {
   name: string;
@@ -153,6 +154,11 @@ export function DashboardPage() {
 
   return (
     <div className="page-stack pbi-dashboard">
+      <PrintHeader
+        title="Facilities Incident Report"
+        subtitle="Operations overview · All sites · All categories"
+        reference={`Data as of ${reportDate}`}
+      />
       {/* ── Report header bar ── */}
       <header className="pbi-header">
         <div className="pbi-header-left">
