@@ -53,6 +53,13 @@ function approvalActionLabel(changeSet: IncidentChangeSet): string {
   return 'Approval action';
 }
 
+function approvalActionClass(changeSet: IncidentChangeSet): string {
+  const status = changeSet.changes.find((change) => change.fieldChanged === 'approval_status')?.newValue;
+  if (status === 'Approved') return 'approved';
+  if (status === 'Rejected') return 'rejected';
+  return 'approval';
+}
+
 export function EditHistoryPage() {
   const [changeSets, setChangeSets] = useState<IncidentChangeSet[]>([]);
   const [loading, setLoading] = useState(false);
@@ -185,7 +192,7 @@ export function EditHistoryPage() {
                           <td colSpan={2}>
                             <span className="edit-history-group-toggle">
                               <ChevronDown size={16} className="edit-history-group-chevron" />
-                              <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
+                              <span className={isApproval ? `report-history-type-badge ${approvalActionClass(changeSet)}` : 'report-history-type-badge edit'}>
                                 {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
                               </span>
                               <span className="my-reports-ref">{changeSet.incidentId}</span>
@@ -224,7 +231,7 @@ export function EditHistoryPage() {
                       reference={changeSet.incidentId}
                       title={formatTimestamp(changeSet.editedAt)}
                       badge={(
-                        <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
+                        <span className={isApproval ? `report-history-type-badge ${approvalActionClass(changeSet)}` : 'report-history-type-badge edit'}>
                           {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
                         </span>
                       )}

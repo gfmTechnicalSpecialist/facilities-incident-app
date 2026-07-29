@@ -628,6 +628,14 @@ th, td {
   color: #6B007B;
   background: #f5e6f9;
 }
+.report-history-type-badge.approved {
+  color: #0F7B3F;
+  background: #e5f6ec;
+}
+.report-history-type-badge.rejected {
+  color: #C4314B;
+  background: #fdeaec;
+}
 .report-history-editor {
   font-weight: 700;
   font-size: 0.83rem;

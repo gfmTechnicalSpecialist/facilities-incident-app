@@ -111,6 +111,13 @@ function approvalActionLabel(changeSet: IncidentChangeSet): string {
   return 'Approval action';
 }
 
+function approvalActionClass(changeSet: IncidentChangeSet): string {
+  const status = changeSet.changes.find((change) => change.fieldChanged === 'approval_status')?.newValue;
+  if (status === 'Approved') return 'approved';
+  if (status === 'Rejected') return 'rejected';
+  return 'approval';
+}
+
 function formatHistoryTimestamp(value: string): string {
   if (!value) return '—';
   const dt = new Date(value);
@@ -467,7 +474,7 @@ export function IncidentViewPage() {
                         aria-expanded={isOpen}
                       >
                         <ChevronDown size={15} className="report-history-chevron" />
-                        <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
+                        <span className={isApproval ? `report-history-type-badge ${approvalActionClass(changeSet)}` : 'report-history-type-badge edit'}>
                           {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
                         </span>
                         <span className="report-history-editor">{changeSet.editedByName}</span>
