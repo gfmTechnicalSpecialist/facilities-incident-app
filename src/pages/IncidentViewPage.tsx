@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
@@ -123,6 +123,19 @@ export function IncidentViewPage() {
   const [changeSets, setChangeSets] = useState<IncidentChangeSet[]>([]);
   const [editsLoading, setEditsLoading] = useState(true);
   const [editsError, setEditsError] = useState<string | null>(null);
+  const [expandedSets, setExpandedSets] = useState<Set<string>>(new Set());
+
+  const toggleSet = (changeSetId: string) => {
+    setExpandedSets((prev) => {
+      const next = new Set(prev);
+      if (next.has(changeSetId)) {
+        next.delete(changeSetId);
+      } else {
+        next.add(changeSetId);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!incidentId) return;
@@ -427,30 +440,43 @@ export function IncidentViewPage() {
             <p className="muted-text">No changes recorded yet.</p>
           ) : (
             <ol className="report-history-timeline">
-              {changeSets.map((changeSet) => (
-                <li className="report-history-entry" key={changeSet.changeSetId}>
-                  <div className="report-history-marker" aria-hidden="true" />
-                  <div className="report-history-body">
-                    <div className="report-history-head">
-                      <span className="report-history-time">{formatHistoryTimestamp(changeSet.editedAt)}</span>
-                      <span className="report-history-count">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>
+              {changeSets.map((changeSet) => {
+                const isOpen = expandedSets.has(changeSet.changeSetId);
+                return (
+                  <li className={isOpen ? 'report-history-entry open' : 'report-history-entry'} key={changeSet.changeSetId}>
+                    <div className="report-history-marker" aria-hidden="true" />
+                    <div className="report-history-body">
+                      <button
+                        type="button"
+                        className="report-history-head"
+                        onClick={() => toggleSet(changeSet.changeSetId)}
+                        aria-expanded={isOpen}
+                      >
+                        <ChevronDown size={15} className="report-history-chevron" />
+                        <span className="report-history-time">{formatHistoryTimestamp(changeSet.editedAt)}</span>
+                        <span className="report-history-count">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>
+                      </button>
+                      {isOpen && (
+                        <>
+                          <ul className="report-history-fields">
+                            {changeSet.changes.map((change) => (
+                              <li className="report-history-field-row" key={change.id}>
+                                <span className="report-history-field">{change.fieldChanged}</span>
+                                <div className="report-history-change">
+                                  <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
+                                  <span className="report-history-arrow" aria-hidden="true">→</span>
+                                  <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                          <p className="report-history-author">by {changeSet.editedByName}</p>
+                        </>
+                      )}
                     </div>
-                    <ul className="report-history-fields">
-                      {changeSet.changes.map((change) => (
-                        <li className="report-history-field-row" key={change.id}>
-                          <span className="report-history-field">{change.fieldChanged}</span>
-                          <div className="report-history-change">
-                            <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
-                            <span className="report-history-arrow" aria-hidden="true">→</span>
-                            <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="report-history-author">by {changeSet.editedByName}</p>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ol>
           )}
         </div>

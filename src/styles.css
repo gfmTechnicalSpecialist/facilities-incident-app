@@ -577,11 +577,25 @@ th, td {
 }
 .report-history-head {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.6rem;
   flex-wrap: wrap;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
 }
+.report-history-chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+.report-history-entry.open .report-history-chevron { transform: rotate(180deg); }
 .report-history-count {
   font-size: 0.7rem;
   font-weight: 700;
@@ -589,6 +603,7 @@ th, td {
   background: #eaf4ff;
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
+  margin-left: auto;
 }
 .report-history-fields {
   list-style: none;
