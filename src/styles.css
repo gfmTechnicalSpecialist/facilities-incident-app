@@ -479,6 +479,100 @@ th, td {
   align-items: baseline;
   gap: 1rem;
 }
+
+/* ── Report history timeline (Incident view) ── */
+.comments-history-grid { align-items: start; }
+.report-history-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0;
+}
+.report-history-timeline {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.report-history-entry {
+  position: relative;
+  padding-left: 1.5rem;
+}
+.report-history-entry::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1.05rem;
+  bottom: -1rem;
+  width: 2px;
+  background: var(--line);
+}
+.report-history-entry:last-child::before { display: none; }
+.report-history-marker {
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #118DFF;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #118DFF;
+}
+.report-history-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.report-history-field {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #252423;
+}
+.report-history-time {
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.report-history-change {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+.report-history-old,
+.report-history-new {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  word-break: break-word;
+}
+.report-history-old {
+  background: #fdecea;
+  border-color: #f5c2bd;
+  color: #b42318;
+  text-decoration: line-through;
+  text-decoration-color: rgba(180, 35, 24, 0.5);
+}
+.report-history-new {
+  background: #e7f6ec;
+  border-color: #b7e0c4;
+  color: #1a7f37;
+}
+.report-history-arrow { color: var(--muted); font-weight: 700; }
+.report-history-author {
+  margin: 0.3rem 0 0;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
 .no-print { }
 
 /* Print-only content is hidden on screen and revealed by @media print. */

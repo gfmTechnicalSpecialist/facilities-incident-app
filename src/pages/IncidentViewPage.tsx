@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
-import { INCIDENT_DETAILS_API_URL } from '../lib/apiBase';
+import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
 import { PrintHeader } from '../components/PrintHeader';
@@ -64,6 +64,18 @@ interface IncidentDetails {
   }[];
 }
 
+interface IncidentEdit {
+  id: string;
+  incidentPk: string;
+  incidentId: string;
+  editedByUserId: string;
+  editedByName: string;
+  editedAt: string;
+  fieldChanged: string;
+  oldValue: string | null;
+  newValue: string | null;
+}
+
 const NA = 'Not captured yet.';
 
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
@@ -75,6 +87,24 @@ function Field({ label, value }: { label: string; value: string | null | undefin
   );
 }
 
+function formatHistoryValue(value: string | null): string {
+  if (value === null || value === undefined || value === '') return '—';
+  return value;
+}
+
+function formatHistoryTimestamp(value: string): string {
+  if (!value) return '—';
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return value;
+  return dt.toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export function IncidentViewPage() {
   const { incidentId } = useParams();
   const navigate = useNavigate();
@@ -84,6 +114,9 @@ export function IncidentViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+  const [edits, setEdits] = useState<IncidentEdit[]>([]);
+  const [editsLoading, setEditsLoading] = useState(true);
+  const [editsError, setEditsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!incidentId) return;
@@ -108,6 +141,34 @@ export function IncidentViewPage() {
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [incidentId]);
+
+  useEffect(() => {
+    if (!incidentId) return;
+    let cancelled = false;
+    setEditsLoading(true);
+    setEditsError(null);
+
+    fetch(EDIT_HISTORY_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ incidentId }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
+        return res.json() as Promise<IncidentEdit[]>;
+      })
+      .then((json) => {
+        if (!cancelled) setEdits(Array.isArray(json) ? json : []);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setEditsError(err instanceof Error ? err.message : 'Failed to load report history');
+      })
+      .finally(() => {
+        if (!cancelled) setEditsLoading(false);
       });
 
     return () => { cancelled = true; };
@@ -317,23 +378,67 @@ export function IncidentViewPage() {
         />
       )}
 
-      {/* Viewer comments */}
-      <section className="card">
-        <h3>Comments</h3>
-        <div className="comment-list">
-          {viewerComments.length > 0 ? (
-            viewerComments.map((c, i) => (
-              <article className="comment-item" key={i}>
-                <div className="comment-meta">
-                  <strong>{c.userName}</strong>
-                  <span>{c.userRole === 'viewer' ? 'Viewer' : 'Admin'}</span>
-                  <span>{c.date}</span>
-                </div>
-                <p>{c.comment}</p>
-              </article>
-            ))
+      {/* Comments + report history */}
+      <section className="detail-grid comments-history-grid">
+        <div className="card">
+          <h3>Comments</h3>
+          <div className="comment-list">
+            {viewerComments.length > 0 ? (
+              viewerComments.map((c, i) => (
+                <article className="comment-item" key={i}>
+                  <div className="comment-meta">
+                    <strong>{c.userName}</strong>
+                    <span>{c.userRole === 'viewer' ? 'Viewer' : 'Admin'}</span>
+                    <span>{c.date}</span>
+                  </div>
+                  <p>{c.comment}</p>
+                </article>
+              ))
+            ) : (
+              <p className="muted-text">No comments yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="grouped-header">
+            <h3>Report history</h3>
+            {!editsLoading && !editsError && (
+              <p className="muted-text">
+                {edits.length} change{edits.length === 1 ? '' : 's'} recorded
+              </p>
+            )}
+          </div>
+
+          {editsLoading ? (
+            <div className="report-history-status">
+              <div className="loading-spinner" />
+              <p className="muted-text">Loading report history…</p>
+            </div>
+          ) : editsError ? (
+            <p className="muted-text">Report history is unavailable right now.</p>
+          ) : edits.length === 0 ? (
+            <p className="muted-text">No changes recorded yet.</p>
           ) : (
-            <p className="muted-text">No comments yet.</p>
+            <ol className="report-history-timeline">
+              {edits.map((edit) => (
+                <li className="report-history-entry" key={edit.id}>
+                  <div className="report-history-marker" aria-hidden="true" />
+                  <div className="report-history-body">
+                    <div className="report-history-head">
+                      <span className="report-history-field">{edit.fieldChanged}</span>
+                      <span className="report-history-time">{formatHistoryTimestamp(edit.editedAt)}</span>
+                    </div>
+                    <div className="report-history-change">
+                      <span className="report-history-old">{formatHistoryValue(edit.oldValue)}</span>
+                      <span className="report-history-arrow" aria-hidden="true">→</span>
+                      <span className="report-history-new">{formatHistoryValue(edit.newValue)}</span>
+                    </div>
+                    <p className="report-history-author">by {edit.editedByName}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           )}
         </div>
       </section>
