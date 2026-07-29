@@ -575,6 +575,10 @@ th, td {
   border: 2px solid #fff;
   box-shadow: 0 0 0 1px #118DFF;
 }
+.report-history-marker.approval {
+  background: #6B007B;
+  box-shadow: 0 0 0 1px #6B007B;
+}
 .report-history-head {
   display: flex;
   align-items: center;
@@ -596,6 +600,28 @@ th, td {
   transition: transform 0.18s ease;
 }
 .report-history-entry.open .report-history-chevron { transform: rotate(180deg); }
+.report-history-type-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  flex-shrink: 0;
+}
+.report-history-type-badge.edit {
+  color: #118DFF;
+  background: #eaf4ff;
+}
+.report-history-type-badge.approval {
+  color: #6B007B;
+  background: #f5e6f9;
+}
+.report-history-editor {
+  font-weight: 700;
+  font-size: 0.83rem;
+  color: #252423;
+}
 .report-history-count {
   font-size: 0.7rem;
   font-weight: 700;

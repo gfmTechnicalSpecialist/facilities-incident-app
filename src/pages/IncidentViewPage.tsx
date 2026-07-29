@@ -98,6 +98,12 @@ function formatHistoryValue(value: string | null): string {
   return value;
 }
 
+const APPROVAL_FIELDS = new Set(['approval_status', 'reviewed_by', 'review_comments', 'approved_by']);
+
+function isApprovalChangeSet(changeSet: IncidentChangeSet): boolean {
+  return changeSet.changes.some((change) => APPROVAL_FIELDS.has(change.fieldChanged));
+}
+
 function formatHistoryTimestamp(value: string): string {
   if (!value) return '—';
   const dt = new Date(value);
@@ -442,9 +448,10 @@ export function IncidentViewPage() {
             <ol className="report-history-timeline">
               {changeSets.map((changeSet) => {
                 const isOpen = expandedSets.has(changeSet.changeSetId);
+                const isApproval = isApprovalChangeSet(changeSet);
                 return (
                   <li className={isOpen ? 'report-history-entry open' : 'report-history-entry'} key={changeSet.changeSetId}>
-                    <div className="report-history-marker" aria-hidden="true" />
+                    <div className={isApproval ? 'report-history-marker approval' : 'report-history-marker'} aria-hidden="true" />
                     <div className="report-history-body">
                       <button
                         type="button"
@@ -453,6 +460,10 @@ export function IncidentViewPage() {
                         aria-expanded={isOpen}
                       >
                         <ChevronDown size={15} className="report-history-chevron" />
+                        <span className={isApproval ? 'report-history-type-badge approval' : 'report-history-type-badge edit'}>
+                          {isApproval ? 'Approval action' : 'Edit'}
+                        </span>
+                        <span className="report-history-editor">{changeSet.editedByName}</span>
                         <span className="report-history-time">{formatHistoryTimestamp(changeSet.editedAt)}</span>
                         <span className="report-history-count">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>
                       </button>
@@ -470,7 +481,6 @@ export function IncidentViewPage() {
                               </li>
                             ))}
                           </ul>
-                          <p className="report-history-author">by {changeSet.editedByName}</p>
                         </>
                       )}
                     </div>
