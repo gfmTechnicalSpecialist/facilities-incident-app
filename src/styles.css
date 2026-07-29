@@ -414,12 +414,28 @@ table { width: 100%; border-collapse: collapse; }
 
 /* ── Edit history: grouped change sets ── */
 .edit-history-group + .edit-history-group tr:first-child td { border-top: 2px solid var(--line); }
+.edit-history-group-header {
+  cursor: pointer;
+  user-select: none;
+}
 .edit-history-group-header td {
   background: #f8fafc;
   padding: 0.65rem 0.75rem;
   border-bottom: 1px solid var(--line);
 }
-.edit-history-group-header .my-reports-ref { margin-right: 0.85rem; }
+.edit-history-group-header:hover td { background: #f0f4ff; }
+.edit-history-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.edit-history-group-chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+.edit-history-group.open .edit-history-group-chevron { transform: rotate(180deg); }
+.edit-history-group-header .my-reports-ref { margin-right: 0.35rem; }
 .edit-history-group-author {
   font-weight: 700;
   color: #252423;
@@ -438,6 +454,7 @@ table { width: 100%; border-collapse: collapse; }
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
 }
+.edit-history-detail-row td { background: #fbfcfe; }
 .edit-history-field { font-weight: 600; }
 .edit-history-old {
   color: #b42318;

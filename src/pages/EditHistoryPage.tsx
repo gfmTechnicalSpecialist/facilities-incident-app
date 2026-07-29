@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { History } from 'lucide-react';
+import { ChevronDown, History } from 'lucide-react';
 import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { EDIT_HISTORY_API_URL } from '../lib/apiBase';
@@ -46,6 +46,19 @@ export function EditHistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [expandedSets, setExpandedSets] = useState<Set<string>>(new Set());
+
+  const toggleSet = (changeSetId: string) => {
+    setExpandedSets((prev) => {
+      const next = new Set(prev);
+      if (next.has(changeSetId)) {
+        next.delete(changeSetId);
+      } else {
+        next.add(changeSetId);
+      }
+      return next;
+    });
+  };
 
   const runSearch = (rawId: string) => {
     const incidentId = rawId.trim();
@@ -57,6 +70,7 @@ export function EditHistoryPage() {
     }
     setLoading(true);
     setHasSearched(true);
+    setExpandedSets(new Set());
     fetch(EDIT_HISTORY_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -150,27 +164,33 @@ export function EditHistoryPage() {
                       <th>New value</th>
                     </tr>
                   </thead>
-                  {changeSets.map((changeSet) => (
-                    <tbody key={changeSet.changeSetId} className="edit-history-group">
-                      <tr className="edit-history-group-header">
-                        <td colSpan={3}>
-                          <span className="my-reports-ref">{changeSet.incidentId}</span>
-                          <span className="edit-history-group-author">{changeSet.editedByName}</span>
-                          <span className="edit-history-group-date">{formatTimestamp(changeSet.editedAt)}</span>
-                          <span className="edit-history-group-count">
-                            {changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}
-                          </span>
-                        </td>
-                      </tr>
-                      {changeSet.changes.map((change) => (
-                        <tr key={change.id}>
-                          <td data-label="Field changed"><span className="edit-history-field">{change.fieldChanged}</span></td>
-                          <td data-label="Old value"><span className="edit-history-old">{formatValue(change.oldValue)}</span></td>
-                          <td data-label="New value"><span className="edit-history-new">{formatValue(change.newValue)}</span></td>
+                  {changeSets.map((changeSet) => {
+                    const isOpen = expandedSets.has(changeSet.changeSetId);
+                    return (
+                      <tbody key={changeSet.changeSetId} className={isOpen ? 'edit-history-group open' : 'edit-history-group'}>
+                        <tr className="edit-history-group-header" onClick={() => toggleSet(changeSet.changeSetId)}>
+                          <td colSpan={3}>
+                            <span className="edit-history-group-toggle">
+                              <ChevronDown size={16} className="edit-history-group-chevron" />
+                              <span className="my-reports-ref">{changeSet.incidentId}</span>
+                              <span className="edit-history-group-author">{changeSet.editedByName}</span>
+                              <span className="edit-history-group-date">{formatTimestamp(changeSet.editedAt)}</span>
+                              <span className="edit-history-group-count">
+                                {changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}
+                              </span>
+                            </span>
+                          </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  ))}
+                        {isOpen && changeSet.changes.map((change) => (
+                          <tr key={change.id} className="edit-history-detail-row">
+                            <td data-label="Field changed"><span className="edit-history-field">{change.fieldChanged}</span></td>
+                            <td data-label="Old value"><span className="edit-history-old">{formatValue(change.oldValue)}</span></td>
+                            <td data-label="New value"><span className="edit-history-new">{formatValue(change.newValue)}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    );
+                  })}
                 </table>
               </div>
 
