@@ -1646,7 +1646,7 @@ th, td {
   color: #605E5C;
   margin-bottom: 0.3rem;
 }
-.pbi-dashboard table { font-size: 0.8rem; }
+.pbi-dashboard table { font-size: 0.8rem; table-layout: fixed; }
 .pbi-dashboard th {
   background: #F3F2F1;
   color: #252423;
