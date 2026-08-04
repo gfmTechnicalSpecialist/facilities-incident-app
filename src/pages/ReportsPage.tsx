@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { approvalStatusClass, approvalStatusLabel, incidentTypeColorMap, siteColorMap } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, incidentTypeColorMap, siteColorMap, sortIncidentsByApprovalPriority } from '../utils/helpers';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
 import { MobileReportCard } from '../components/MobileReportCard';
 
@@ -96,6 +96,7 @@ export function ReportsPage() {
   const allIncidents = groups.flatMap((g) => g.incidents);
   const byType = tally(allIncidents.map((i) => i.type), incidentTypeColorMap);
   const bySite = tally(allIncidents.map((i) => i.site), siteColorMap);
+  const sortedGroups = groups.map((group) => ({ ...group, incidents: sortIncidentsByApprovalPriority(group.incidents) }));
 
   return (
     <div className="page-stack pbi-dashboard">
@@ -178,7 +179,7 @@ export function ReportsPage() {
         </div>
       </section>
 
-      {groups.map((group) => (
+      {sortedGroups.map((group) => (
         <section key={group.monthGroup} className="pbi-tile">
           <div className="grouped-header" style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <h3 style={{ margin: 0 }}>{group.monthGroup}</h3>

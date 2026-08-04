@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { actionStatuses, severities, sites, isApprover } from '../utils/constants';
-import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, sortIncidentsByApprovalPriority } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
@@ -78,7 +78,7 @@ export function IncidentsPage() {
   const filteredGroups = useMemo(() => {
     return groups
       .map((group) => {
-        const filtered = group.incidents.filter((incident) => {
+        const filtered = sortIncidentsByApprovalPriority(group.incidents.filter((incident) => {
           const haystack = [incident.title, incident.incidentId, incident.site, incident.type]
             .join(' ')
             .toLowerCase();
@@ -91,7 +91,7 @@ export function IncidentsPage() {
           const matchesFrom = !dateFrom || incidentDate >= new Date(dateFrom);
           const matchesTo = !dateTo || incidentDate <= new Date(dateTo);
           return matchesSearch && matchesSite && matchesType && matchesSeverity && matchesStatus && matchesFrom && matchesTo;
-        });
+        }));
         return { ...group, incidents: filtered };
       })
       .filter((group) => group.incidents.length > 0);

@@ -87,6 +87,20 @@ export function stringifyJiraTicketReferences(raw: string | null | undefined): s
   return values.length > 0 ? JSON.stringify(values) : null;
 }
 
+/**
+ * Sort incidents so Rejected and Pending approval appear first,
+ * followed by everything else in reverse chronological order.
+ */
+export function sortIncidentsByApprovalPriority<T extends { approvalStatus: string; date: string }>(incidents: T[]): T[] {
+  const priority: Record<string, number> = { Rejected: 0, Pending: 1 };
+  return [...incidents].sort((a, b) => {
+    const pa = priority[a.approvalStatus] ?? 2;
+    const pb = priority[b.approvalStatus] ?? 2;
+    if (pa !== pb) return pa - pb;
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+}
+
 
 export function approvalStatusLabel(status: string): string {
   return status === 'Pending' ? 'Pending Approval' : status;

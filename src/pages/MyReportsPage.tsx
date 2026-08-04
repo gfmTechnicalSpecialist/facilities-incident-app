@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle2, ClipboardEdit, Eye, FolderClock, Loader2, ShieldEllipsis } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { actionStatuses } from '../utils/constants';
-import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, sortIncidentsByApprovalPriority } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { USER_REPORTS_API_URL } from '../lib/apiBase';
@@ -54,12 +54,12 @@ export function MyReportsPage() {
   }, [user]);
 
   const filtered = useMemo(() => {
-    return reports.filter((i) => {
+    return sortIncidentsByApprovalPriority(reports.filter((i) => {
       const haystack = [i.title, i.incidentId, i.site, i.type].join(' ').toLowerCase();
       const matchSearch = haystack.includes(search.toLowerCase());
       const matchStatus = statusFilter === 'All' || i.actionStatus === statusFilter;
       return matchSearch && matchStatus;
-    });
+    }));
   }, [reports, search, statusFilter]);
 
   const totalCount = reports.length;

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { REPORTS_DATA_API_URL } from '../lib/apiBase';
-import { approvalStatusClass, approvalStatusLabel } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, sortIncidentsByApprovalPriority } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
 
 interface ApiIncident {
@@ -50,8 +50,12 @@ export function ApprovalsPage() {
     };
   }, []);
 
-  const pendingIncidents = useMemo(
-    () => groups.flatMap((g) => g.incidents).filter((incident) => incident.approvalStatus === 'Pending'),
+  const approvalPriorityIncidents = useMemo(
+    () => sortIncidentsByApprovalPriority(
+      groups.flatMap((g) => g.incidents).filter(
+        (incident) => incident.approvalStatus === 'Pending' || incident.approvalStatus === 'Rejected',
+      ),
+    ),
     [groups],
   );
 
@@ -78,8 +82,8 @@ export function ApprovalsPage() {
     <div className="page-stack pbi-dashboard">
       <section className="pbi-tile table-card">
         <div className="grouped-header">
-          <h3>Incidents awaiting approval</h3>
-          <p className="muted-text">{pendingIncidents.length} report{pendingIncidents.length === 1 ? '' : 's'}</p>
+          <h3>Incidents awaiting approval / rejected</h3>
+          <p className="muted-text">{approvalPriorityIncidents.length} report{approvalPriorityIncidents.length === 1 ? '' : 's'}</p>
         </div>
         <div className="table-scroll desktop-only">
           <table>
@@ -94,7 +98,7 @@ export function ApprovalsPage() {
               </tr>
             </thead>
             <tbody>
-              {pendingIncidents.map((incident) => (
+              {approvalPriorityIncidents.map((incident) => (
                 <tr
                   key={incident.incidentId}
                   className="clickable-row"
@@ -116,7 +120,7 @@ export function ApprovalsPage() {
           </table>
         </div>
         <div className="m-card-list mobile-only">
-          {pendingIncidents.map((incident) => (
+          {approvalPriorityIncidents.map((incident) => (
             <MobileReportCard
               key={incident.incidentId}
               reference={incident.incidentId}
@@ -142,7 +146,7 @@ export function ApprovalsPage() {
             />
           ))}
         </div>
-        {!pendingIncidents.length && <p className="muted-text">No incidents are currently awaiting approval.</p>}
+        {!approvalPriorityIncidents.length && <p className="muted-text">No incidents are currently awaiting approval or rejected.</p>}
       </section>
     </div>
   );
