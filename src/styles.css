@@ -1646,19 +1646,19 @@ th, td {
   color: #605E5C;
   margin-bottom: 0.3rem;
 }
-.pbi-dashboard table { font-size: 0.8rem; table-layout: fixed; }
+.pbi-dashboard table { font-size: 0.75rem; table-layout: fixed; }
 .pbi-dashboard th {
   background: #F3F2F1;
   color: #252423;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: none;
   letter-spacing: 0;
   border-bottom: 1px solid #E1DFDD;
-  padding: 0.55rem 0.75rem;
+  padding: 0.4rem 0.5rem;
 }
 .pbi-dashboard td {
-  padding: 0.5rem 0.75rem;
+  padding: 0.35rem 0.5rem;
   border-bottom: 1px solid #F3F2F1;
   color: #252423;
 }
@@ -1683,8 +1683,9 @@ th, td {
 .pbi-dashboard .approval-pill,
 .pbi-dashboard .my-reports-filter-chip {
   border-radius: 2px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  padding: 0.2rem 0.5rem;
 }
 .pbi-dashboard .ranking-list li {
   display: flex;
