@@ -39,7 +39,7 @@ function buildPayload(values: IncidentFormValues, userEmail: string) {
     impactOnOperations: values.impactOnOperations,
     jiraTicketReference: stringifyJiraTicketReferences(values.jiraTicketReference),
     systemRestored: values.systemRestored,
-    restoredAt: values.restoredAt ? new Date(values.restoredAt).toISOString() : null,
+    restoredAt: values.restoredAt || null,
     incidentSummary: values.incidentSummary || null,
     why1: values.why1 || null,
     why2: values.why2 || null,

@@ -96,6 +96,10 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 
 function formatHistoryValue(value: string | null): string {
   if (value === null || value === undefined || value === '') return '—';
+  // Format ISO date strings into readable locale format
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+    return formatDateTime(value);
+  }
   return value;
 }
 

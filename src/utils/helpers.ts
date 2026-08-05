@@ -54,6 +54,14 @@ export function monthYearLabel(dateString: string): string {
   return new Date(dateString).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 }
 
+/** Convert any ISO-ish date string to a datetime-local compatible value (YYYY-MM-DDTHH:MM in local time). */
+export function toDatetimeLocal(dateString: string): string {
+  const d = new Date(dateString);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function parseJiraTicketReferences(raw: string | null | undefined): string[] {
   if (!raw) return [];
 
