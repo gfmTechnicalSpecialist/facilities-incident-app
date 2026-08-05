@@ -285,7 +285,8 @@ export function IncidentViewPage() {
     );
   }
 
-  const { header, incidentDetail, actionsTaken, rootCauseAnalysis, workflow, viewerComments } = data;
+  const { header, incidentDetail, actionsTaken, rootCauseAnalysis, workflow, viewerComments: rawComments } = data;
+  const viewerComments = [...rawComments].reverse();
   const jiraTicketReferences = parseJiraTicketReferences(incidentDetail.jiraTicketReference);
 
   return (
@@ -561,11 +562,11 @@ export function IncidentViewPage() {
                               return (
                                 <li className="report-history-field-row" key={change.id}>
                                   <span className="report-history-field">{change.fieldChanged}</span>
-                                  <div className={stacked ? 'report-history-change stacked' : 'report-history-change'}>
+                                  <span className={stacked ? 'report-history-change-inline stacked' : 'report-history-change-inline'}>
                                     <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
                                     <span className="report-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
                                     <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
-                                  </div>
+                                  </span>
                                 </li>
                               );
                             })}
