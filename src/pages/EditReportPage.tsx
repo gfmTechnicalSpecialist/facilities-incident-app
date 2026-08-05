@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
 import { AttachmentsPanel } from '../components/AttachmentsPanel';
 import { useAuth } from '../contexts/AuthContext';
-import { INCIDENT_DETAILS_API_URL, UPDATE_INCIDENT_API_URL } from '../lib/apiBase';
+import { getUploadAttachmentsUrl, INCIDENT_DETAILS_API_URL, UPDATE_INCIDENT_API_URL } from '../lib/apiBase';
 import { parseJiraTicketReferences, stringifyJiraTicketReferences } from '../utils/helpers';
 import type { IncidentAttachmentFile, IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
 
@@ -154,6 +154,7 @@ export function EditReportPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedBanner, setSavedBanner] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   function fetchDetails(): Promise<ApiDetails> {
     return fetch(DETAILS_API_URL, {
@@ -259,6 +260,23 @@ export function EditReportPage() {
       if (!res.ok) {
         setSaveError(message ?? `Save failed (${res.status})`);
       } else {
+        // Upload any staged attachments
+        if (pendingFiles.length > 0 && incidentId) {
+          try {
+            const formData = new FormData();
+            pendingFiles.forEach((file) => formData.append('files', file));
+            const uploadRes = await fetch(getUploadAttachmentsUrl(incidentId), {
+              method: 'POST',
+              body: formData,
+            });
+            if (uploadRes.ok) {
+              setPendingFiles([]);
+              refetchDetails();
+            }
+          } catch {
+            // non-fatal: report saved, attachments can be added later
+          }
+        }
         setSavedBanner(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -336,8 +354,9 @@ export function EditReportPage() {
         <AttachmentsPanel
           incidentId={incidentId}
           attachments={rawData.attachments ?? []}
-          canUpload
-          onUploaded={refetchDetails}
+          mode="staged"
+          stagedFiles={pendingFiles}
+          onFilesChange={setPendingFiles}
         />
       )}
 

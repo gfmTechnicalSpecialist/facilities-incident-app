@@ -404,8 +404,6 @@ export function IncidentViewPage() {
       <AttachmentsPanel
         incidentId={header.incidentId}
         attachments={data.attachments ?? []}
-        canUpload={user?.role === 'admin'}
-        onUploaded={refetchDetails}
       />
 
       {/* Root cause analysis */}

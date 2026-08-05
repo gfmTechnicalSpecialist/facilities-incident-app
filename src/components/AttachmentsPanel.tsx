@@ -1,30 +1,69 @@
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useId, useRef, useState, type ChangeEvent } from 'react';
 import { FileText, Upload, X } from 'lucide-react';
 import { getUploadAttachmentsUrl } from '../lib/apiBase';
 import type { IncidentAttachmentFile } from '../types';
 
+type AttachmentsMode = 'view' | 'instant' | 'staged';
+
 interface AttachmentsPanelProps {
   incidentId: string;
   attachments: IncidentAttachmentFile[];
-  canUpload?: boolean;
+  /** @default "view" — only lists existing attachments, no file picker or upload. */
+  mode?: AttachmentsMode;
+  /** Called when files are staged for deferred upload (mode="staged"). */
+  onFilesChange?: (files: File[]) => void;
+  /** Called after a successful instant upload (mode="instant"). */
   onUploaded?: () => void;
+  /** Pre-populate the pending file list (used in mode="staged" when parent manages state). */
+  stagedFiles?: File[];
 }
 
-export function AttachmentsPanel({ incidentId, attachments, canUpload = false, onUploaded }: AttachmentsPanelProps) {
+export function AttachmentsPanel({
+  incidentId,
+  attachments,
+  mode = 'view',
+  onFilesChange,
+  onUploaded,
+  stagedFiles,
+}: AttachmentsPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const canPick = mode === 'instant' || mode === 'staged';
+  const pendingFiles = mode === 'staged' && stagedFiles ? stagedFiles : selectedFiles;
+
+  // Sync staged files prop -> internal state for instant mode is not needed,
+  // but for staged mode the parent owns the state via stagedFiles prop.
+  useEffect(() => {
+    if (mode === 'instant') {
+      // reset internal state when incident changes (mode=instant re-mounts anyway but be safe)
+      setSelectedFiles([]);
+      setError(null);
+    }
+  }, [incidentId, mode]);
+
   function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
     const files = e.target.files ? Array.from(e.target.files) : [];
-    setSelectedFiles((previous) => [...previous, ...files]);
+    if (mode === 'staged') {
+      const combined = [...(stagedFiles ?? []), ...files];
+      onFilesChange?.(combined);
+    } else {
+      setSelectedFiles((previous) => [...previous, ...files]);
+    }
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   function removeSelected(index: number) {
-    setSelectedFiles((previous) => previous.filter((_, i) => i !== index));
+    if (mode === 'staged') {
+      const next = (stagedFiles ?? []).filter((_, i) => i !== index);
+      onFilesChange?.(next);
+    } else {
+      setSelectedFiles((previous) => previous.filter((_, i) => i !== index));
+    }
   }
 
   async function handleUpload() {
@@ -66,16 +105,16 @@ export function AttachmentsPanel({ incidentId, attachments, canUpload = false, o
         <p className="muted-text">No attachments uploaded yet.</p>
       )}
 
-      {canUpload && (
+      {canPick && (
         <div className="attachment-upload no-print">
-          <label className="outline-button attachment-file-picker">
+          <label htmlFor={inputId} className="outline-button attachment-file-picker">
             <Upload size={16} /> Choose files
-            <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} hidden />
+            <input id={inputId} ref={fileInputRef} type="file" multiple onChange={handleFileSelect} hidden />
           </label>
 
-          {selectedFiles.length > 0 && (
+          {pendingFiles.length > 0 && (
             <ul className="attachment-pending-list">
-              {selectedFiles.map((file, i) => (
+              {pendingFiles.map((file, i) => (
                 <li key={`${file.name}-${i}`}>
                   <span>{file.name}</span>
                   <button type="button" className="ghost-button attachment-remove-btn" onClick={() => removeSelected(i)} aria-label={`Remove ${file.name}`}>
@@ -88,9 +127,9 @@ export function AttachmentsPanel({ incidentId, attachments, canUpload = false, o
 
           {error && <p className="form-error">{error}</p>}
 
-          {selectedFiles.length > 0 && (
+          {mode === 'instant' && pendingFiles.length > 0 && (
             <button type="button" className="solid-button" disabled={uploading} onClick={handleUpload}>
-              {uploading ? 'Uploading…' : `Upload ${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`}
+              {uploading ? 'Uploading…' : `Upload ${pendingFiles.length} file${pendingFiles.length > 1 ? 's' : ''}`}
             </button>
           )}
         </div>
