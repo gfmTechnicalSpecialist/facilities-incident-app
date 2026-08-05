@@ -27,6 +27,7 @@ interface IncidentDetails {
     impactOnOperations: string | null;
     criticalLoadAffected: string | null;
     systemRestored: string | null;
+    restoredAt: string | null;
     jiraTicketReference: string | null;
     impactedSystem: string | null;
     dateTime: string | null;
@@ -335,6 +336,9 @@ export function IncidentViewPage() {
             <Field label="Impact on operations" value={incidentDetail.impactOnOperations} />
             <Field label="Critical load affected" value={incidentDetail.criticalLoadAffected} />
             <Field label="System restored" value={incidentDetail.systemRestored} />
+            {incidentDetail.systemRestored === 'Yes' && (
+              <Field label="Restored at" value={incidentDetail.restoredAt} />
+            )}
             <div className="full-span-item">
               <dt>Jira ticket references</dt>
               <dd>
@@ -561,7 +565,7 @@ export function IncidentViewPage() {
                               const stacked = isLongChange(change);
                               return (
                                 <li className="report-history-field-row" key={change.id}>
-                                  <span className="report-history-field">{change.fieldChanged}</span>
+                                  <span className="report-history-field">{change.fieldChanged}:</span>
                                   <span className={stacked ? 'report-history-change-inline stacked' : 'report-history-change-inline'}>
                                     <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
                                     <span className="report-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>

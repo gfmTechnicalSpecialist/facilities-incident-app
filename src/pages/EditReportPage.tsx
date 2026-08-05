@@ -27,6 +27,7 @@ interface ApiDetails {
     impactOnOperations: string | null;
     criticalLoadAffected: string | null;
     systemRestored: string | null;
+    restoredAt: string | null;
     jiraTicketReference: string | null;
     impactedSystem: string | null;
     dateTime: string | null;
@@ -110,7 +111,7 @@ function mapToFormValues(data: ApiDetails): IncidentFormValues {
     impactOnOperations: (data.incidentDetail.impactOnOperations as Impact) ?? 'Minor',
     jiraTicketReference: parseJiraTicketReferences(data.incidentDetail.jiraTicketReference).join('\n'),
     systemRestored: parseBooleanish(data.incidentDetail.systemRestored),
-    restoredAt: '',
+    restoredAt: data.incidentDetail.restoredAt ?? '',
     incidentSummary: data.incidentDetail.incidentSummary ?? '',
     why1: data.rootCauseAnalysis.why1 ?? '',
     why2: data.rootCauseAnalysis.why2 ?? '',
