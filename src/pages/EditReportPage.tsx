@@ -61,20 +61,30 @@ interface ApiDetails {
 
 function parseDateTime(raw: string | null): { incidentDate: string; incidentTime: string } {
   if (!raw) return { incidentDate: '', incidentTime: '' };
+  // Try ISO format: 2026-08-04T14:30...
+  const isoMatch = raw.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  if (isoMatch) return { incidentDate: isoMatch[1], incidentTime: isoMatch[2] };
+  // Fallback: extract date/time parts in local time
   const dt = new Date(raw);
   if (isNaN(dt.getTime())) return { incidentDate: '', incidentTime: '' };
+  const pad = (n: number) => String(n).padStart(2, '0');
   return {
-    incidentDate: dt.toISOString().slice(0, 10),
-    incidentTime: dt.toTimeString().slice(0, 5),
+    incidentDate: `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`,
+    incidentTime: `${pad(dt.getHours())}:${pad(dt.getMinutes())}`,
   };
 }
 
-/** Convert any date string (ISO or formatted like "May 15, 2026") to YYYY-MM-DD for <input type="date"> */
+/** Convert any date string to YYYY-MM-DD for <input type="date">, preserving local date. */
 function parseToDateInput(raw: string | null): string {
   if (!raw) return '';
+  // Try ISO format first
+  const isoMatch = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoMatch) return isoMatch[1];
+  // Fallback: extract date in local time
   const dt = new Date(raw);
   if (isNaN(dt.getTime())) return '';
-  return dt.toISOString().slice(0, 10);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
 }
 
 /** Handle 'yes'/'no', 'true'/'false', or actual booleans from the API */
