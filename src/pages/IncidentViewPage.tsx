@@ -96,7 +96,17 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 
 function formatHistoryValue(value: string | null): string {
   if (value === null || value === undefined || value === '') return '—';
+  // Clean up ISO datetimes to readable form
+  const isoMatch = value.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  if (isoMatch) return `${isoMatch[1]} ${isoMatch[2]}`;
   return value;
+}
+
+/** Format an ISO datetime string to a readable form without timezone conversion: 2026-08-04 11:06 */
+function formatReadableDateTime(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const match = raw.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  return match ? `${match[1]} ${match[2]}` : raw;
 }
 
 const LONG_VALUE_THRESHOLD = 40;
@@ -337,7 +347,7 @@ export function IncidentViewPage() {
             <Field label="Critical load affected" value={incidentDetail.criticalLoadAffected} />
             <Field label="System restored" value={incidentDetail.systemRestored} />
             {incidentDetail.systemRestored === 'Yes' && (
-              <Field label="Restored at" value={incidentDetail.restoredAt} />
+              <Field label="Restored at" value={formatReadableDateTime(incidentDetail.restoredAt)} />
             )}
             <div className="full-span-item">
               <dt>Jira ticket references</dt>
