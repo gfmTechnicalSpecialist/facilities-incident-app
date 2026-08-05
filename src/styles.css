@@ -553,6 +553,50 @@ th, td {
   padding: 1rem;
 }
 .comment-meta { flex-wrap: wrap; align-items: center; color: var(--muted); font-size: 0.92rem; }
+.comment-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.comment-feedback {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.comment-feedback.success { color: #107C10; }
+.comment-feedback.error { color: #A4262C; }
+.comment-role-badge {
+  display: inline-block;
+  background: #E6E6E6;
+  color: #484644;
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.comment-date { white-space: nowrap; }
+.comment-connected { position: relative; }
+.comment-connector {
+  position: absolute;
+  bottom: -1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  z-index: 1;
+}
+.comment-arrow {
+  font-size: 0.7rem;
+  color: #605E5C;
+  line-height: 1;
+}
 .grouped-header {
   display: flex;
   justify-content: space-between;
@@ -1759,6 +1803,48 @@ th, td {
 }
 .pbi-dashboard .detail-list dd { font-size: 0.88rem; color: #252423; }
 .pbi-dashboard .comment-meta { font-size: 0.8rem; color: #605E5C; }
+.pbi-dashboard .comment-form {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #E6E6E6;
+}
+.pbi-dashboard .comment-form textarea {
+  width: 100%;
+  border: 1px solid #C8C6C4;
+  border-radius: 4px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  resize: vertical;
+  background: #fff;
+  color: #252423;
+}
+.pbi-dashboard .comment-form textarea:focus {
+  outline: none;
+  border-color: #118DFF;
+  box-shadow: 0 0 0 2px rgba(17, 141, 255, 0.15);
+}
+.pbi-dashboard .comment-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.pbi-dashboard .comment-connector {
+  background: #FAF9F8;
+  border-color: #C8C6C4;
+}
+.pbi-dashboard .comment-role-badge {
+  background: #E1E1E1;
+  color: #484644;
+}
+.pbi-dashboard .comment-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+.pbi-dashboard .comment-item:last-child {
+  padding-bottom: 1rem;
+}
 .pbi-dashboard .validation-summary {
   border-radius: 4px;
   border: 1px solid #E6B8BA;

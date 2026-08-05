@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
-import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL } from '../lib/apiBase';
+import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL, ADD_INCIDENT_COMMENT_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
 import { PrintHeader } from '../components/PrintHeader';
@@ -150,6 +150,10 @@ export function IncidentViewPage() {
   const [editsLoading, setEditsLoading] = useState(true);
   const [editsError, setEditsError] = useState<string | null>(null);
   const [expandedSets, setExpandedSets] = useState<Set<string>>(new Set());
+  const [commentText, setCommentText] = useState('');
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const [commentSuccess, setCommentSuccess] = useState(false);
 
   const toggleSet = (changeSetId: string) => {
     setExpandedSets((prev) => {
@@ -218,6 +222,44 @@ export function IncidentViewPage() {
 
     return () => { cancelled = true; };
   }, [incidentId]);
+
+  async function handleCommentSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!commentText.trim() || !incidentId || !user) return;
+    setCommentSubmitting(true);
+    setCommentError(null);
+    setCommentSuccess(false);
+    try {
+      const res = await fetch(ADD_INCIDENT_COMMENT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          incidentId,
+          commentText: commentText.trim(),
+          userName: user.fullName,
+          userEmail: user.email,
+          userRole: user.role,
+        }),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      setCommentText('');
+      setCommentSuccess(true);
+      // Refresh incident details to get updated comments
+      const detailsRes = await fetch(DETAILS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ incidentId }),
+      });
+      if (detailsRes.ok) {
+        const json = await detailsRes.json() as IncidentDetails;
+        setData(json);
+      }
+    } catch (err: unknown) {
+      setCommentError(err instanceof Error ? err.message : 'Failed to add comment');
+    } finally {
+      setCommentSubmitting(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -427,16 +469,40 @@ export function IncidentViewPage() {
       <section className="detail-grid comments-history-grid">
         <div className="card">
           <h3>Comments</h3>
+
+          {/* Comment input — everyone can add */}
+          <form className="comment-form no-print" onSubmit={handleCommentSubmit}>
+            <textarea
+              rows={3}
+              value={commentText}
+              onChange={(e) => { setCommentText(e.target.value); setCommentError(null); setCommentSuccess(false); }}
+              placeholder="Add a comment to this incident…"
+              disabled={commentSubmitting}
+            />
+            <div className="comment-form-actions">
+              <button className="solid-button" type="submit" disabled={commentSubmitting || !commentText.trim()}>
+                {commentSubmitting ? 'Posting…' : 'Post comment'}
+              </button>
+              {commentError && <span className="comment-feedback error">{commentError}</span>}
+              {commentSuccess && <span className="comment-feedback success">Comment added!</span>}
+            </div>
+          </form>
+
           <div className="comment-list">
             {viewerComments.length > 0 ? (
               viewerComments.map((c, i) => (
-                <article className="comment-item" key={i}>
+                <article className={`comment-item ${i < viewerComments.length - 1 ? 'comment-connected' : ''}`} key={i}>
                   <div className="comment-meta">
                     <strong>{c.userName}</strong>
-                    <span>{c.userRole === 'viewer' ? 'Viewer' : 'Admin'}</span>
-                    <span>{c.date}</span>
+                    <span className="comment-role-badge">{c.userRole === 'viewer' ? 'Viewer' : c.userRole}</span>
+                    <span className="comment-date">{c.date}</span>
                   </div>
                   <p>{c.comment}</p>
+                  {i < viewerComments.length - 1 && (
+                    <div className="comment-connector" aria-hidden="true">
+                      <span className="comment-arrow">↓</span>
+                    </div>
+                  )}
                 </article>
               ))
             ) : (
