@@ -111,7 +111,7 @@ function mapToFormValues(data: ApiDetails): IncidentFormValues {
     impactOnOperations: (data.incidentDetail.impactOnOperations as Impact) ?? 'Minor',
     jiraTicketReference: parseJiraTicketReferences(data.incidentDetail.jiraTicketReference).join('\n'),
     systemRestored: parseBooleanish(data.incidentDetail.systemRestored),
-    restoredAt: data.incidentDetail.restoredAt ?? '',
+    restoredAt: data.incidentDetail.restoredAt ? new Date(data.incidentDetail.restoredAt).toISOString().slice(0, 16) : '',
     incidentSummary: data.incidentDetail.incidentSummary ?? '',
     why1: data.rootCauseAnalysis.why1 ?? '',
     why2: data.rootCauseAnalysis.why2 ?? '',
