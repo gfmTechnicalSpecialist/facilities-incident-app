@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Printer } from 'lucide-react';
-import { approvalStatusClass, approvalStatusLabel, formatDateTime, parseJiraTicketReferences } from '../utils/helpers';
+import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL, ADD_INCIDENT_COMMENT_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
@@ -96,10 +96,6 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 
 function formatHistoryValue(value: string | null): string {
   if (value === null || value === undefined || value === '') return '—';
-  // Format ISO date strings into readable locale format
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
-    return formatDateTime(value);
-  }
   return value;
 }
 
@@ -341,7 +337,7 @@ export function IncidentViewPage() {
             <Field label="Critical load affected" value={incidentDetail.criticalLoadAffected} />
             <Field label="System restored" value={incidentDetail.systemRestored} />
             {incidentDetail.systemRestored === 'Yes' && (
-              <Field label="Restored at" value={incidentDetail.restoredAt ? formatDateTime(incidentDetail.restoredAt) : null} />
+              <Field label="Restored at" value={incidentDetail.restoredAt} />
             )}
             <div className="full-span-item">
               <dt>Jira ticket references</dt>

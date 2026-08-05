@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
 import { INCIDENT_DETAILS_API_URL, UPDATE_INCIDENT_API_URL } from '../lib/apiBase';
-import { parseJiraTicketReferences, stringifyJiraTicketReferences, toDatetimeLocal } from '../utils/helpers';
+import { parseJiraTicketReferences, stringifyJiraTicketReferences } from '../utils/helpers';
 import type { IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
@@ -111,7 +111,7 @@ function mapToFormValues(data: ApiDetails): IncidentFormValues {
     impactOnOperations: (data.incidentDetail.impactOnOperations as Impact) ?? 'Minor',
     jiraTicketReference: parseJiraTicketReferences(data.incidentDetail.jiraTicketReference).join('\n'),
     systemRestored: parseBooleanish(data.incidentDetail.systemRestored),
-    restoredAt: data.incidentDetail.restoredAt ? toDatetimeLocal(data.incidentDetail.restoredAt) : '',
+    restoredAt: data.incidentDetail.restoredAt ?? '',
     incidentSummary: data.incidentDetail.incidentSummary ?? '',
     why1: data.rootCauseAnalysis.why1 ?? '',
     why2: data.rootCauseAnalysis.why2 ?? '',

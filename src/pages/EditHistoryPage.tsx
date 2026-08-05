@@ -3,7 +3,6 @@ import { ChevronDown, History } from 'lucide-react';
 import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { MobileReportCard } from '../components/MobileReportCard';
 import { EDIT_HISTORY_API_URL } from '../lib/apiBase';
-import { formatDateTime } from '../utils/helpers';
 
 interface IncidentChange {
   id: string;
@@ -25,9 +24,6 @@ interface IncidentChangeSet {
 
 function formatValue(value: string | null): string {
   if (value === null || value === undefined || value === '') return '—';
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
-    return formatDateTime(value);
-  }
   return value;
 }
 
