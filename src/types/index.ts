@@ -106,5 +106,10 @@ export interface IncidentComment {
   createdAt: string;
 }
 
+export interface IncidentAttachmentFile {
+  fileName: string;
+  url: string;
+}
+
 export interface IncidentFormValues
   extends Omit<Incident, 'id' | 'incidentId' | 'createdAt' | 'updatedAt' | 'approvalStatus' | 'reviewedBy' | 'approvedBy' | 'reviewComments'> {}

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
+import { AttachmentsPanel } from '../components/AttachmentsPanel';
 import { useAuth } from '../contexts/AuthContext';
 import { INCIDENT_DETAILS_API_URL, UPDATE_INCIDENT_API_URL } from '../lib/apiBase';
 import { parseJiraTicketReferences, stringifyJiraTicketReferences } from '../utils/helpers';
-import type { IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
+import type { IncidentAttachmentFile, IncidentCategory, IncidentFormValues, IncidentType, ActionStatus, Impact, Severity } from '../types';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
 const UPDATE_API_URL = UPDATE_INCIDENT_API_URL;
@@ -57,6 +58,8 @@ interface ApiDetails {
     approvedBy: string | null;
     reviewComments: string | null;
   };
+  hasAttachments: boolean;
+  attachments: IncidentAttachmentFile[];
 }
 
 function parseDateTime(raw: string | null): { incidentDate: string; incidentTime: string } {
@@ -152,21 +155,30 @@ export function EditReportPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedBanner, setSavedBanner] = useState(false);
 
+  function fetchDetails(): Promise<ApiDetails> {
+    return fetch(DETAILS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ incidentId }),
+    }).then((res) => {
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      return res.json() as Promise<ApiDetails>;
+    });
+  }
+
+  function refetchDetails() {
+    fetchDetails()
+      .then((data) => setRawData(data))
+      .catch(() => { /* keep existing data on refresh failure */ });
+  }
+
   useEffect(() => {
     if (!incidentId) return;
     let cancelled = false;
     setLoading(true);
     setFetchError(null);
 
-    fetch(DETAILS_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ incidentId }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        return res.json() as Promise<ApiDetails>;
-      })
+    fetchDetails()
       .then((data) => {
         if (!cancelled) {
           setRawData(data);
@@ -319,6 +331,15 @@ export function EditReportPage() {
           <div><dt>Submitted by</dt><dd>{rawData?.incidentDetail.submittedBy ?? '—'}</dd></div>
         </dl>
       </section>
+
+      {incidentId && (
+        <AttachmentsPanel
+          incidentId={incidentId}
+          attachments={rawData.attachments ?? []}
+          canUpload
+          onUploaded={refetchDetails}
+        />
+      )}
 
       {savedBanner && (
         <div

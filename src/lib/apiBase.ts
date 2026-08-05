@@ -17,6 +17,7 @@ const addIncidentFunctionCode = import.meta.env.VITE_ADD_INCIDENT_FUNCTION_CODE;
 const approveIncidentFunctionCode = import.meta.env.VITE_APPROVE_INCIDENT_FUNCTION_CODE;
 const editHistoryFunctionCode = import.meta.env.VITE_EDIT_HISTORY_FUNCTION_CODE;
 const addIncidentCommentFunctionCode = import.meta.env.VITE_ADD_INCIDENT_COMMENT_FUNCTION_CODE;
+const uploadAttachmentsFunctionCode = import.meta.env.VITE_UPLOAD_ATTACHMENTS_FUNCTION_CODE;
 
 function getFunctionUrl(path: string, code?: string) {
   const url = `${API_BASE}${path}`;
@@ -34,3 +35,8 @@ export const ADD_INCIDENT_API_URL = getFunctionUrl('/api/AddIncident', addIncide
 export const APPROVE_INCIDENT_API_URL = getFunctionUrl('/api/ApproveIncident', approveIncidentFunctionCode);
 export const EDIT_HISTORY_API_URL = getFunctionUrl('/api/GetIncidentEdits', editHistoryFunctionCode);
 export const ADD_INCIDENT_COMMENT_API_URL = getFunctionUrl('/api/AddIncidentComment', addIncidentCommentFunctionCode);
+
+/** Builds the multipart upload URL for a given incident's attachments (route includes incidentId as a path segment). */
+export function getUploadAttachmentsUrl(incidentId: string): string {
+  return getFunctionUrl(`/api/incidents/${encodeURIComponent(incidentId)}/attachments`, uploadAttachmentsFunctionCode);
+}

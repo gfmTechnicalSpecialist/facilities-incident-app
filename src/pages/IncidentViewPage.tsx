@@ -6,7 +6,9 @@ import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL, ADD_INCIDENT_COMMENT_AP
 import { useAuth } from '../contexts/AuthContext';
 import { ApprovalDialog } from '../components/ApprovalDialog';
 import { PrintHeader } from '../components/PrintHeader';
+import { AttachmentsPanel } from '../components/AttachmentsPanel';
 import { isApprover } from '../utils/constants';
+import type { IncidentAttachmentFile } from '../types';
 
 const DETAILS_API_URL = INCIDENT_DETAILS_API_URL;
 
@@ -63,6 +65,8 @@ interface IncidentDetails {
     date: string;
     comment: string;
   }[];
+  hasAttachments: boolean;
+  attachments: IncidentAttachmentFile[];
 }
 
 interface IncidentChange {
@@ -178,21 +182,30 @@ export function IncidentViewPage() {
     });
   };
 
+  function fetchDetails(): Promise<IncidentDetails> {
+    return fetch(DETAILS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ incidentId }),
+    }).then((res) => {
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      return res.json() as Promise<IncidentDetails>;
+    });
+  }
+
+  function refetchDetails() {
+    fetchDetails()
+      .then((json) => setData(json))
+      .catch(() => { /* keep existing data on refresh failure */ });
+  }
+
   useEffect(() => {
     if (!incidentId) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    fetch(DETAILS_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ incidentId }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-        return res.json() as Promise<IncidentDetails>;
-      })
+    fetchDetails()
       .then((json) => {
         if (!cancelled) setData(json);
       })
@@ -256,15 +269,7 @@ export function IncidentViewPage() {
       setCommentText('');
       setCommentSuccess(true);
       // Refresh incident details to get updated comments
-      const detailsRes = await fetch(DETAILS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ incidentId }),
-      });
-      if (detailsRes.ok) {
-        const json = await detailsRes.json() as IncidentDetails;
-        setData(json);
-      }
+      refetchDetails();
     } catch (err: unknown) {
       setCommentError(err instanceof Error ? err.message : 'Failed to add comment');
     } finally {
@@ -395,6 +400,13 @@ export function IncidentViewPage() {
           <p>{actionsTaken.mitigationApplied || NA}</p>
         </div>
       </section>
+
+      <AttachmentsPanel
+        incidentId={header.incidentId}
+        attachments={data.attachments ?? []}
+        canUpload={user?.role === 'admin'}
+        onUploaded={refetchDetails}
+      />
 
       {/* Root cause analysis */}
       <section className="card">

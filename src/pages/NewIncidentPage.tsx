@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Upload, X } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
-import { ADD_INCIDENT_API_URL } from '../lib/apiBase';
+import { ADD_INCIDENT_API_URL, getUploadAttachmentsUrl } from '../lib/apiBase';
 import { stringifyJiraTicketReferences } from '../utils/helpers';
 import type { IncidentFormValues } from '../types';
 
@@ -69,8 +70,20 @@ export function NewIncidentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [attachmentWarning, setAttachmentWarning] = useState<string | null>(null);
 
   if (!user) return null;
+
+  function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    setPendingFiles((previous) => [...previous, ...files]);
+    e.target.value = '';
+  }
+
+  function removePendingFile(index: number) {
+    setPendingFiles((previous) => previous.filter((_, i) => i !== index));
+  }
 
   if (successId) {
     return (
@@ -80,9 +93,10 @@ export function NewIncidentPage() {
           <div>
             <h3>Report submitted successfully</h3>
             <p className="muted-text">Incident <strong>{successId}</strong> has been logged and is now pending review.</p>
+            {attachmentWarning && <p className="form-error">{attachmentWarning}</p>}
             <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem' }}>
               <button className="solid-button" onClick={() => navigate('/incidents')}>Go to incident workspace</button>
-              <button className="outline-button" onClick={() => { setSuccessId(null); setApiError(null); }}>Log another report</button>
+              <button className="outline-button" onClick={() => { setSuccessId(null); setApiError(null); setPendingFiles([]); setAttachmentWarning(null); }}>Log another report</button>
             </div>
           </div>
         </div>
@@ -93,6 +107,7 @@ export function NewIncidentPage() {
   async function handleSubmit(values: IncidentFormValues) {
     setSubmitting(true);
     setApiError(null);
+    setAttachmentWarning(null);
     try {
       const payload = buildPayload(values, user!.email);
       const res = await fetch(ADD_INCIDENT_URL, {
@@ -101,6 +116,21 @@ export function NewIncidentPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      if (pendingFiles.length > 0) {
+        try {
+          const formData = new FormData();
+          pendingFiles.forEach((file) => formData.append('files', file));
+          const uploadRes = await fetch(getUploadAttachmentsUrl(payload.incidentId), {
+            method: 'POST',
+            body: formData,
+          });
+          if (!uploadRes.ok) throw new Error(`Server returned ${uploadRes.status}`);
+        } catch {
+          setAttachmentWarning('Report created, but attachments failed to upload. You can add them from the report page.');
+        }
+      }
+
       setSuccessId(payload.incidentId);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Failed to submit incident. Please try again.');
@@ -120,6 +150,28 @@ export function NewIncidentPage() {
           <p className="form-error">{apiError}</p>
         </div>
       )}
+      <div className="card">
+        <h3>Attachments</h3>
+        <p className="muted-text">Optional. Selected files are uploaded once the report is created.</p>
+        <div className="attachment-upload">
+          <label className="outline-button attachment-file-picker">
+            <Upload size={16} /> Choose files
+            <input type="file" multiple onChange={handleFileSelect} hidden />
+          </label>
+          {pendingFiles.length > 0 && (
+            <ul className="attachment-pending-list">
+              {pendingFiles.map((file, i) => (
+                <li key={`${file.name}-${i}`}>
+                  <span>{file.name}</span>
+                  <button type="button" className="ghost-button attachment-remove-btn" onClick={() => removePendingFile(i)} aria-label={`Remove ${file.name}`}>
+                    <X size={14} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
       <IncidentForm
         currentUser={user}
         onSubmit={handleSubmit}
