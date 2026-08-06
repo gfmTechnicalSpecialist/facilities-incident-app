@@ -821,11 +821,14 @@ th, td {
   gap: 1rem;
   max-height: 360px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .report-history-entry {
   position: relative;
   padding-left: 1.5rem;
+  min-width: 0;
 }
+.report-history-body { min-width: 0; }
 .report-history-entry::before {
   content: '';
   position: absolute;
@@ -852,11 +855,12 @@ th, td {
   box-shadow: 0 0 0 1px #6B007B;
 }
 .report-history-head {
-  display: grid;
-  grid-template-columns: 18px 132px 1fr 148px 68px;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.3rem 0.55rem;
   width: 100%;
+  min-width: 0;
   background: none;
   border: none;
   padding: 0;
@@ -879,8 +883,8 @@ th, td {
   letter-spacing: 0.04em;
   border-radius: 999px;
   padding: 0.15rem 0.55rem;
-  justify-self: start;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .report-history-type-badge.edit {
   color: #118DFF;
@@ -912,6 +916,7 @@ th, td {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1 1 auto;
   min-width: 0;
 }
 .report-history-count {
@@ -921,8 +926,9 @@ th, td {
   background: #eaf4ff;
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
-  justify-self: start;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .report-history-fields {
   list-style: none;
@@ -953,6 +959,7 @@ th, td {
   font-size: 0.72rem;
   color: var(--muted);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .report-history-change-inline {
   display: inline-flex;
