@@ -16,6 +16,12 @@ interface AttachmentsPanelProps {
   onUploaded?: () => void;
   /** Pre-populate the pending file list (used in mode="staged" when parent manages state). */
   stagedFiles?: File[];
+  /** Whether the upload is happening during an edit of an existing report. */
+  isEditPhase?: boolean;
+  /** Name of the user editing (required when isEditPhase is true). */
+  editedByName?: string;
+  /** ID of the user editing (required when isEditPhase is true). */
+  editedByUserId?: string;
 }
 
 export function AttachmentsPanel({
@@ -25,6 +31,9 @@ export function AttachmentsPanel({
   onFilesChange,
   onUploaded,
   stagedFiles,
+  isEditPhase = false,
+  editedByName,
+  editedByUserId,
 }: AttachmentsPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
@@ -73,6 +82,11 @@ export function AttachmentsPanel({
     try {
       const formData = new FormData();
       selectedFiles.forEach((file) => formData.append('files', file));
+      formData.append('metadata', JSON.stringify({
+        IsEditPhase: isEditPhase,
+        EditedByName: editedByName ?? null,
+        EditedByUserId: editedByUserId ?? null,
+      }));
       const res = await fetch(getUploadAttachmentsUrl(incidentId), {
         method: 'POST',
         body: formData,

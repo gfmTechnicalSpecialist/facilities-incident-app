@@ -121,6 +121,11 @@ export function NewIncidentPage() {
         try {
           const formData = new FormData();
           pendingFiles.forEach((file) => formData.append('files', file));
+          formData.append('metadata', JSON.stringify({
+            IsEditPhase: false,
+            EditedByName: null,
+            EditedByUserId: null,
+          }));
           const uploadRes = await fetch(getUploadAttachmentsUrl(payload.incidentId), {
             method: 'POST',
             body: formData,

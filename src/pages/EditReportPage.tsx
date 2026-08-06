@@ -265,6 +265,11 @@ export function EditReportPage() {
           try {
             const formData = new FormData();
             pendingFiles.forEach((file) => formData.append('files', file));
+            formData.append('metadata', JSON.stringify({
+              IsEditPhase: true,
+              EditedByName: user?.fullName ?? null,
+              EditedByUserId: user?.id ?? null,
+            }));
             const uploadRes = await fetch(getUploadAttachmentsUrl(incidentId), {
               method: 'POST',
               body: formData,
@@ -357,6 +362,9 @@ export function EditReportPage() {
           mode="staged"
           stagedFiles={pendingFiles}
           onFilesChange={setPendingFiles}
+          isEditPhase
+          editedByName={user?.fullName}
+          editedByUserId={user?.id}
         />
       )}
 
