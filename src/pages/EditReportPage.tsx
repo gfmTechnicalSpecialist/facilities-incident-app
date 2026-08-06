@@ -151,7 +151,7 @@ export function EditReportPage() {
   const [rawData, setRawData] = useState<ApiDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [savingAction, setSavingAction] = useState<'submit' | 'draft' | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedBanner, setSavedBanner] = useState(false);
   const [lastAction, setLastAction] = useState<'saved' | 'draft' | 'submitted'>('saved');
@@ -198,7 +198,7 @@ export function EditReportPage() {
   }, [incidentId]);
 
   async function handleSubmit(values: IncidentFormValues, targetApprovalStatus?: 'Draft' | 'Pending') {
-    setSaving(true);
+    setSavingAction(targetApprovalStatus === 'Draft' ? 'draft' : 'submit');
     setSaveError(null);
     setSavedBanner(false);
     try {
@@ -290,7 +290,7 @@ export function EditReportPage() {
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : 'Failed to save changes');
     } finally {
-      setSaving(false);
+      setSavingAction(null);
     }
   }
 
@@ -432,11 +432,11 @@ export function EditReportPage() {
         currentUser={user}
         initialValues={initialValues}
         onSubmit={(values) => handleSubmit(values, isDraft ? 'Pending' : undefined)}
-        submitLabel={saving ? 'Saving…' : isDraft ? 'Submit for review' : 'Save changes'}
+        submitLabel={savingAction === 'submit' ? 'Saving…' : isDraft ? 'Submit for review' : 'Save changes'}
         onSaveDraft={isDraft ? (values) => handleSubmit(values, 'Draft') : undefined}
-        draftLabel={saving ? 'Saving…' : 'Save as draft'}
-        submitDisabled={saving}
-        draftDisabled={saving}
+        draftLabel={savingAction === 'draft' ? 'Saving…' : 'Save as draft'}
+        submitDisabled={savingAction !== null}
+        draftDisabled={savingAction !== null}
         hideReporterSection
       />
     </div>

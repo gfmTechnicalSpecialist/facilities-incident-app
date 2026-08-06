@@ -90,7 +90,8 @@ export function IncidentsPage() {
           const incidentDate = new Date(incident.date);
           const matchesFrom = !dateFrom || incidentDate >= new Date(dateFrom);
           const matchesTo = !dateTo || incidentDate <= new Date(dateTo);
-          return matchesSearch && matchesSite && matchesType && matchesSeverity && matchesStatus && matchesFrom && matchesTo;
+          const isNotDraft = incident.approvalStatus !== 'Draft';
+          return matchesSearch && matchesSite && matchesType && matchesSeverity && matchesStatus && matchesFrom && matchesTo && isNotDraft;
         }));
         return { ...group, incidents: filtered };
       })

@@ -67,7 +67,7 @@ function buildPayload(values: IncidentFormValues, userEmail: string, approvalSta
 export function NewIncidentPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [submitting, setSubmitting] = useState(false);
+  const [submittingAction, setSubmittingAction] = useState<'submit' | 'draft' | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [savedAsDraft, setSavedAsDraft] = useState(false);
@@ -112,7 +112,7 @@ export function NewIncidentPage() {
   }
 
   async function handleSubmit(values: IncidentFormValues) {
-    setSubmitting(true);
+    setSubmittingAction('submit');
     setApiError(null);
     setAttachmentWarning(null);
     try {
@@ -148,12 +148,12 @@ export function NewIncidentPage() {
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Failed to submit incident. Please try again.');
     } finally {
-      setSubmitting(false);
+      setSubmittingAction(null);
     }
   }
 
   async function handleSaveDraft(values: IncidentFormValues) {
-    setSubmitting(true);
+    setSubmittingAction('draft');
     setApiError(null);
     setAttachmentWarning(null);
     try {
@@ -189,7 +189,7 @@ export function NewIncidentPage() {
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Failed to save draft. Please try again.');
     } finally {
-      setSubmitting(false);
+      setSubmittingAction(null);
     }
   }
 
@@ -230,10 +230,10 @@ export function NewIncidentPage() {
         currentUser={user}
         onSubmit={handleSubmit}
         onSaveDraft={handleSaveDraft}
-        submitLabel={submitting ? 'Submitting…' : 'Create report'}
-        draftLabel={submitting ? 'Saving…' : 'Save as draft'}
-        submitDisabled={submitting}
-        draftDisabled={submitting}
+        submitLabel={submittingAction === 'submit' ? 'Submitting…' : 'Create report'}
+        draftLabel={submittingAction === 'draft' ? 'Saving…' : 'Save as draft'}
+        submitDisabled={submittingAction !== null}
+        draftDisabled={submittingAction !== null}
       />
     </div>
   );

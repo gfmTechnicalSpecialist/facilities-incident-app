@@ -53,19 +53,22 @@ export function MyReportsPage() {
     return () => { cancelled = true; };
   }, [user]);
 
+  const draftReports = useMemo(() => reports.filter((i) => i.approvalStatus === 'Draft'), [reports]);
+  const submittedReports = useMemo(() => reports.filter((i) => i.approvalStatus !== 'Draft'), [reports]);
+
   const filtered = useMemo(() => {
-    return sortIncidentsByApprovalPriority(reports.filter((i) => {
+    return sortIncidentsByApprovalPriority(submittedReports.filter((i) => {
       const haystack = [i.title, i.incidentId, i.site, i.type].join(' ').toLowerCase();
       const matchSearch = haystack.includes(search.toLowerCase());
       const matchStatus = statusFilter === 'All' || i.actionStatus === statusFilter;
       return matchSearch && matchStatus;
     }));
-  }, [reports, search, statusFilter]);
+  }, [submittedReports, search, statusFilter]);
 
-  const totalCount = reports.length;
-  const openCount = reports.filter((i) => i.actionStatus === 'Open').length;
-  const inProgressCount = reports.filter((i) => i.actionStatus === 'In Progress' || i.actionStatus === 'Pending Review').length;
-  const closedCount = reports.filter((i) => i.actionStatus === 'Closed').length;
+  const totalCount = submittedReports.length;
+  const openCount = submittedReports.filter((i) => i.actionStatus === 'Open').length;
+  const inProgressCount = submittedReports.filter((i) => i.actionStatus === 'In Progress' || i.actionStatus === 'Pending Review').length;
+  const closedCount = submittedReports.filter((i) => i.actionStatus === 'Closed').length;
 
   return (
     <div className="page-stack pbi-dashboard">
@@ -133,6 +136,29 @@ export function MyReportsPage() {
               <p className="pbi-kpi-value">{closedCount}</p>
             </div>
           </section>
+
+          {/* Drafts */}
+          {draftReports.length > 0 && (
+            <CollapsibleFiltersCard title={`Drafts (${draftReports.length})`} className="no-print">
+              <div className="my-reports-drafts-list">
+                {draftReports.map((incident) => (
+                  <div key={incident.incidentId} className="my-reports-draft-item">
+                    <div className="my-reports-draft-info">
+                      <span className="my-reports-title-cell">{incident.title || 'Untitled draft'}</span>
+                      <span className="my-reports-draft-meta">{incident.site} • {incident.date}</span>
+                    </div>
+                    <button
+                      className="outline-button my-reports-action-btn"
+                      type="button"
+                      onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
+                    >
+                      <ClipboardEdit size={15} /> Continue editing
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleFiltersCard>
+          )}
 
           {/* Filters */}
           <CollapsibleFiltersCard title="Filters" className="no-print">
