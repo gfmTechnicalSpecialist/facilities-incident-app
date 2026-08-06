@@ -113,6 +113,14 @@ export const appUsers: UserRecord[] = [
     department: 'Facilities',
     initialPassword: 'DG*MGroup26',
   },
+  {
+    id: 'admin_boitumelo_tshoenyane',
+    fullName: 'Boitumelo Tshoenyane',
+    email: 'boitumelo.tshoenyane@mmltd.co.za',
+    role: 'admin',
+    department: 'Facilities',
+    initialPassword: 'BT!MGroup26',
+  },
 ];
 
 const adminReporter = appUsers.find((u) => u.id === 'admin_jacob_lesale')!;
