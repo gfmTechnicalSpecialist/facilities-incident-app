@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CheckCircle2, ClipboardEdit, Eye, FolderClock, Loader2, ShieldEllipsis } from 'lucide-react';
+import { CheckCircle2, ClipboardEdit, Eye, FolderClock, Loader2, Search, ShieldEllipsis } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { actionStatuses } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel, sortIncidentsByApprovalPriority } from '../utils/helpers';
@@ -70,23 +70,46 @@ export function MyReportsPage() {
   const inProgressCount = submittedReports.filter((i) => i.actionStatus === 'In Progress' || i.actionStatus === 'Pending Review').length;
   const closedCount = submittedReports.filter((i) => i.actionStatus === 'Closed').length;
 
+  const stats = [
+    { key: 'total', label: 'Total submitted', value: totalCount, accent: '#118DFF', icon: <ShieldEllipsis size={15} /> },
+    { key: 'open', label: 'Open', value: openCount, accent: '#E66C37', icon: <FolderClock size={15} /> },
+    { key: 'progress', label: 'In progress / review', value: inProgressCount, accent: '#6B007B', icon: <Loader2 size={15} /> },
+    { key: 'closed', label: 'Closed', value: closedCount, accent: '#107C10', icon: <CheckCircle2 size={15} /> },
+  ];
+
   return (
     <div className="page-stack pbi-dashboard">
 
-      {/* Header */}
-      <header className="pbi-header">
-        <div className="my-reports-header-left">
-          <h2 className="pbi-title">My Reports</h2>
-          <p className="pbi-subtitle">
-            Incidents submitted under your account - track status, approval and make edits where permitted.
-          </p>
+      {/* Overview: title, action and inline KPI strip */}
+      <section className="my-reports-overview">
+        <div className="my-reports-overview-head">
+          <div className="my-reports-overview-titles">
+            <h2 className="pbi-title">My Reports</h2>
+            <p className="pbi-subtitle">
+              Incidents submitted under your account &mdash; track status, approval and make edits where permitted.
+            </p>
+          </div>
+          {user?.role === 'admin' && (
+            <Link to="/incidents/new" className="solid-button">
+              + Log new report
+            </Link>
+          )}
         </div>
-        {user?.role === 'admin' && (
-          <Link to="/incidents/new" className="solid-button">
-            + Log new report
-          </Link>
+
+        {!loading && !error && (
+          <dl className="my-reports-stat-strip">
+            {stats.map((stat) => (
+              <div className="my-reports-stat" key={stat.key} style={{ ['--stat-accent' as string]: stat.accent }}>
+                <span className="my-reports-stat-icon">{stat.icon}</span>
+                <div className="my-reports-stat-text">
+                  <dt>{stat.label}</dt>
+                  <dd>{stat.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
         )}
-      </header>
+      </section>
 
       {/* Loading */}
       {loading && (
@@ -105,38 +128,6 @@ export function MyReportsPage() {
 
       {!loading && !error && (
         <>
-          {/* KPI summary */}
-          <section className="pbi-kpi-row">
-            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#118DFF' }}>
-              <div className="pbi-kpi-head">
-                <span className="pbi-kpi-icon"><ShieldEllipsis size={16} /></span>
-                <span className="pbi-kpi-label">Total Submitted</span>
-              </div>
-              <p className="pbi-kpi-value">{totalCount}</p>
-            </div>
-            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#E66C37' }}>
-              <div className="pbi-kpi-head">
-                <span className="pbi-kpi-icon"><FolderClock size={16} /></span>
-                <span className="pbi-kpi-label">Open</span>
-              </div>
-              <p className="pbi-kpi-value">{openCount}</p>
-            </div>
-            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#6B007B' }}>
-              <div className="pbi-kpi-head">
-                <span className="pbi-kpi-icon"><Loader2 size={16} /></span>
-                <span className="pbi-kpi-label">In Progress / Review</span>
-              </div>
-              <p className="pbi-kpi-value">{inProgressCount}</p>
-            </div>
-            <div className="pbi-tile pbi-kpi" style={{ ['--kpi-accent' as string]: '#107C10' }}>
-              <div className="pbi-kpi-head">
-                <span className="pbi-kpi-icon"><CheckCircle2 size={16} /></span>
-                <span className="pbi-kpi-label">Closed</span>
-              </div>
-              <p className="pbi-kpi-value">{closedCount}</p>
-            </div>
-          </section>
-
           {/* Drafts */}
           {draftReports.length > 0 && (
             <CollapsibleFiltersCard title={`Drafts (${draftReports.length})`} className="no-print">
@@ -160,33 +151,38 @@ export function MyReportsPage() {
             </CollapsibleFiltersCard>
           )}
 
-          {/* Filters */}
-          <CollapsibleFiltersCard title="Filters" className="no-print">
-            <div className="my-reports-filters">
-              <label className="my-reports-search-label">
-                <span>Search</span>
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by title, ID, site or type..."
-                />
-              </label>
-              <label>
-                <span>Action status</span>
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as ActionStatus | 'All')}>
+          {/* Table */}
+          <section className="pbi-tile table-card">
+            <div className="my-reports-table-header">
+              <h3 className="my-reports-table-title">
+                {filtered.length} report{filtered.length === 1 ? '' : 's'}
+                {statusFilter !== 'All' && <span className="my-reports-filter-chip">{statusFilter}</span>}
+              </h3>
+              <div className="my-reports-toolbar no-print">
+                <div className="my-reports-search">
+                  <Search size={15} aria-hidden="true" />
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by title, ID, site or type..."
+                    aria-label="Search reports"
+                  />
+                </div>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as ActionStatus | 'All')}
+                  aria-label="Filter by action status"
+                >
                   <option value="All">All statuses</option>
                   {actionStatuses.map((s) => (
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
-              </label>
+              </div>
             </div>
-          </CollapsibleFiltersCard>
 
-          {/* Table */}
-          {filtered.length === 0 ? (
-            <section className="pbi-tile">
-              {totalCount === 0 ? (
+            {filtered.length === 0 ? (
+              totalCount === 0 ? (
                 <div className="my-reports-empty">
                   <p className="eyebrow">No reports found</p>
                   <p className="muted-text">You have not submitted any incident reports yet.</p>
@@ -197,18 +193,11 @@ export function MyReportsPage() {
                   )}
                 </div>
               ) : (
-                <p className="muted-text">No reports match the current filters.</p>
-              )}
-            </section>
-          ) : (
-            <section className="pbi-tile table-card">
-              <div className="my-reports-table-header">
-                <h3 className="my-reports-table-title">
-                  {filtered.length} report{filtered.length === 1 ? '' : 's'}
-                  {statusFilter !== 'All' && <span className="my-reports-filter-chip">{statusFilter}</span>}
-                </h3>
-              </div>
-              <div className="table-scroll desktop-only">
+                <p className="muted-text my-reports-empty">No reports match the current filters.</p>
+              )
+            ) : (
+              <>
+                <div className="table-scroll desktop-only">
                 <table>
                   <thead>
                     <tr>
@@ -315,8 +304,9 @@ export function MyReportsPage() {
                   />
                 ))}
               </div>
-            </section>
-          )}
+              </>
+            )}
+          </section>
         </>
       )}
     </div>

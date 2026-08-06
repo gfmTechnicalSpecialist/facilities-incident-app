@@ -1687,7 +1687,7 @@ th, td {
     -webkit-overflow-scrolling: touch;
   }
   .chart-canvas { overflow-x: hidden; }
-  .my-reports-kpi-row { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .my-reports-stat-strip { grid-template-columns: 1fr 1fr; }
   .my-reports-actions { flex-wrap: wrap; }
   .page-actions { flex-direction: column; align-items: stretch; }
   .form-actions { justify-content: stretch; }
@@ -2086,56 +2086,98 @@ th, td {
 .pbi-dashboard .success-text { color: #107C10; font-weight: 600; }
 
 /* ── My Reports Page ── */
-.my-reports-header {
+.my-reports-overview {
+  background: #ffffff;
+  border: 1px solid #E6E6E6;
+  border-top: 3px solid #118DFF;
+  border-radius: 4px;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.08), 0 0.3px 0.9px rgba(0, 0, 0, 0.05);
+  padding: 0.8rem 1.1rem 0;
+}
+.my-reports-overview-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
   flex-wrap: wrap;
 }
-.my-reports-header-left { flex: 1 1 0; }
-.my-reports-kpi-row {
+.my-reports-overview-titles { flex: 1 1 260px; min-width: 0; }
+.my-reports-stat-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 0;
+  margin: 0.8rem 0 0;
+  border-top: 1px solid #EDEBE9;
 }
-.my-reports-kpi-card {
+.my-reports-stat {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.1rem 1.25rem;
+  gap: 0.65rem;
+  padding: 0.7rem 1rem;
+  min-width: 0;
 }
-.my-reports-kpi-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
+.my-reports-stat + .my-reports-stat { border-left: 1px solid #EDEBE9; }
+.my-reports-stat-icon {
   display: grid;
   place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
   flex-shrink: 0;
+  color: var(--stat-accent, #118DFF);
+  background: color-mix(in srgb, var(--stat-accent, #118DFF) 12%, #ffffff);
 }
-.my-reports-kpi-value {
+.my-reports-stat-text { min-width: 0; }
+.my-reports-stat dt {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A8886;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.my-reports-stat dd {
   margin: 0.1rem 0 0;
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--text);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #201F1E;
 }
-.my-reports-filters {
-  display: grid;
-  grid-template-columns: 1fr 220px;
-  gap: 1rem;
-  align-items: end;
-}
-.my-reports-search-label { display: block; }
 .my-reports-table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.85rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--line);
   margin-bottom: 0.1rem;
 }
+.my-reports-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.my-reports-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.my-reports-search svg {
+  position: absolute;
+  left: 0.6rem;
+  color: #8A8886;
+  pointer-events: none;
+}
+.my-reports-search input {
+  width: min(280px, 60vw);
+  padding-left: 1.95rem;
+}
+.my-reports-toolbar select { min-width: 150px; }
 .my-reports-table-title {
   margin: 0;
   font-size: 0.85rem;
@@ -2209,12 +2251,16 @@ th, td {
 }
 
 @media (max-width: 1120px) {
-  .my-reports-kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .my-reports-filters { grid-template-columns: 1fr; }
+  .my-reports-stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .my-reports-stat:nth-child(odd) { border-left: none; }
+  .my-reports-stat:nth-child(n + 3) { border-top: 1px solid #EDEBE9; }
 }
 @media (max-width: 760px) {
-  .my-reports-kpi-row { grid-template-columns: 1fr 1fr; }
-  .my-reports-header { flex-direction: column; align-items: flex-start; }
+  .my-reports-overview-head { flex-direction: column; align-items: flex-start; }
+  .my-reports-toolbar { width: 100%; }
+  .my-reports-search { flex: 1 1 100%; }
+  .my-reports-search input { width: 100%; }
+  .my-reports-toolbar select { flex: 1; }
 }
 
 @media (max-width: 560px) {
