@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, FileText, Paperclip, Printer } from 'lucide-react';
+import { ArrowLeft, ChevronDown, FileText, MapPin, Paperclip, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL, ADD_INCIDENT_COMMENT_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
@@ -419,15 +419,25 @@ export function IncidentViewPage() {
         <div className="incident-title-main">
           <p className="eyebrow">{header.incidentId}</p>
           <h2 className="incident-title-heading">{header.title}</h2>
-          <p className="muted-text">
-            {header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}
+          <p className="incident-title-location">
+            <MapPin size={14} aria-hidden="true" />
+            <span>{header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}</span>
           </p>
         </div>
         <div className="incident-title-actions no-print">
           <div className="incident-status-group">
-            <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
-            <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
-            <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
+            <div className="incident-status-item">
+              <span className="incident-status-label">Severity</span>
+              <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
+            </div>
+            <div className="incident-status-item">
+              <span className="incident-status-label">Status</span>
+              <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
+            </div>
+            <div className="incident-status-item">
+              <span className="incident-status-label">Approval</span>
+              <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
+            </div>
           </div>
           <div className="incident-action-group">
             {isApprover(user) && header.approvalStatus === 'Pending' && (
