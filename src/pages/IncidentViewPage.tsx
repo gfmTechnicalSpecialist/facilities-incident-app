@@ -430,29 +430,33 @@ export function IncidentViewPage() {
           </div>
         </div>
 
-        <div className="incident-hero-body">
-          <span className="incident-hero-id">{header.incidentId}</span>
-          <h2 className="incident-hero-title">{header.title}</h2>
-          <p className="incident-hero-location">
-            <MapPin size={14} aria-hidden="true" />
-            <span>{header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}</span>
-          </p>
-        </div>
+        <div className="incident-hero-main">
+          <div className="incident-hero-body">
+            <div className="incident-hero-headline">
+              <span className="incident-hero-id">{header.incidentId}</span>
+              <h2 className="incident-hero-title">{header.title}</h2>
+            </div>
+            <p className="incident-hero-location">
+              <MapPin size={13} aria-hidden="true" />
+              <span>{header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}</span>
+            </p>
+          </div>
 
-        <dl className="incident-hero-meta">
-          <div className="incident-hero-meta-item">
-            <dt>Severity</dt>
-            <dd><span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span></dd>
-          </div>
-          <div className="incident-hero-meta-item">
-            <dt>Status</dt>
-            <dd><span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span></dd>
-          </div>
-          <div className="incident-hero-meta-item">
-            <dt>Approval</dt>
-            <dd><span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span></dd>
-          </div>
-        </dl>
+          <dl className="incident-hero-meta">
+            <div className="incident-hero-meta-item">
+              <dt>Severity</dt>
+              <dd><span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span></dd>
+            </div>
+            <div className="incident-hero-meta-item">
+              <dt>Status</dt>
+              <dd><span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span></dd>
+            </div>
+            <div className="incident-hero-meta-item">
+              <dt>Approval</dt>
+              <dd><span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span></dd>
+            </div>
+          </dl>
+        </div>
       </section>
 
 
