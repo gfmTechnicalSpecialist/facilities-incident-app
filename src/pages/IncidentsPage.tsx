@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { actionStatuses, severities, sites, isApprover } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel, sortIncidentsByApprovalPriority } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
@@ -30,18 +30,19 @@ interface MonthGroup {
 export function IncidentsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [groups, setGroups] = useState<MonthGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reviewIncidentId, setReviewIncidentId] = useState<string | null>(null);
 
   const [search, setSearch] = useState('');
-  const [site, setSite] = useState('All');
-  const [type, setType] = useState('All');
-  const [severity, setSeverity] = useState('All');
-  const [status, setStatus] = useState('All');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [site, setSite] = useState(() => searchParams.get('site') ?? 'All');
+  const [type, setType] = useState(() => searchParams.get('type') ?? 'All');
+  const [severity, setSeverity] = useState(() => searchParams.get('severity') ?? 'All');
+  const [status, setStatus] = useState(() => searchParams.get('status') ?? 'All');
+  const [dateFrom, setDateFrom] = useState(() => searchParams.get('dateFrom') ?? '');
+  const [dateTo, setDateTo] = useState(() => searchParams.get('dateTo') ?? '');
 
   const canApprove = isApprover(user);
 

@@ -62,6 +62,24 @@ function mapByMonth(items: { month: string; count: number }[]): ChartItem[] {
   }));
 }
 
+const MONTH_ABBREVIATIONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Parses a "MMM YY" label (e.g. "Aug 26") into an inclusive [from, to] ISO date range covering that month. */
+function monthLabelToDateRange(label: string): { from: string; to: string } | null {
+  const [monthAbbr, yearShort] = label.split(' ');
+  const monthIndex = MONTH_ABBREVIATIONS.indexOf(monthAbbr);
+  if (monthIndex === -1 || !yearShort) return null;
+  const year = 2000 + Number.parseInt(yearShort, 10);
+  const from = new Date(year, monthIndex, 1);
+  const to = new Date(year, monthIndex + 1, 0);
+  const toIso = (d: Date) => d.toISOString().slice(0, 10);
+  return { from: toIso(from), to: toIso(to) };
+}
+
+function drillThroughUrl(params: Record<string, string>): string {
+  return `/incidents?${new URLSearchParams(params).toString()}`;
+}
+
 function LegendRow({ items }: { items: ChartItem[] }) {
   return (
     <div className="pbi-legend">
@@ -139,10 +157,10 @@ export function DashboardPage() {
   });
 
   const kpis = [
-    { label: 'Total Incidents', value: overview.totalIncidents, icon: <ShieldEllipsis size={16} />, accent: '#118DFF' },
-    { label: 'Open Incidents', value: overview.openIncidents, icon: <FolderClock size={16} />, accent: '#E66C37' },
-    { label: 'Closed Incidents', value: overview.closedIncidents, icon: <CheckCircle2 size={16} />, accent: '#6B007B' },
-    { label: 'Critical Incidents', value: overview.criticalIncidents, icon: <AlertTriangle size={16} />, accent: '#D64550' },
+    { label: 'Total Incidents', value: overview.totalIncidents, icon: <ShieldEllipsis size={16} />, accent: '#118DFF', onClick: () => navigate('/incidents') },
+    { label: 'Open Incidents', value: overview.openIncidents, icon: <FolderClock size={16} />, accent: '#E66C37', onClick: () => navigate(drillThroughUrl({ status: 'Open' })) },
+    { label: 'Closed Incidents', value: overview.closedIncidents, icon: <CheckCircle2 size={16} />, accent: '#6B007B', onClick: () => navigate(drillThroughUrl({ status: 'Closed' })) },
+    { label: 'Critical Incidents', value: overview.criticalIncidents, icon: <AlertTriangle size={16} />, accent: '#D64550', onClick: () => navigate(drillThroughUrl({ severity: 'Critical' })) },
     {
       label: 'Pending Approvals',
       value: pendingApprovalsCount,
@@ -231,7 +249,12 @@ export function DashboardPage() {
                 <Bar dataKey="value" name="Incidents" radius={[2, 2, 0, 0]} maxBarSize={40}>
                   <LabelList dataKey="value" position="top" style={{ fontSize: 11, fontWeight: 600, fill: '#252423' }} />
                   {byType.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
+                    <Cell
+                      key={entry.name}
+                      fill={entry.color}
+                      cursor="pointer"
+                      onClick={() => navigate(drillThroughUrl({ type: entry.name }))}
+                    />
                   ))}
                 </Bar>
               </BarChart>
@@ -257,7 +280,12 @@ export function DashboardPage() {
                   strokeWidth={2}
                 >
                   {bySite.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
+                    <Cell
+                      key={entry.name}
+                      fill={entry.color}
+                      cursor="pointer"
+                      onClick={() => navigate(drillThroughUrl({ site: entry.name }))}
+                    />
                   ))}
                 </Pie>
                 <Tooltip contentStyle={{ borderRadius: 4, border: '1px solid #E6E6E6', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} />
@@ -286,6 +314,17 @@ export function DashboardPage() {
               <Tooltip cursor={{ fill: 'rgba(17, 141, 255, 0.06)' }} contentStyle={{ borderRadius: 4, border: '1px solid #E6E6E6', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} />
               <Bar dataKey="value" name="Incidents" fill="#118DFF" radius={[2, 2, 0, 0]} maxBarSize={36}>
                 <LabelList dataKey="value" position="top" style={{ fontSize: 11, fontWeight: 600, fill: '#252423' }} />
+                {byMonth.map((entry) => (
+                  <Cell
+                    key={entry.name}
+                    fill={entry.color}
+                    cursor="pointer"
+                    onClick={() => {
+                      const range = monthLabelToDateRange(entry.name);
+                      if (range) navigate(drillThroughUrl({ dateFrom: range.from, dateTo: range.to }));
+                    }}
+                  />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
