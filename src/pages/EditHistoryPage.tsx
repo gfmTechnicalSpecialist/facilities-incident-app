@@ -276,7 +276,7 @@ export function EditHistoryPage() {
         </div>
 
         <form className="edit-history-search no-print" onSubmit={handleSubmit}>
-          <div className="edit-history-search-field">
+          <div className="my-reports-search">
             <Search size={15} aria-hidden="true" />
             <input
               value={search}

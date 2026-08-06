@@ -526,20 +526,6 @@ table { width: 100%; border-collapse: collapse; }
   flex-wrap: nowrap;
   padding: 0.75rem 0 0.8rem;
 }
-.edit-history-search-field { position: relative; display: flex; align-items: center; }
-.edit-history-search-field svg {
-  position: absolute;
-  left: 0.7rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #8A8886;
-  pointer-events: none;
-}
-.edit-history-search-field input {
-  width: 280px;
-  padding: 0.45rem 0.7rem 0.45rem 2.3rem;
-  text-overflow: ellipsis;
-}
 .edit-history-search .solid-button {
   padding: 0.45rem 1rem;
   font-size: 0.85rem;
@@ -718,8 +704,7 @@ table { width: 100%; border-collapse: collapse; }
 }
 @media (max-width: 760px) {
   .edit-history-search { width: 100%; }
-  .edit-history-search-field { flex: 1 1 auto; }
-  .edit-history-search-field input { width: 100%; }
+  .edit-history-search .my-reports-search { flex: 1 1 auto; }
   .edit-history-entry-head { flex-wrap: wrap; }
   .edit-history-entry-author { flex-basis: 100%; }
   .edit-history-change { grid-template-columns: minmax(0, 1fr); }
