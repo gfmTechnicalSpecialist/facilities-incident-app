@@ -415,31 +415,12 @@ export function IncidentViewPage() {
         reference={header.incidentId}
       />
       {/* Header */}
-      <section className="pbi-tile incident-title-card print-report-header">
-        <div className="incident-title-main">
-          <p className="eyebrow">{header.incidentId}</p>
-          <h2 className="incident-title-heading">{header.title}</h2>
-          <p className="incident-title-location">
-            <MapPin size={14} aria-hidden="true" />
-            <span>{header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}</span>
-          </p>
-        </div>
-        <div className="incident-title-actions no-print">
-          <div className="incident-status-group">
-            <div className="incident-status-item">
-              <span className="incident-status-label">Severity</span>
-              <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
-            </div>
-            <div className="incident-status-item">
-              <span className="incident-status-label">Status</span>
-              <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
-            </div>
-            <div className="incident-status-item">
-              <span className="incident-status-label">Approval</span>
-              <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
-            </div>
-          </div>
-          <div className="incident-action-group">
+      <section className={`incident-hero print-report-header sev-${header.severity.toLowerCase()}`}>
+        <div className="incident-hero-top">
+          <button className="incident-hero-back no-print" type="button" onClick={() => navigate('/incidents')}>
+            <ArrowLeft size={15} /> Back to workspace
+          </button>
+          <div className="incident-hero-actions no-print">
             {isApprover(user) && header.approvalStatus === 'Pending' && (
               <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
             )}
@@ -448,13 +429,32 @@ export function IncidentViewPage() {
             </button>
           </div>
         </div>
+
+        <div className="incident-hero-body">
+          <span className="incident-hero-id">{header.incidentId}</span>
+          <h2 className="incident-hero-title">{header.title}</h2>
+          <p className="incident-hero-location">
+            <MapPin size={14} aria-hidden="true" />
+            <span>{header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}</span>
+          </p>
+        </div>
+
+        <dl className="incident-hero-meta">
+          <div className="incident-hero-meta-item">
+            <dt>Severity</dt>
+            <dd><span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span></dd>
+          </div>
+          <div className="incident-hero-meta-item">
+            <dt>Status</dt>
+            <dd><span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span></dd>
+          </div>
+          <div className="incident-hero-meta-item">
+            <dt>Approval</dt>
+            <dd><span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span></dd>
+          </div>
+        </dl>
       </section>
 
-      <section className="card no-print">
-        <button className="outline-button" type="button" onClick={() => navigate('/incidents')}>
-          <ArrowLeft size={16} /> Back to workspace
-        </button>
-      </section>
 
       {/* Incident detail + actions taken */}
       <section className="detail-grid">
