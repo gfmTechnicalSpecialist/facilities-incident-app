@@ -593,7 +593,8 @@ th, td {
 .summary-pair { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; align-items: start; }
 .summary-pair > div { background: #f8fbff; border: 1px solid var(--line); border-radius: 16px; padding: 1rem; }
 .summary-pair h4 { margin-bottom: 0.6rem; }
-.detail-header-actions, .quick-status-controls, .comment-form, .comment-meta { display: flex; gap: 1rem; }
+.detail-header-actions, .quick-status-controls, .comment-meta { display: flex; gap: 1rem; }
+.comment-form { display: flex; flex-direction: column; gap: 0.6rem; }
 .quick-status-controls { min-width: min(100%, 420px); }
 .quick-status-controls select { flex: 1; }
 .viewer-review-grid { display: grid; gap: 1rem; min-width: min(100%, 540px); }
@@ -676,8 +677,17 @@ th, td {
 .comment-form-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 1rem;
   flex-wrap: wrap;
+}
+.comment-form-actions .solid-button {
+  order: 2;
+  white-space: nowrap;
+}
+.comment-form-actions .comment-feedback {
+  order: 1;
+  margin-right: auto;
 }
 .comment-feedback {
   font-size: 0.85rem;
@@ -1946,8 +1956,9 @@ th, td {
 .pbi-dashboard .comment-form-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.75rem;
-  margin-top: 0.5rem;
+  margin-top: 0;
 }
 .pbi-dashboard .comment-role-badge {
   background: #E1E1E1;
