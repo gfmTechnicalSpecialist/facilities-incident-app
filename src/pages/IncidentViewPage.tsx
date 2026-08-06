@@ -415,24 +415,28 @@ export function IncidentViewPage() {
         reference={header.incidentId}
       />
       {/* Header */}
-      <section className="card detail-header-card print-report-header">
-        <div>
+      <section className="pbi-tile incident-title-card print-report-header">
+        <div className="incident-title-main">
           <p className="eyebrow">{header.incidentId}</p>
-          <h2>{header.title}</h2>
+          <h2 className="incident-title-heading">{header.title}</h2>
           <p className="muted-text">
             {header.site}{header.specificLocation ? ` • ${header.specificLocation}` : ''}
           </p>
         </div>
-        <div className="detail-header-actions no-print">
-          <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
-          <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
-          <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
-          {isApprover(user) && header.approvalStatus === 'Pending' && (
-            <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
-          )}
-          <button className="outline-button" type="button" onClick={() => window.print()}>
-            <Printer size={16} /> Print PDF
-          </button>
+        <div className="incident-title-actions no-print">
+          <div className="incident-status-group">
+            <span className={`badge badge-${header.severity.toLowerCase()}`}>{header.severity}</span>
+            <span className={`status-pill status-${header.actionStatus.toLowerCase().replace(/\s+/g, '-')}`}>{header.actionStatus}</span>
+            <span className={`approval-pill detail-approval-pill ${approvalStatusClass(header.approvalStatus)}`}>{approvalStatusLabel(header.approvalStatus)}</span>
+          </div>
+          <div className="incident-action-group">
+            {isApprover(user) && header.approvalStatus === 'Pending' && (
+              <button className="solid-button" type="button" onClick={() => setIsApprovalDialogOpen(true)}>Review</button>
+            )}
+            <button className="outline-button" type="button" onClick={() => window.print()}>
+              <Printer size={16} /> Print PDF
+            </button>
+          </div>
         </div>
       </section>
 
@@ -595,7 +599,12 @@ export function IncidentViewPage() {
       {/* Comments + report history */}
       <section className="detail-grid comments-history-grid">
         <div className="card">
-          <h3>Comments</h3>
+          <div className="grouped-header">
+            <h3>Comments</h3>
+            <p className="muted-text">
+              {viewerComments.length} comment{viewerComments.length === 1 ? '' : 's'}
+            </p>
+          </div>
 
           {/* Comment input — everyone can add */}
           <form className="comment-form no-print" onSubmit={handleCommentSubmit}>
@@ -617,21 +626,25 @@ export function IncidentViewPage() {
 
           <div className="comment-list">
             {viewerComments.length > 0 ? (
-              viewerComments.map((c, i) => (
-                <article className={`comment-item ${i < viewerComments.length - 1 ? 'comment-connected' : ''}`} key={i}>
-                  <div className="comment-meta">
-                    <strong>{c.userName}</strong>
-                    <span className="comment-role-badge">{c.userRole === 'viewer' ? 'Viewer' : c.userRole}</span>
-                    <span className="comment-date">{c.date}</span>
-                  </div>
-                  <p>{c.comment}</p>
-                  {i < viewerComments.length - 1 && (
-                    <div className="comment-connector" aria-hidden="true">
-                      <span className="comment-arrow">↓</span>
+              viewerComments.map((c, i) => {
+                const initials = c.userName
+                  .split(' ')
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((part) => part[0]?.toUpperCase())
+                  .join('') || '?';
+                return (
+                  <article className="comment-item" key={i}>
+                    <div className="comment-meta">
+                      <span className="comment-avatar" aria-hidden="true">{initials}</span>
+                      <strong className="comment-author">{c.userName}</strong>
+                      <span className="comment-role-badge">{c.userRole === 'viewer' ? 'Viewer' : c.userRole}</span>
+                      <span className="comment-date">{c.date}</span>
                     </div>
-                  )}
-                </article>
-              ))
+                    <p className="comment-text">{c.comment}</p>
+                  </article>
+                );
+              })
             ) : (
               <p className="muted-text">No comments yet.</p>
             )}

@@ -552,6 +552,44 @@ th, td {
 .approval-draft { background: #e2e8f0; color: #475569; }
 .detail-header-card, .quick-status-card { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .detail-approval-pill { border: 1px solid rgba(0,0,0,0.06); }
+
+/* ── Incident title card (view page) ── */
+.incident-title-card {
+  border-top: 3px solid #118DFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.incident-title-main { min-width: 0; }
+.incident-title-heading {
+  margin: 0.15rem 0 0.25rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #252423;
+  letter-spacing: -0.01em;
+}
+.incident-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.incident-status-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.incident-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-left: 1rem;
+  border-left: 1px solid var(--line);
+}
 .summary-pair { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; align-items: start; }
 .summary-pair > div { background: #f8fbff; border: 1px solid var(--line); border-radius: 16px; padding: 1rem; }
 .summary-pair h4 { margin-bottom: 0.6rem; }
@@ -608,14 +646,33 @@ th, td {
   font-size: 0.88rem;
 }
 .attachment-remove-btn { display: inline-flex; padding: 0.2rem; }
-.comment-list { display: grid; gap: 1rem; }
+.comment-list { display: grid; gap: 0.85rem; }
 .comment-item {
   background: #f8fbff;
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 1rem;
+  padding: 0.85rem 1rem;
 }
-.comment-meta { flex-wrap: wrap; align-items: center; color: var(--muted); font-size: 0.92rem; }
+.comment-meta { flex-wrap: wrap; align-items: center; gap: 0.6rem; color: var(--muted); font-size: 0.92rem; }
+.comment-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #118DFF;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.comment-author {
+  color: var(--text);
+  margin-right: -0.15rem;
+}
+.comment-date { white-space: nowrap; margin-left: auto; }
+.comment-text { margin: 0.5rem 0 0; }
 .comment-form-actions {
   display: flex;
   align-items: center;
@@ -639,27 +696,6 @@ th, td {
   text-transform: capitalize;
 }
 .comment-date { white-space: nowrap; }
-.comment-connected { position: relative; }
-.comment-connector {
-  position: absolute;
-  bottom: -1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  z-index: 1;
-}
-.comment-arrow {
-  font-size: 0.7rem;
-  color: #605E5C;
-  line-height: 1;
-}
 .grouped-header {
   display: flex;
   justify-content: space-between;
@@ -885,7 +921,8 @@ th, td {
 @media (max-width: 760px) {
   .login-panel, .main-content { padding: 1rem; }
   .fields.two-column, .filters-grid, .detail-list, .summary-pair { grid-template-columns: 1fr; }
-  .detail-header-card, .quick-status-card, .detail-header-actions, .quick-status-controls, .comment-form { flex-direction: column; align-items: stretch; }
+  .detail-header-card, .quick-status-card, .detail-header-actions, .quick-status-controls, .comment-form, .incident-title-card, .incident-title-actions { flex-direction: column; align-items: stretch; }
+  .incident-action-group { border-left: none; padding-left: 0; }
   .sidebar { display: none; }
   .main-content { padding-bottom: 6rem; }
 
@@ -1912,20 +1949,9 @@ th, td {
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
-.pbi-dashboard .comment-connector {
-  background: #FAF9F8;
-  border-color: #C8C6C4;
-}
 .pbi-dashboard .comment-role-badge {
   background: #E1E1E1;
   color: #484644;
-}
-.pbi-dashboard .comment-item {
-  position: relative;
-  padding-bottom: 1.5rem;
-}
-.pbi-dashboard .comment-item:last-child {
-  padding-bottom: 1rem;
 }
 .pbi-dashboard .validation-summary {
   border-radius: 4px;
