@@ -491,6 +491,38 @@ table { width: 100%; border-collapse: collapse; }
   white-space: pre-wrap;
 }
 .edit-history-arrow { color: var(--muted); font-weight: 700; }
+.edit-history-attachment-row td { padding-top: 0.85rem; padding-bottom: 0.85rem; }
+.edit-history-attachment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.edit-history-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 10px;
+  background: #e5f6ec;
+  color: #0f7b3f;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: fit-content;
+  max-width: 100%;
+}
+.edit-history-attachment-chip .edit-history-attachment-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.edit-history-attachment-chip.removed {
+  background: #fdeaec;
+  color: #c4314b;
+  text-decoration: line-through;
+}
 th, td {
   text-align: left;
   padding: 0.95rem 0.75rem;
@@ -728,6 +760,13 @@ th, td {
 .report-history-type-badge.rejected {
   color: #C4314B;
   background: #fdeaec;
+}
+.report-history-type-badge.attachment {
+  color: #0B7285;
+  background: #e3fafc;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 .report-history-editor {
   font-weight: 700;
