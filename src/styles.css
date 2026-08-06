@@ -794,6 +794,9 @@ th, td {
   display: grid;
   gap: 0.5rem;
 }
+.report-history-attachments {
+  margin: 0.45rem 0 0;
+}
 .report-history-field-row + .report-history-field-row {
   padding-top: 0.5rem;
   border-top: 1px dashed var(--line);

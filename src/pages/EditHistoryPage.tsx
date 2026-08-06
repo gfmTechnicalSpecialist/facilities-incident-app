@@ -150,13 +150,10 @@ function approvalActionClass(changeSet: IncidentChangeSet): string {
   return 'approval';
 }
 
-/** Returns the badge label + class for a change set, accounting for approval, attachment-only, and regular edit rows. */
+/** Returns the badge label + class for a change set, accounting for approval and regular edit rows (attachment-only edits also show as "Edit"). */
 function changeSetBadge(changeSet: IncidentChangeSet): { label: string; className: string } {
   if (isApprovalChangeSet(changeSet)) {
     return { label: approvalActionLabel(changeSet), className: approvalActionClass(changeSet) };
-  }
-  if (isAttachmentOnlyChangeSet(changeSet)) {
-    return { label: 'Attachment', className: 'attachment' };
   }
   return { label: 'Edit', className: 'edit' };
 }

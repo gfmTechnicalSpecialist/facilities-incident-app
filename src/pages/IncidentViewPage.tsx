@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, Printer } from 'lucide-react';
+import { ArrowLeft, ChevronDown, FileText, Paperclip, Printer } from 'lucide-react';
 import { approvalStatusClass, approvalStatusLabel, parseJiraTicketReferences } from '../utils/helpers';
 import { INCIDENT_DETAILS_API_URL, EDIT_HISTORY_API_URL, ADD_INCIDENT_COMMENT_API_URL } from '../lib/apiBase';
 import { useAuth } from '../contexts/AuthContext';
@@ -100,10 +100,54 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 
 function formatHistoryValue(value: string | null): string {
   if (value === null || value === undefined || value === '') return '—';
+  const trimmed = value.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower === 'true') return 'True';
+  if (lower === 'false') return 'False';
   // Clean up ISO datetimes to readable form
   const isoMatch = value.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
   if (isoMatch) return `${isoMatch[1]} ${isoMatch[2]}`;
   return value;
+}
+
+const ATTACHMENTS_FIELD = 'attachments';
+
+const FIELD_LABELS: Record<string, string> = {
+  approval_status: 'Approval status',
+  reviewed_by: 'Reviewed by',
+  review_comments: 'Review comments',
+  approved_by: 'Approved by',
+  critical_load_affected: 'Critical load affected',
+  restored_at: 'Restored at',
+  system_restored: 'System restored',
+  attachments: 'Attachments',
+};
+
+function humanizeFieldName(field: string): string {
+  if (FIELD_LABELS[field]) return FIELD_LABELS[field];
+  return field
+    .split('_')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/** Splits a change value into individual attachment file names, supporting single or multi-file changes. */
+function splitAttachmentNames(value: string | null): string[] {
+  if (!value) return [];
+  const byDelimiter = value
+    .split(/\r?\n|;|\|/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (byDelimiter.length > 1) return byDelimiter;
+  const byComma = value
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (byComma.length > 1 && byComma.every((part) => /\.[a-zA-Z0-9]{2,5}$/.test(part))) {
+    return byComma;
+  }
+  return [value.trim()];
 }
 
 /** Format an ISO datetime string to a readable form without timezone conversion: 2026-08-04 11:06 */
@@ -137,6 +181,64 @@ function approvalActionClass(changeSet: IncidentChangeSet): string {
   if (status === 'Approved') return 'approved';
   if (status === 'Rejected') return 'rejected';
   return 'approval';
+}
+
+function isAttachmentOnlyChangeSet(changeSet: IncidentChangeSet): boolean {
+  return changeSet.changes.length > 0 && changeSet.changes.every((change) => change.fieldChanged === ATTACHMENTS_FIELD);
+}
+
+/** Splits a change set's changes into attachment changes and regular field changes. */
+function splitChanges(changeSet: IncidentChangeSet) {
+  const attachmentChanges = changeSet.changes.filter((change) => change.fieldChanged === ATTACHMENTS_FIELD);
+  const fieldChanges = changeSet.changes.filter((change) => change.fieldChanged !== ATTACHMENTS_FIELD);
+  return { attachmentChanges, fieldChanges };
+}
+
+interface AttachmentEntry {
+  name: string;
+  action: 'added' | 'removed';
+}
+
+function collectAttachmentEntries(attachmentChanges: IncidentChange[]): AttachmentEntry[] {
+  const entries: AttachmentEntry[] = [];
+  for (const change of attachmentChanges) {
+    if (change.newValue) {
+      splitAttachmentNames(change.newValue).forEach((name) => entries.push({ name, action: 'added' }));
+    } else if (change.oldValue) {
+      splitAttachmentNames(change.oldValue).forEach((name) => entries.push({ name, action: 'removed' }));
+    }
+  }
+  return entries;
+}
+
+/** Returns the badge label + class for a change set, accounting for approval and regular edit rows (attachment-only edits also show as "Edit"). */
+function changeSetBadge(changeSet: IncidentChangeSet): { label: string; className: string } {
+  if (isApprovalChangeSet(changeSet)) {
+    return { label: approvalActionLabel(changeSet), className: approvalActionClass(changeSet) };
+  }
+  return { label: 'Edit', className: 'edit' };
+}
+
+/** Returns the "N field(s)" / "N attachment(s)" chip text for a change set. */
+function changeSetCountLabel(changeSet: IncidentChangeSet): string {
+  if (isAttachmentOnlyChangeSet(changeSet)) {
+    const count = collectAttachmentEntries(changeSet.changes).length;
+    return `${count} attachment${count === 1 ? '' : 's'}`;
+  }
+  return `${changeSet.changeCount} field${changeSet.changeCount === 1 ? '' : 's'}`;
+}
+
+function AttachmentChangeList({ entries }: { entries: AttachmentEntry[] }) {
+  return (
+    <ul className="edit-history-attachment-list">
+      {entries.map((entry, i) => (
+        <li key={`${entry.name}-${i}`} className={`edit-history-attachment-chip ${entry.action}`}>
+          <FileText size={14} />
+          <span className="edit-history-attachment-name">{entry.name}</span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function formatHistoryTimestamp(value: string): string {
@@ -560,6 +662,9 @@ export function IncidentViewPage() {
               {changeSets.map((changeSet) => {
                 const isOpen = expandedSets.has(changeSet.changeSetId);
                 const isApproval = isApprovalChangeSet(changeSet);
+                const badge = changeSetBadge(changeSet);
+                const { attachmentChanges, fieldChanges } = splitChanges(changeSet);
+                const attachmentEntries = collectAttachmentEntries(attachmentChanges);
                 return (
                   <li className={isOpen ? 'report-history-entry open' : 'report-history-entry'} key={changeSet.changeSetId}>
                     <div className={isApproval ? 'report-history-marker approval' : 'report-history-marker'} aria-hidden="true" />
@@ -571,30 +676,37 @@ export function IncidentViewPage() {
                         aria-expanded={isOpen}
                       >
                         <ChevronDown size={15} className="report-history-chevron" />
-                        <span className={isApproval ? `report-history-type-badge ${approvalActionClass(changeSet)}` : 'report-history-type-badge edit'}>
-                          {isApproval ? approvalActionLabel(changeSet) : 'Edit'}
+                        <span className={`report-history-type-badge ${badge.className}`}>
+                          {badge.className === 'attachment' && <Paperclip size={11} />} {badge.label}
                         </span>
                         <span className="report-history-editor">{changeSet.editedByName}</span>
                         <span className="report-history-time">{formatHistoryTimestamp(changeSet.editedAt)}</span>
-                        <span className="report-history-count">{changeSet.changeCount} field{changeSet.changeCount === 1 ? '' : 's'}</span>
+                        <span className="report-history-count">{changeSetCountLabel(changeSet)}</span>
                       </button>
                       {isOpen && (
                         <>
-                          <ul className="report-history-fields">
-                            {changeSet.changes.map((change) => {
-                              const stacked = isLongChange(change);
-                              return (
-                                <li className="report-history-field-row" key={change.id}>
-                                  <span className="report-history-field">{change.fieldChanged}:</span>
-                                  <span className={stacked ? 'report-history-change-inline stacked' : 'report-history-change-inline'}>
-                                    <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
-                                    <span className="report-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
-                                    <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
-                                  </span>
-                                </li>
-                              );
-                            })}
-                          </ul>
+                          {attachmentEntries.length > 0 && (
+                            <div className="report-history-attachments">
+                              <AttachmentChangeList entries={attachmentEntries} />
+                            </div>
+                          )}
+                          {fieldChanges.length > 0 && (
+                            <ul className="report-history-fields">
+                              {fieldChanges.map((change) => {
+                                const stacked = isLongChange(change);
+                                return (
+                                  <li className="report-history-field-row" key={change.id}>
+                                    <span className="report-history-field">{humanizeFieldName(change.fieldChanged)}:</span>
+                                    <span className={stacked ? 'report-history-change-inline stacked' : 'report-history-change-inline'}>
+                                      <span className="report-history-old">{formatHistoryValue(change.oldValue)}</span>
+                                      <span className="report-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
+                                      <span className="report-history-new">{formatHistoryValue(change.newValue)}</span>
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
                         </>
                       )}
                     </div>
