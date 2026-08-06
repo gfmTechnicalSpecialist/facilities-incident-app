@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, X } from 'lucide-react';
+import { AlertTriangle, Paperclip, Upload, X } from 'lucide-react';
 import { IncidentForm } from '../components/IncidentForm';
 import { useAuth } from '../contexts/AuthContext';
 import { ADD_INCIDENT_API_URL, getUploadAttachmentsUrl } from '../lib/apiBase';
@@ -195,37 +195,59 @@ export function NewIncidentPage() {
 
   return (
     <div className="page-stack pbi-dashboard">
-      <div className="card">
-        <h3>Log a new report</h3>
-        <p className="muted-text">Only admin users can create or edit incident reports.</p>
-      </div>
+
+      {/* Overview: title, guidance and inline attachment picker */}
+      <section className="new-incident-overview">
+        <div className="new-incident-overview-head">
+          <div className="new-incident-overview-titles">
+            <h2 className="pbi-title">Log a new report</h2>
+            <p className="pbi-subtitle">
+              Work through each section below, then submit for review or save it as a draft. Only admin users can create or edit incident reports.
+            </p>
+          </div>
+          <div className="new-incident-attachments">
+            <label className="outline-button attachment-file-picker">
+              <Upload size={16} /> Choose files
+              <input type="file" multiple onChange={handleFileSelect} hidden />
+            </label>
+            <span className="new-incident-attachment-hint">
+              {pendingFiles.length === 0
+                ? 'Attachments optional'
+                : `${pendingFiles.length} file${pendingFiles.length === 1 ? '' : 's'} ready to upload`}
+            </span>
+          </div>
+        </div>
+
+        {pendingFiles.length > 0 && (
+          <ul className="new-incident-file-strip">
+            {pendingFiles.map((file, i) => (
+              <li key={`${file.name}-${i}`} className="new-incident-file-chip">
+                <Paperclip size={13} aria-hidden="true" />
+                <span className="new-incident-file-name">{file.name}</span>
+                <button
+                  type="button"
+                  className="new-incident-file-remove"
+                  onClick={() => removePendingFile(i)}
+                  aria-label={`Remove ${file.name}`}
+                >
+                  <X size={13} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       {apiError && (
-        <div className="card">
-          <p className="form-error">{apiError}</p>
+        <div className="pbi-tile new-incident-error">
+          <span className="new-incident-error-icon"><AlertTriangle size={20} /></span>
+          <div>
+            <p className="pbi-visual-title">Couldn’t save the report</p>
+            <p className="muted-text">{apiError}</p>
+          </div>
         </div>
       )}
-      <div className="card">
-        <h3>Attachments</h3>
-        <p className="muted-text">Optional. Selected files are uploaded once the report is created.</p>
-        <div className="attachment-upload">
-          <label className="outline-button attachment-file-picker">
-            <Upload size={16} /> Choose files
-            <input type="file" multiple onChange={handleFileSelect} hidden />
-          </label>
-          {pendingFiles.length > 0 && (
-            <ul className="attachment-pending-list">
-              {pendingFiles.map((file, i) => (
-                <li key={`${file.name}-${i}`}>
-                  <span>{file.name}</span>
-                  <button type="button" className="ghost-button attachment-remove-btn" onClick={() => removePendingFile(i)} aria-label={`Remove ${file.name}`}>
-                    <X size={14} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+
       <IncidentForm
         currentUser={user}
         onSubmit={handleSubmit}

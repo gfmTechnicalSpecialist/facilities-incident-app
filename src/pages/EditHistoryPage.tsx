@@ -1,7 +1,5 @@
-import { useState, type FormEvent } from 'react';
-import { ChevronDown, FileText, History, Paperclip } from 'lucide-react';
-import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
-import { MobileReportCard } from '../components/MobileReportCard';
+import { useMemo, useState, type FormEvent } from 'react';
+import { AlertTriangle, ChevronDown, FileText, History, Paperclip, Search, ShieldCheck, SquarePen } from 'lucide-react';
 import { EDIT_HISTORY_API_URL } from '../lib/apiBase';
 
 interface IncidentChange {
@@ -237,23 +235,74 @@ export function EditHistoryPage() {
     runSearch(search);
   };
 
+  const summary = useMemo(() => {
+    let fieldChangeCount = 0;
+    let attachmentCount = 0;
+    let approvalCount = 0;
+    for (const changeSet of changeSets) {
+      const { attachmentChanges, fieldChanges } = splitChanges(changeSet);
+      fieldChangeCount += fieldChanges.length;
+      attachmentCount += collectAttachmentEntries(attachmentChanges).length;
+      if (isApprovalChangeSet(changeSet)) approvalCount += 1;
+    }
+    return [
+      { key: 'sets', label: 'Change sets', value: changeSets.length, accent: '#118DFF', icon: <History size={15} /> },
+      { key: 'fields', label: 'Field updates', value: fieldChangeCount, accent: '#6B007B', icon: <SquarePen size={15} /> },
+      { key: 'attachments', label: 'Attachment changes', value: attachmentCount, accent: '#E66C37', icon: <Paperclip size={15} /> },
+      { key: 'approvals', label: 'Approval actions', value: approvalCount, accent: '#107C10', icon: <ShieldCheck size={15} /> },
+    ];
+  }, [changeSets]);
+
+  const allExpanded = changeSets.length > 0 && expandedSets.size === changeSets.length;
+
+  const toggleAll = () => {
+    setExpandedSets(allExpanded ? new Set() : new Set(changeSets.map((c) => c.changeSetId)));
+  };
+
+  const showResults = !loading && !error && hasSearched;
+
   return (
     <div className="page-stack pbi-dashboard">
-      <CollapsibleFiltersCard title="Filters" className="no-print">
-        <form className="my-reports-filters" onSubmit={handleSubmit}>
-          <label className="my-reports-search-label">
-            <span>Incident ID</span>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Enter incident ID (e.g. INC-2026-001)"
-            />
-          </label>
-          <button type="submit" className="solid-button" disabled={loading}>
-            {loading ? 'Searching…' : 'Search'}
-          </button>
-        </form>
-      </CollapsibleFiltersCard>
+
+      {/* Lookup: title, description and inline incident search */}
+      <section className="edit-history-overview">
+        <div className="edit-history-overview-head">
+          <div className="edit-history-overview-titles">
+            <h2 className="pbi-title">Edit History</h2>
+            <p className="pbi-subtitle">
+              Look up an incident to review its full audit trail &mdash; field updates, approval actions and attachment changes.
+            </p>
+          </div>
+          <form className="edit-history-search no-print" onSubmit={handleSubmit}>
+            <div className="edit-history-search-field">
+              <Search size={15} aria-hidden="true" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Incident ID (e.g. INC-2026-001)"
+                aria-label="Incident ID"
+              />
+            </div>
+            <button type="submit" className="solid-button" disabled={loading || !search.trim()}>
+              {loading ? 'Searching…' : 'Search'}
+            </button>
+          </form>
+        </div>
+
+        {showResults && changeSets.length > 0 && (
+          <dl className="edit-history-stat-strip">
+            {summary.map((stat) => (
+              <div className="edit-history-stat" key={stat.key} style={{ ['--stat-accent' as string]: stat.accent }}>
+                <span className="edit-history-stat-icon">{stat.icon}</span>
+                <div className="edit-history-stat-text">
+                  <dt>{stat.label}</dt>
+                  <dd>{stat.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
+        )}
+      </section>
 
       {loading && (
         <div className="pbi-tile loading-center">
@@ -264,10 +313,10 @@ export function EditHistoryPage() {
 
       {!loading && error && (
         <section className="pbi-tile edit-history-empty">
-          <span className="edit-history-empty-icon"><History size={22} /></span>
+          <span className="edit-history-empty-icon error"><AlertTriangle size={22} /></span>
           <div>
-            <p className="pbi-visual-title">No edit history available yet</p>
-            <p className="muted-text">Once the edit history service is connected, changes will appear here.</p>
+            <p className="pbi-visual-title">Couldn’t load edit history</p>
+            <p className="muted-text">{error}</p>
           </div>
         </section>
       )}
@@ -282,116 +331,82 @@ export function EditHistoryPage() {
         </section>
       )}
 
-      {!loading && !error && hasSearched && (
-        <section className="pbi-tile table-card">
-          <div className="grouped-header">
-            <h3>Incident edits</h3>
-            <p className="muted-text">
-              {changeSets.length} change{changeSets.length === 1 ? '' : 's'} recorded
-            </p>
+      {showResults && changeSets.length === 0 && (
+        <section className="pbi-tile edit-history-empty">
+          <span className="edit-history-empty-icon"><History size={22} /></span>
+          <div>
+            <p className="pbi-visual-title">No edits recorded</p>
+            <p className="muted-text">Nothing has been changed on “{search.trim()}” yet.</p>
+          </div>
+        </section>
+      )}
+
+      {showResults && changeSets.length > 0 && (
+        <section className="pbi-tile edit-history-panel">
+          <div className="edit-history-panel-head">
+            <div className="edit-history-panel-titles">
+              <h3 className="pbi-visual-title">Change log</h3>
+              <p className="muted-text">
+                {changeSets.length} change set{changeSets.length === 1 ? '' : 's'} for {changeSets[0].incidentId}
+              </p>
+            </div>
+            <button type="button" className="ghost-button edit-history-toggle-all no-print" onClick={toggleAll}>
+              {allExpanded ? 'Collapse all' : 'Expand all'}
+            </button>
           </div>
 
-          {changeSets.length === 0 ? (
-            <p className="muted-text">No edits found for “{search.trim()}”.</p>
-          ) : (
-            <>
-              <div className="table-scroll desktop-only">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Field changed</th>
-                      <th>Change</th>
-                    </tr>
-                  </thead>
-                  {changeSets.map((changeSet) => {
-                    const isOpen = expandedSets.has(changeSet.changeSetId);
-                    const badge = changeSetBadge(changeSet);
-                    const { attachmentChanges, fieldChanges } = splitChanges(changeSet);
-                    const attachmentEntries = collectAttachmentEntries(attachmentChanges);
-                    return (
-                      <tbody key={changeSet.changeSetId} className={isOpen ? 'edit-history-group open' : 'edit-history-group'}>
-                        <tr className="edit-history-group-header" onClick={() => toggleSet(changeSet.changeSetId)}>
-                          <td colSpan={2}>
-                            <span className="edit-history-group-toggle">
-                              <ChevronDown size={16} className="edit-history-group-chevron" />
-                              <span className={`report-history-type-badge ${badge.className}`}>
-                                {badge.className === 'attachment' && <Paperclip size={11} />} {badge.label}
-                              </span>
-                              <span className="my-reports-ref">{changeSet.incidentId}</span>
-                              <span className="edit-history-group-author">{changeSet.editedByName}</span>
-                              <span className="edit-history-group-date">{formatTimestamp(changeSet.editedAt)}</span>
-                              <span className="edit-history-group-count">{changeSetCountLabel(changeSet)}</span>
-                            </span>
-                          </td>
-                        </tr>
-                        {isOpen && attachmentEntries.length > 0 && (
-                          <tr className="edit-history-detail-row edit-history-attachment-row">
-                            <td data-label="Field changed"><span className="edit-history-field">Attachments</span></td>
-                            <td data-label="Change"><AttachmentChangeList entries={attachmentEntries} /></td>
-                          </tr>
-                        )}
-                        {isOpen && fieldChanges.map((change) => {
-                          const stacked = isLongChange(change);
-                          return (
-                            <tr key={change.id} className="edit-history-detail-row">
-                              <td data-label="Field changed"><span className="edit-history-field">{humanizeFieldName(change.fieldChanged)}</span></td>
-                              <td data-label="Change">
-                                <span className={stacked ? 'edit-history-change-inline stacked' : 'edit-history-change-inline'}>
-                                  <span className="edit-history-old">{formatValue(change.oldValue)}</span>
-                                  <span className="edit-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
-                                  <span className="edit-history-new">{formatValue(change.newValue)}</span>
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    );
-                  })}
-                </table>
-              </div>
+          <ol className="edit-history-timeline">
+            {changeSets.map((changeSet) => {
+              const isOpen = expandedSets.has(changeSet.changeSetId);
+              const badge = changeSetBadge(changeSet);
+              const { attachmentChanges, fieldChanges } = splitChanges(changeSet);
+              const attachmentEntries = collectAttachmentEntries(attachmentChanges);
+              return (
+                <li className={isOpen ? 'edit-history-entry open' : 'edit-history-entry'} key={changeSet.changeSetId}>
+                  <button
+                    type="button"
+                    className="edit-history-entry-head"
+                    aria-expanded={isOpen}
+                    onClick={() => toggleSet(changeSet.changeSetId)}
+                  >
+                    <ChevronDown size={16} className="edit-history-entry-chevron" aria-hidden="true" />
+                    <span className={`report-history-type-badge ${badge.className}`}>
+                      {badge.className === 'attachment' && <Paperclip size={11} />} {badge.label}
+                    </span>
+                    <span className="edit-history-entry-author">{changeSet.editedByName}</span>
+                    <span className="edit-history-entry-date">{formatTimestamp(changeSet.editedAt)}</span>
+                    <span className="edit-history-entry-count">{changeSetCountLabel(changeSet)}</span>
+                  </button>
 
-              <div className="m-card-list mobile-only">
-                {changeSets.map((changeSet) => {
-                  const badge = changeSetBadge(changeSet);
-                  const { attachmentChanges, fieldChanges } = splitChanges(changeSet);
-                  const attachmentEntries = collectAttachmentEntries(attachmentChanges);
-                  return (
-                    <MobileReportCard
-                      key={changeSet.changeSetId}
-                      reference={changeSet.incidentId}
-                      title={formatTimestamp(changeSet.editedAt)}
-                      badge={(
-                        <span className={`report-history-type-badge ${badge.className}`}>
-                          {badge.className === 'attachment' && <Paperclip size={11} />} {badge.label}
-                        </span>
+                  {isOpen && (
+                    <dl className="edit-history-entry-body">
+                      {attachmentEntries.length > 0 && (
+                        <div className="edit-history-change">
+                          <dt>Attachments</dt>
+                          <dd><AttachmentChangeList entries={attachmentEntries} /></dd>
+                        </div>
                       )}
-                      fields={[
-                        ...(attachmentEntries.length > 0
-                          ? [{ label: 'Attachments', value: <AttachmentChangeList entries={attachmentEntries} /> }]
-                          : []),
-                        ...fieldChanges.map((change) => {
-                          const stacked = isLongChange(change);
-                          return {
-                            label: humanizeFieldName(change.fieldChanged),
-                            value: (
+                      {fieldChanges.map((change) => {
+                        const stacked = isLongChange(change);
+                        return (
+                          <div className="edit-history-change" key={change.id}>
+                            <dt>{humanizeFieldName(change.fieldChanged)}</dt>
+                            <dd>
                               <span className={stacked ? 'edit-history-change-inline stacked' : 'edit-history-change-inline'}>
                                 <span className="edit-history-old">{formatValue(change.oldValue)}</span>
                                 <span className="edit-history-arrow" aria-hidden="true">{stacked ? '↓' : '→'}</span>
                                 <span className="edit-history-new">{formatValue(change.newValue)}</span>
                               </span>
-                            ),
-                          };
-                        }),
-                        { label: 'Edited by', value: changeSet.editedByName },
-                        { label: 'User ID', value: changeSet.editedByUserId },
-                      ]}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
+                            </dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
         </section>
       )}
     </div>

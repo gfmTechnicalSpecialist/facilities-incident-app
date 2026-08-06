@@ -29,7 +29,7 @@ export function MyReportsPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ActionStatus | 'All'>('All');
-  const [activeTab, setActiveTab] = useState<'submitted' | 'drafts'>('submitted');
+  const [activeTab, setActiveTab] = useState<'submitted' | 'approved' | 'drafts'>('submitted');
 
   useEffect(() => {
     if (!user) return;
@@ -55,15 +55,18 @@ export function MyReportsPage() {
 
   const draftReports = useMemo(() => reports.filter((i) => i.approvalStatus === 'Draft'), [reports]);
   const submittedReports = useMemo(() => reports.filter((i) => i.approvalStatus !== 'Draft'), [reports]);
+  const approvedReports = useMemo(() => reports.filter((i) => i.approvalStatus === 'Approved'), [reports]);
 
-  const filtered = useMemo(() => {
-    return sortIncidentsByApprovalPriority(submittedReports.filter((i) => {
+  const applyFilters = (list: ApiUserReport[]) =>
+    sortIncidentsByApprovalPriority(list.filter((i) => {
       const haystack = [i.title, i.incidentId, i.site, i.type].join(' ').toLowerCase();
       const matchSearch = haystack.includes(search.toLowerCase());
       const matchStatus = statusFilter === 'All' || i.actionStatus === statusFilter;
       return matchSearch && matchStatus;
     }));
-  }, [submittedReports, search, statusFilter]);
+
+  const filtered = useMemo(() => applyFilters(submittedReports), [submittedReports, search, statusFilter]);
+  const filteredApproved = useMemo(() => applyFilters(approvedReports), [approvedReports, search, statusFilter]);
 
   const totalCount = submittedReports.length;
   const openCount = submittedReports.filter((i) => i.actionStatus === 'Open').length;
@@ -76,6 +79,42 @@ export function MyReportsPage() {
     { key: 'progress', label: 'In progress / review', value: inProgressCount, accent: '#6B007B', icon: <Loader2 size={15} /> },
     { key: 'closed', label: 'Closed', value: closedCount, accent: '#107C10', icon: <CheckCircle2 size={15} /> },
   ];
+
+  const isDrafts = activeTab === 'drafts';
+  const rows = isDrafts ? draftReports : activeTab === 'approved' ? filteredApproved : filtered;
+
+  const rowActions = (incident: ApiUserReport) =>
+    isDrafts ? (
+      <button
+        className="outline-button my-reports-action-btn"
+        type="button"
+        onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
+        title="Continue editing"
+      >
+        <ClipboardEdit size={15} /> Continue editing
+      </button>
+    ) : (
+      <>
+        <button
+          className="ghost-button my-reports-action-btn"
+          type="button"
+          onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
+          title="View report"
+        >
+          <Eye size={15} /> View
+        </button>
+        {user?.role === 'admin' && incident.approvalStatus !== 'Approved' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && (
+          <button
+            className="outline-button my-reports-action-btn"
+            type="button"
+            onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
+            title="Edit report"
+          >
+            <ClipboardEdit size={15} /> Edit
+          </button>
+        )}
+      </>
+    );
 
   return (
     <div className="page-stack pbi-dashboard">
@@ -143,6 +182,15 @@ export function MyReportsPage() {
                 <button
                   type="button"
                   role="tab"
+                  aria-selected={activeTab === 'approved'}
+                  className={activeTab === 'approved' ? 'my-reports-tab active' : 'my-reports-tab'}
+                  onClick={() => setActiveTab('approved')}
+                >
+                  Approved <span className="my-reports-tab-count">{approvedReports.length}</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
                   aria-selected={activeTab === 'drafts'}
                   className={activeTab === 'drafts' ? 'my-reports-tab active' : 'my-reports-tab'}
                   onClick={() => setActiveTab('drafts')}
@@ -151,7 +199,7 @@ export function MyReportsPage() {
                 </button>
               </div>
 
-              {activeTab === 'submitted' && (
+              {!isDrafts && (
                 <div className="my-reports-toolbar no-print">
                   <div className="my-reports-search">
                     <Search size={15} aria-hidden="true" />
@@ -176,33 +224,18 @@ export function MyReportsPage() {
               )}
             </div>
 
-            {activeTab === 'drafts' ? (
-              draftReports.length === 0 ? (
+            {rows.length === 0 ? (
+              isDrafts ? (
                 <div className="my-reports-empty">
                   <p className="eyebrow">No drafts</p>
                   <p className="muted-text">Reports you save without submitting will appear here.</p>
                 </div>
-              ) : (
-                <div className="my-reports-drafts-list">
-                  {draftReports.map((incident) => (
-                    <div key={incident.incidentId} className="my-reports-draft-item">
-                      <div className="my-reports-draft-info">
-                        <span className="my-reports-title-cell">{incident.title || 'Untitled draft'}</span>
-                        <span className="my-reports-draft-meta">{incident.site} • {incident.date}</span>
-                      </div>
-                      <button
-                        className="outline-button my-reports-action-btn"
-                        type="button"
-                        onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
-                      >
-                        <ClipboardEdit size={15} /> Continue editing
-                      </button>
-                    </div>
-                  ))}
+              ) : activeTab === 'approved' && approvedReports.length === 0 ? (
+                <div className="my-reports-empty">
+                  <p className="eyebrow">No approved reports</p>
+                  <p className="muted-text">Reports approved by a reviewer will appear here.</p>
                 </div>
-              )
-            ) : filtered.length === 0 ? (
-              totalCount === 0 ? (
+              ) : totalCount === 0 ? (
                 <div className="my-reports-empty">
                   <p className="eyebrow">No reports found</p>
                   <p className="muted-text">You have not submitted any incident reports yet.</p>
@@ -235,10 +268,10 @@ export function MyReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((incident) => (
+                    {rows.map((incident) => (
                       <tr key={incident.incidentId}>
                         <td data-label="Reference"><span className="my-reports-ref">{incident.incidentId}</span></td>
-                        <td data-label="Title"><span className="my-reports-title-cell">{incident.title}</span></td>
+                        <td data-label="Title"><span className="my-reports-title-cell">{incident.title || 'Untitled draft'}</span></td>
                         <td data-label="Site">{incident.site}</td>
                         <td data-label="Type">{incident.type}</td>
                         <td data-label="Severity">
@@ -256,26 +289,7 @@ export function MyReportsPage() {
                         </td>
                         <td data-label="Date">{incident.date}</td>
                         <td data-label="Actions">
-                          <div className="my-reports-actions">
-                            <button
-                              className="ghost-button my-reports-action-btn"
-                              type="button"
-                              onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
-                              title="View report"
-                            >
-                              <Eye size={15} /> View
-                            </button>
-                            {user?.role === 'admin' && incident.approvalStatus !== 'Approved' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && (
-                              <button
-                                className="outline-button my-reports-action-btn"
-                                type="button"
-                                onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
-                                title="Edit report"
-                              >
-                                <ClipboardEdit size={15} /> Edit
-                              </button>
-                            )}
-                          </div>
+                          <div className="my-reports-actions">{rowActions(incident)}</div>
                         </td>
                       </tr>
                     ))}
@@ -284,11 +298,11 @@ export function MyReportsPage() {
               </div>
 
               <div className="m-card-list mobile-only">
-                {filtered.map((incident) => (
+                {rows.map((incident) => (
                   <MobileReportCard
                     key={incident.incidentId}
                     reference={incident.incidentId}
-                    title={incident.title}
+                    title={incident.title || 'Untitled draft'}
                     badge={<span className={`badge badge-${incident.severity.toLowerCase()}`}>{incident.severity}</span>}
                     fields={[
                       { label: 'Site', value: incident.site },
@@ -303,26 +317,7 @@ export function MyReportsPage() {
                       },
                       { label: 'Date', value: incident.date },
                     ]}
-                    actions={
-                      <>
-                        <button
-                          className="ghost-button my-reports-action-btn"
-                          type="button"
-                          onClick={() => navigate(`/incidents/view/${incident.incidentId}`, { state: incident })}
-                        >
-                          <Eye size={15} /> View
-                        </button>
-                        {user?.role === 'admin' && incident.approvalStatus !== 'Approved' && (incident.actionStatus !== 'Closed' || incident.approvalStatus === 'Rejected') && (
-                          <button
-                            className="outline-button my-reports-action-btn"
-                            type="button"
-                            onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
-                          >
-                            <ClipboardEdit size={15} /> Edit
-                          </button>
-                        )}
-                      </>
-                    }
+                    actions={rowActions(incident)}
                   />
                 ))}
               </div>
