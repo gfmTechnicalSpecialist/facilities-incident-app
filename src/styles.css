@@ -529,13 +529,16 @@ table { width: 100%; border-collapse: collapse; }
 .edit-history-search-field { position: relative; display: flex; align-items: center; }
 .edit-history-search-field svg {
   position: absolute;
-  left: 0.6rem;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
   color: #8A8886;
   pointer-events: none;
 }
 .edit-history-search-field input {
-  width: 260px;
-  padding: 0.4rem 0.6rem 0.4rem 1.9rem;
+  width: 280px;
+  padding: 0.45rem 0.7rem 0.45rem 2.3rem;
+  text-overflow: ellipsis;
 }
 .edit-history-search .solid-button {
   padding: 0.45rem 1rem;
