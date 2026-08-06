@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { actionStatuses } from '../utils/constants';
 import { approvalStatusClass, approvalStatusLabel, sortIncidentsByApprovalPriority } from '../utils/helpers';
 import { MobileReportCard } from '../components/MobileReportCard';
-import { CollapsibleFiltersCard } from '../components/CollapsibleFiltersCard';
 import { USER_REPORTS_API_URL } from '../lib/apiBase';
 import type { ActionStatus } from '../types';
 
@@ -30,6 +29,7 @@ export function MyReportsPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ActionStatus | 'All'>('All');
+  const [activeTab, setActiveTab] = useState<'submitted' | 'drafts'>('submitted');
 
   useEffect(() => {
     if (!user) return;
@@ -128,60 +128,80 @@ export function MyReportsPage() {
 
       {!loading && !error && (
         <>
-          {/* Drafts */}
-          {draftReports.length > 0 && (
-            <CollapsibleFiltersCard title={`Drafts (${draftReports.length})`} className="no-print">
-              <div className="my-reports-drafts-list">
-                {draftReports.map((incident) => (
-                  <div key={incident.incidentId} className="my-reports-draft-item">
-                    <div className="my-reports-draft-info">
-                      <span className="my-reports-title-cell">{incident.title || 'Untitled draft'}</span>
-                      <span className="my-reports-draft-meta">{incident.site} • {incident.date}</span>
-                    </div>
-                    <button
-                      className="outline-button my-reports-action-btn"
-                      type="button"
-                      onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
-                    >
-                      <ClipboardEdit size={15} /> Continue editing
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleFiltersCard>
-          )}
-
-          {/* Table */}
-          <section className="pbi-tile table-card">
-            <div className="my-reports-table-header">
-              <h3 className="my-reports-table-title">
-                {filtered.length} report{filtered.length === 1 ? '' : 's'}
-                {statusFilter !== 'All' && <span className="my-reports-filter-chip">{statusFilter}</span>}
-              </h3>
-              <div className="my-reports-toolbar no-print">
-                <div className="my-reports-search">
-                  <Search size={15} aria-hidden="true" />
-                  <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by title, ID, site or type..."
-                    aria-label="Search reports"
-                  />
-                </div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as ActionStatus | 'All')}
-                  aria-label="Filter by action status"
+          <section className="pbi-tile table-card my-reports-panel">
+            <div className="my-reports-panel-head">
+              <div className="my-reports-tabs" role="tablist" aria-label="Report groups">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'submitted'}
+                  className={activeTab === 'submitted' ? 'my-reports-tab active' : 'my-reports-tab'}
+                  onClick={() => setActiveTab('submitted')}
                 >
-                  <option value="All">All statuses</option>
-                  {actionStatuses.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+                  Submitted <span className="my-reports-tab-count">{submittedReports.length}</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'drafts'}
+                  className={activeTab === 'drafts' ? 'my-reports-tab active' : 'my-reports-tab'}
+                  onClick={() => setActiveTab('drafts')}
+                >
+                  Drafts <span className="my-reports-tab-count">{draftReports.length}</span>
+                </button>
               </div>
+
+              {activeTab === 'submitted' && (
+                <div className="my-reports-toolbar no-print">
+                  <div className="my-reports-search">
+                    <Search size={15} aria-hidden="true" />
+                    <input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search by title, ID, site or type..."
+                      aria-label="Search reports"
+                    />
+                  </div>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as ActionStatus | 'All')}
+                    aria-label="Filter by action status"
+                  >
+                    <option value="All">All statuses</option>
+                    {actionStatuses.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
-            {filtered.length === 0 ? (
+            {activeTab === 'drafts' ? (
+              draftReports.length === 0 ? (
+                <div className="my-reports-empty">
+                  <p className="eyebrow">No drafts</p>
+                  <p className="muted-text">Reports you save without submitting will appear here.</p>
+                </div>
+              ) : (
+                <div className="my-reports-drafts-list">
+                  {draftReports.map((incident) => (
+                    <div key={incident.incidentId} className="my-reports-draft-item">
+                      <div className="my-reports-draft-info">
+                        <span className="my-reports-title-cell">{incident.title || 'Untitled draft'}</span>
+                        <span className="my-reports-draft-meta">{incident.site} • {incident.date}</span>
+                      </div>
+                      <button
+                        className="outline-button my-reports-action-btn"
+                        type="button"
+                        onClick={() => navigate(`/incidents/view/${incident.incidentId}/edit`)}
+                      >
+                        <ClipboardEdit size={15} /> Continue editing
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : filtered.length === 0 ? (
               totalCount === 0 ? (
                 <div className="my-reports-empty">
                   <p className="eyebrow">No reports found</p>
@@ -193,7 +213,9 @@ export function MyReportsPage() {
                   )}
                 </div>
               ) : (
-                <p className="muted-text my-reports-empty">No reports match the current filters.</p>
+                <div className="my-reports-empty">
+                  <p className="muted-text">No reports match the current filters.</p>
+                </div>
               )
             ) : (
               <>
