@@ -403,7 +403,7 @@ label span, label > strong {
   align-self: end;
 }
 .checkbox-row input { width: auto; }
-.form-actions { display: flex; justify-content: flex-end; }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
 .inline-actions { justify-content: flex-start; }
 .form-error { color: var(--red-dark); font-weight: 700; margin: 0; }
 .success-text { color: var(--blue-dark); font-weight: 700; margin: 0; }
@@ -517,6 +517,7 @@ th, td {
 .approval-pending { background: #fff3bf; color: #8a4b00; }
 .approval-approved { background: #dcfce7; color: #166534; }
 .approval-rejected { background: #ffe2e2; color: #b42318; }
+.approval-draft { background: #e2e8f0; color: #475569; }
 .detail-header-card, .quick-status-card { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .detail-approval-pill { border: 1px solid rgba(0,0,0,0.06); }
 .summary-pair { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; align-items: start; }

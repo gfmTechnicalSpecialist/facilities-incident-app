@@ -45,7 +45,7 @@ export type IncidentType =
 export type Severity = 'Low' | 'Moderate' | 'High' | 'Critical';
 export type Impact = 'No Impact' | 'Minor' | 'Moderate' | 'Major';
 export type ActionStatus = 'Open' | 'In Progress' | 'Pending Review' | 'Closed';
-export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
+export type ApprovalStatus = 'Draft' | 'Pending' | 'Approved' | 'Rejected';
 
 export interface Incident {
   id: string;

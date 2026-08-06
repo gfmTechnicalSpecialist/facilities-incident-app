@@ -92,7 +92,7 @@ export function stringifyJiraTicketReferences(raw: string | null | undefined): s
  * followed by everything else in reverse chronological order.
  */
 export function sortIncidentsByApprovalPriority<T extends { approvalStatus: string; date: string }>(incidents: T[]): T[] {
-  const priority: Record<string, number> = { Rejected: 0, Pending: 1 };
+  const priority: Record<string, number> = { Draft: 0, Rejected: 0, Pending: 1 };
   return [...incidents].sort((a, b) => {
     const pa = priority[a.approvalStatus] ?? 2;
     const pb = priority[b.approvalStatus] ?? 2;

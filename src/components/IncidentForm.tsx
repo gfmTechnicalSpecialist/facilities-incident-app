@@ -18,6 +18,10 @@ interface IncidentFormProps {
   submitLabel: string;
   submitDisabled?: boolean;
   hideReporterSection?: boolean;
+  /** When provided, renders a secondary "save as draft" action that bypasses required-field validation. */
+  onSaveDraft?: (values: IncidentFormValues) => void;
+  draftLabel?: string;
+  draftDisabled?: boolean;
 }
 
 function getToday(): string {
@@ -116,7 +120,7 @@ function FormSection({
   );
 }
 
-export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled, hideReporterSection }: IncidentFormProps) {
+export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel, submitDisabled, hideReporterSection, onSaveDraft, draftLabel, draftDisabled }: IncidentFormProps) {
   const [values, setValues] = useState<IncidentFormValues>(() => initialValues ?? buildDefaultValues(currentUser));
   const [touched, setTouched] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
@@ -199,6 +203,10 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
     setTouched(true);
     if (hasErrors) return;
     onSubmit(values);
+  }
+
+  function handleSaveDraft() {
+    onSaveDraft?.(values);
   }
 
   return (
@@ -508,6 +516,11 @@ export function IncidentForm({ currentUser, initialValues, onSubmit, submitLabel
       )}
 
       <div className="form-actions no-print">
+        {onSaveDraft && (
+          <button className="outline-button" type="button" disabled={draftDisabled} onClick={handleSaveDraft}>
+            {draftLabel ?? 'Save as draft'}
+          </button>
+        )}
         <button className="solid-button" type="submit" disabled={submitDisabled}>
           {submitLabel}
         </button>

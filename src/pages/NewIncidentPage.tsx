@@ -9,7 +9,7 @@ import type { IncidentFormValues } from '../types';
 
 const ADD_INCIDENT_URL = ADD_INCIDENT_API_URL;
 
-function buildPayload(values: IncidentFormValues, userEmail: string) {
+function buildPayload(values: IncidentFormValues, userEmail: string, approvalStatus: 'Draft' | 'Pending') {
   const now = new Date().toISOString();
   const year = new Date().getFullYear();
   const randomSuffix = String(Math.floor(1000 + Math.random() * 9000));
@@ -54,7 +54,7 @@ function buildPayload(values: IncidentFormValues, userEmail: string) {
     responsiblePerson: values.responsiblePerson || null,
     targetCompletionDate: values.targetCompletionDate ? `${values.targetCompletionDate}T00:00:00Z` : null,
     actionStatus: values.actionStatus,
-    approvalStatus: 'Pending',
+    approvalStatus,
     reviewedBy: null,
     approvedBy: null,
     reviewComments: null,
@@ -70,6 +70,7 @@ export function NewIncidentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [savedAsDraft, setSavedAsDraft] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [attachmentWarning, setAttachmentWarning] = useState<string | null>(null);
 
@@ -91,12 +92,18 @@ export function NewIncidentPage() {
         <div className="card success-banner">
           <div className="success-banner-icon">✓</div>
           <div>
-            <h3>Report submitted successfully</h3>
-            <p className="muted-text">Incident <strong>{successId}</strong> has been logged and is now pending review.</p>
+            <h3>{savedAsDraft ? 'Draft saved' : 'Report submitted successfully'}</h3>
+            <p className="muted-text">
+              {savedAsDraft ? (
+                <>Incident <strong>{successId}</strong> has been saved as a draft. Continue editing it from My Reports whenever you're ready to submit.</>
+              ) : (
+                <>Incident <strong>{successId}</strong> has been logged and is now pending review.</>
+              )}
+            </p>
             {attachmentWarning && <p className="form-error">{attachmentWarning}</p>}
             <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem' }}>
               <button className="solid-button" onClick={() => navigate('/incidents')}>Go to incident workspace</button>
-              <button className="outline-button" onClick={() => { setSuccessId(null); setApiError(null); setPendingFiles([]); setAttachmentWarning(null); }}>Log another report</button>
+              <button className="outline-button" onClick={() => { setSuccessId(null); setApiError(null); setPendingFiles([]); setAttachmentWarning(null); setSavedAsDraft(false); }}>Log another report</button>
             </div>
           </div>
         </div>
@@ -109,7 +116,7 @@ export function NewIncidentPage() {
     setApiError(null);
     setAttachmentWarning(null);
     try {
-      const payload = buildPayload(values, user!.email);
+      const payload = buildPayload(values, user!.email, 'Pending');
       const res = await fetch(ADD_INCIDENT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -136,9 +143,51 @@ export function NewIncidentPage() {
         }
       }
 
+      setSavedAsDraft(false);
       setSuccessId(payload.incidentId);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Failed to submit incident. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleSaveDraft(values: IncidentFormValues) {
+    setSubmitting(true);
+    setApiError(null);
+    setAttachmentWarning(null);
+    try {
+      const payload = buildPayload(values, user!.email, 'Draft');
+      const res = await fetch(ADD_INCIDENT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      if (pendingFiles.length > 0) {
+        try {
+          const formData = new FormData();
+          pendingFiles.forEach((file) => formData.append('files', file));
+          formData.append('metadata', JSON.stringify({
+            IsEditPhase: false,
+            EditedByName: null,
+            EditedByUserId: null,
+          }));
+          const uploadRes = await fetch(getUploadAttachmentsUrl(payload.incidentId), {
+            method: 'POST',
+            body: formData,
+          });
+          if (!uploadRes.ok) throw new Error(`Server returned ${uploadRes.status}`);
+        } catch {
+          setAttachmentWarning('Draft saved, but attachments failed to upload. You can add them from the report page.');
+        }
+      }
+
+      setSavedAsDraft(true);
+      setSuccessId(payload.incidentId);
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Failed to save draft. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -180,8 +229,11 @@ export function NewIncidentPage() {
       <IncidentForm
         currentUser={user}
         onSubmit={handleSubmit}
+        onSaveDraft={handleSaveDraft}
         submitLabel={submitting ? 'Submitting…' : 'Create report'}
+        draftLabel={submitting ? 'Saving…' : 'Save as draft'}
         submitDisabled={submitting}
+        draftDisabled={submitting}
       />
     </div>
   );

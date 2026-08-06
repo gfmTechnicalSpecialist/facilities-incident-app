@@ -28,7 +28,7 @@ export const incidentCategories = Object.keys(incidentCategoryMap) as IncidentCa
 export const severities: Severity[] = ['Low', 'Moderate', 'High', 'Critical'];
 export const impacts: Impact[] = ['No Impact', 'Minor', 'Moderate', 'Major'];
 export const actionStatuses: ActionStatus[] = ['Open', 'In Progress', 'Pending Review', 'Closed'];
-export const approvalStatuses: ApprovalStatus[] = ['Pending', 'Approved', 'Rejected'];
+export const approvalStatuses: ApprovalStatus[] = ['Draft', 'Pending', 'Approved', 'Rejected'];
 
 export const rootCauseCategories = [
   'Human Error',

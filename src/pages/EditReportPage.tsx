@@ -154,6 +154,7 @@ export function EditReportPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedBanner, setSavedBanner] = useState(false);
+  const [lastAction, setLastAction] = useState<'saved' | 'draft' | 'submitted'>('saved');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   function fetchDetails(): Promise<ApiDetails> {
@@ -196,7 +197,7 @@ export function EditReportPage() {
     return () => { cancelled = true; };
   }, [incidentId]);
 
-  async function handleSubmit(values: IncidentFormValues) {
+  async function handleSubmit(values: IncidentFormValues, targetApprovalStatus?: 'Draft' | 'Pending') {
     setSaving(true);
     setSaveError(null);
     setSavedBanner(false);
@@ -241,7 +242,7 @@ export function EditReportPage() {
             responsiblePerson: values.responsiblePerson || undefined,
             targetCompletionDate: values.targetCompletionDate || undefined,
             actionStatus: values.actionStatus,
-            approvalStatus: rawData?.header.approvalStatus ?? undefined,
+            approvalStatus: targetApprovalStatus ?? rawData?.header.approvalStatus ?? undefined,
             reviewedBy: rawData?.workflow.reviewedBy ?? null,
             approvedBy: rawData?.workflow.approvedBy ?? null,
             reviewComments: rawData?.workflow.reviewComments ?? null,
@@ -282,6 +283,7 @@ export function EditReportPage() {
             // non-fatal: report saved, attachments can be added later
           }
         }
+        setLastAction(targetApprovalStatus === 'Draft' ? 'draft' : targetApprovalStatus === 'Pending' ? 'submitted' : 'saved');
         setSavedBanner(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -332,6 +334,8 @@ export function EditReportPage() {
     );
   }
 
+  const isDraft = rawData.header.approvalStatus === 'Draft';
+
   return (
     <div className="page-stack pbi-dashboard">
       <header className="card">
@@ -379,8 +383,16 @@ export function EditReportPage() {
             gap: '0.75rem',
           }}
         >
-          <span style={{ fontWeight: 600, color: '#2e7031' }}>Changes saved</span>
-          <span className="muted-text">The incident record has been updated successfully.</span>
+          <span style={{ fontWeight: 600, color: '#2e7031' }}>
+            {lastAction === 'draft' ? 'Draft saved' : lastAction === 'submitted' ? 'Submitted for review' : 'Changes saved'}
+          </span>
+          <span className="muted-text">
+            {lastAction === 'draft'
+              ? 'Your draft has been updated. It has not been submitted for review yet.'
+              : lastAction === 'submitted'
+              ? 'The report has been submitted and is now pending review.'
+              : 'The incident record has been updated successfully.'}
+          </span>
           <button
             className="ghost-button"
             type="button"
@@ -419,9 +431,12 @@ export function EditReportPage() {
       <IncidentForm
         currentUser={user}
         initialValues={initialValues}
-        onSubmit={handleSubmit}
-        submitLabel={saving ? 'Saving…' : 'Save changes'}
+        onSubmit={(values) => handleSubmit(values, isDraft ? 'Pending' : undefined)}
+        submitLabel={saving ? 'Saving…' : isDraft ? 'Submit for review' : 'Save changes'}
+        onSaveDraft={isDraft ? (values) => handleSubmit(values, 'Draft') : undefined}
+        draftLabel={saving ? 'Saving…' : 'Save as draft'}
         submitDisabled={saving}
+        draftDisabled={saving}
         hideReporterSection
       />
     </div>
