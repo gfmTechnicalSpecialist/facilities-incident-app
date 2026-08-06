@@ -264,7 +264,7 @@ export function EditHistoryPage() {
   return (
     <div className="page-stack pbi-dashboard">
 
-      {/* Lookup: title, description and inline incident search */}
+      {/* Lookup: title, description and incident search */}
       <section className="edit-history-overview">
         <div className="edit-history-overview-head">
           <div className="edit-history-overview-titles">
@@ -273,21 +273,22 @@ export function EditHistoryPage() {
               Look up an incident to review its full audit trail &mdash; field updates, approval actions and attachment changes.
             </p>
           </div>
-          <form className="edit-history-search no-print" onSubmit={handleSubmit}>
-            <div className="edit-history-search-field">
-              <Search size={15} aria-hidden="true" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Incident ID (e.g. INC-2026-001)"
-                aria-label="Incident ID"
-              />
-            </div>
-            <button type="submit" className="solid-button" disabled={loading || !search.trim()}>
-              {loading ? 'Searching…' : 'Search'}
-            </button>
-          </form>
         </div>
+
+        <form className="edit-history-search no-print" onSubmit={handleSubmit}>
+          <div className="edit-history-search-field">
+            <Search size={15} aria-hidden="true" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Incident ID (e.g. INC-2026-001)"
+              aria-label="Incident ID"
+            />
+          </div>
+          <button type="submit" className="solid-button" disabled={loading || !search.trim()}>
+            {loading ? 'Searching…' : 'Search'}
+          </button>
+        </form>
 
         {showResults && changeSets.length > 0 && (
           <dl className="edit-history-stat-strip">

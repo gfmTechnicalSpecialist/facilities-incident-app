@@ -516,14 +516,15 @@ table { width: 100%; border-collapse: collapse; }
   justify-content: space-between;
   gap: 1.5rem;
   flex-wrap: wrap;
-  padding-bottom: 0.8rem;
 }
 .edit-history-overview-titles { flex: 1 1 280px; min-width: 0; }
 .edit-history-search {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   flex-wrap: nowrap;
+  padding: 0.75rem 0 0.8rem;
 }
 .edit-history-search-field { position: relative; display: flex; align-items: center; }
 .edit-history-search-field svg {
