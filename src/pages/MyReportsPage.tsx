@@ -74,10 +74,10 @@ export function MyReportsPage() {
   const closedCount = submittedReports.filter((i) => i.actionStatus === 'Closed').length;
 
   const stats = [
-    { key: 'total', label: 'Total submitted', value: totalCount, accent: '#118DFF', icon: <ShieldEllipsis size={15} /> },
-    { key: 'open', label: 'Open', value: openCount, accent: '#E66C37', icon: <FolderClock size={15} /> },
-    { key: 'progress', label: 'In progress / review', value: inProgressCount, accent: '#6B007B', icon: <Loader2 size={15} /> },
-    { key: 'closed', label: 'Closed', value: closedCount, accent: '#107C10', icon: <CheckCircle2 size={15} /> },
+    { key: 'total', label: 'Total submitted', value: totalCount, accent: '#0b2f6b', icon: <ShieldEllipsis size={15} /> },
+    { key: 'open', label: 'Open', value: openCount, accent: '#d71920', icon: <FolderClock size={15} /> },
+    { key: 'progress', label: 'In progress / review', value: inProgressCount, accent: '#0057b8', icon: <Loader2 size={15} /> },
+    { key: 'closed', label: 'Closed', value: closedCount, accent: '#3f6ea8', icon: <CheckCircle2 size={15} /> },
   ];
 
   const isDrafts = activeTab === 'drafts';

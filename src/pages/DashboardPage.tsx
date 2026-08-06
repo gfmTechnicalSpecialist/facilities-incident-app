@@ -58,7 +58,7 @@ function mapByMonth(items: { month: string; count: number }[]): ChartItem[] {
   return items.map((item) => ({
     name: item.month,
     value: item.count,
-    color: '#118DFF',
+    color: '#0b2f6b',
   }));
 }
 
@@ -157,10 +157,10 @@ export function DashboardPage() {
   });
 
   const kpis = [
-    { label: 'Total Incidents', value: overview.totalIncidents, icon: <ShieldEllipsis size={16} />, accent: '#118DFF', onClick: () => navigate('/incidents') },
-    { label: 'Open Incidents', value: overview.openIncidents, icon: <FolderClock size={16} />, accent: '#E66C37', onClick: () => navigate(drillThroughUrl({ status: 'Open' })) },
-    { label: 'Closed Incidents', value: overview.closedIncidents, icon: <CheckCircle2 size={16} />, accent: '#6B007B', onClick: () => navigate(drillThroughUrl({ status: 'Closed' })) },
-    { label: 'Critical Incidents', value: overview.criticalIncidents, icon: <AlertTriangle size={16} />, accent: '#D64550', onClick: () => navigate(drillThroughUrl({ severity: 'Critical' })) },
+    { label: 'Total Incidents', value: overview.totalIncidents, icon: <ShieldEllipsis size={16} />, accent: '#0b2f6b', onClick: () => navigate('/incidents') },
+    { label: 'Open Incidents', value: overview.openIncidents, icon: <FolderClock size={16} />, accent: '#0057b8', onClick: () => navigate(drillThroughUrl({ status: 'Open' })) },
+    { label: 'Closed Incidents', value: overview.closedIncidents, icon: <CheckCircle2 size={16} />, accent: '#3f6ea8', onClick: () => navigate(drillThroughUrl({ status: 'Closed' })) },
+    { label: 'Critical Incidents', value: overview.criticalIncidents, icon: <AlertTriangle size={16} />, accent: '#d71920', onClick: () => navigate(drillThroughUrl({ severity: 'Critical' })) },
     {
       label: 'Pending Approvals',
       value: pendingApprovalsCount,
@@ -312,7 +312,7 @@ export function DashboardPage() {
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#605E5C' }} axisLine={{ stroke: '#E6E6E6' }} tickLine={false} />
               <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#605E5C' }} axisLine={false} tickLine={false} />
               <Tooltip cursor={{ fill: 'rgba(17, 141, 255, 0.06)' }} contentStyle={{ borderRadius: 4, border: '1px solid #E6E6E6', fontSize: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }} />
-              <Bar dataKey="value" name="Incidents" fill="#118DFF" radius={[2, 2, 0, 0]} maxBarSize={36}>
+              <Bar dataKey="value" name="Incidents" fill="#0b2f6b" radius={[2, 2, 0, 0]} maxBarSize={36}>
                 <LabelList dataKey="value" position="top" style={{ fontSize: 11, fontWeight: 600, fill: '#252423' }} />
                 {byMonth.map((entry) => (
                   <Cell

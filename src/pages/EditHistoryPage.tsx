@@ -246,10 +246,10 @@ export function EditHistoryPage() {
       if (isApprovalChangeSet(changeSet)) approvalCount += 1;
     }
     return [
-      { key: 'sets', label: 'Change sets', value: changeSets.length, accent: '#118DFF', icon: <History size={15} /> },
-      { key: 'fields', label: 'Field updates', value: fieldChangeCount, accent: '#6B007B', icon: <SquarePen size={15} /> },
-      { key: 'attachments', label: 'Attachment changes', value: attachmentCount, accent: '#E66C37', icon: <Paperclip size={15} /> },
-      { key: 'approvals', label: 'Approval actions', value: approvalCount, accent: '#107C10', icon: <ShieldCheck size={15} /> },
+      { key: 'sets', label: 'Change sets', value: changeSets.length, accent: '#0b2f6b', icon: <History size={15} /> },
+      { key: 'fields', label: 'Field updates', value: fieldChangeCount, accent: '#0057b8', icon: <SquarePen size={15} /> },
+      { key: 'attachments', label: 'Attachment changes', value: attachmentCount, accent: '#3f6ea8', icon: <Paperclip size={15} /> },
+      { key: 'approvals', label: 'Approval actions', value: approvalCount, accent: '#d71920', icon: <ShieldCheck size={15} /> },
     ];
   }, [changeSets]);
 
