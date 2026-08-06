@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import { AdminRoute, ProtectedRoute } from './components/ProtectedRoute';
+import { AdminRoute, ApproverRoute, ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { HEALTH_CHECK_URL } from './lib/apiBase';
 import { DashboardPage } from './pages/DashboardPage';
@@ -47,7 +47,9 @@ function App() {
                 <Route path="/incidents/:id/edit" element={<EditIncidentPage />} />
                 <Route path="/incidents/view/:incidentId/edit" element={<EditReportPage />} />
               </Route>
-              <Route path="/approvals" element={<ApprovalsPage />} />
+              <Route element={<ApproverRoute />}>
+                <Route path="/approvals" element={<ApprovalsPage />} />
+              </Route>
               <Route path="/edit-history" element={<EditHistoryPage />} />
             </Route>
           </Route>
